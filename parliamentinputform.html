@@ -1,0 +1,107 @@
+<html>
+<head>
+<script type="text/javascript">
+document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js' type='text/javascript'>\<\/script>");
+</script>
+<script type="text/javascript" src="jscolor/jscolor.js"></script>
+<script type='text/javascript'>
+//Generate random color, based on http://stackoverflow.com/questions/1484506
+function getRandomColor() {
+	var letters = '0123456789ABCDEF'.split('');
+	//var color = '#'; // In my case, I don't want the leading #
+	var color = ''; // In my case, I don't want the leading #
+	for (var i = 0; i < 6; i++ ) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return color;
+}
+function CallArchScript(){
+	// Container <div> where dynamic content will be placed
+	//var container = document.getElementById("container");
+	// Create request string
+	var requeststring="";
+	$( "input" ).each( function() { 
+		if(requeststring && this.name.match( /^Name/ )){
+			requeststring += "; ";
+		}
+		//Don't allow parties without delegates: a bit of a hack, but shouldn't be much of a limitation.
+		if(this.name.match( /^Number/ )){
+			if(this.value < 1){this.value = 1;};
+		}
+		if(this.name.match( /^Color/ )){
+			requeststring += "#";
+		}
+		requeststring += this.value;
+		if(!this.name.match( /^Color/ )){
+			requeststring += ", ";
+		}
+	});
+	$.ajax({
+		type: "POST",
+		url: "newarch.py",
+		data: {inputlist: requeststring },
+	}).done( function(data,status){
+		var postcontainer = document.getElementById("postcontainer");
+		var a = document.createElement('a');
+		var linkText = document.createTextNode("SVG diagram - don't worry if it doesn't render properly in your browser, just download it.");
+		a.appendChild(linkText);
+		a.title = "SVG diagram";
+		a.href = data;
+		postcontainer.appendChild(a);
+		postcontainer.appendChild(document.createElement("br"));
+	});
+}
+</script>
+<script type='text/javascript'>
+function addParty(){
+	// Container <div> where dynamic content will be placed
+	var container = document.getElementById("container");
+	// Count child nodes in div, and divide by two to get party count.
+	i=container.childElementCount / 6 + 1;
+	//Party name
+	var partytitle=document.createTextNode("Party " + i + " name");
+	container.appendChild(partytitle);
+	var input = document.createElement("input");
+	input.type = "text";
+	input.id = "pn";
+	input.name = "Name" + i;
+	input.value = "Party " + i;
+	container.appendChild(input);
+	container.appendChild(document.createElement("br"));
+	//Party support
+	var partysupport=document.createTextNode("Party " + i + " delegates");
+	container.appendChild(partysupport);
+	var input = document.createElement("input");
+	input.type = "number";
+	input.name = "Number" + i;
+	input.value = i;
+	container.appendChild(input);
+	container.appendChild(document.createElement("br"));
+	//Party color
+	var partycolor=document.createTextNode("Party " + i + " color");
+	container.appendChild(partycolor);
+	var input = document.createElement("input");
+	input.type = "text";
+	input.name = "Color" + i;
+	input.value = getRandomColor();
+	container.appendChild(input);
+	container.appendChild(document.createElement("br"));
+	$( "input[name=Color" + i + "]").addClass('color');
+	jscolor.init();
+}
+</script>
+</head
+<body>
+<div id="container"/>
+Party 1 name <input type="text" name="Name1" value="Party 1"></input><br>
+Party 1 delegates <input type="number" value = 1 name="Number1"></input><br>
+Party 1 color <input class="color" type="text" value = AD1FFF name="Color1"></input><br>
+</div>
+<div id="postcontainer" />
+<a href="#" id="AddPartyButton" onclick="addParty()">Add a party</a>
+<br>
+<a href="#" id="CreateDiagram" onclick="CallArchScript()">Make my diagram</a>
+<br>
+</div>
+</body>
+</html>
