@@ -84,7 +84,7 @@ if inputlist:
       #Make each party's blocks an svg group
       outfile.write('  <g style="fill:'+partylist[i][2]+'" id="'+''.join(partylist[i][0].split())+'">\n')
       for Counter in range(Counter+1, Counter+partylist[i][1]+1):
-        tempstring='    <circle cx="%5.2f" cy="%5.2f" r="%5.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
+        tempstring='    <circle cx="%5.2f" cy="%5.2f" r="%.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('</g>\n')
