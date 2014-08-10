@@ -48,7 +48,7 @@ if inputlist:
     #Write svg header:
     outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
     outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
-    outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.0"\n')
+    outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
     #Make 350 px wide, 175 px high diagram with a 5 px blank border
     outfile.write('width="360" height="185">\n')
     outfile.write('<g>\n')
@@ -82,7 +82,7 @@ if inputlist:
     Counter=-1 #How many spots have we drawn?
     for i in range(len(partylist)):
       #Make each party's blocks an svg group
-      outfile.write('  <g style="fill:'+partylist[i][2]+'" id="'+partylist[i][0]+'">\n')
+      outfile.write('  <g style="fill:'+partylist[i][2]+'" id="'+''.join(partylist[i][0].split())+'">\n')
       for Counter in range(Counter+1, Counter+partylist[i][1]+1):
         tempstring='    <circle cx="%5.2f" cy="%5.2f" r="%5.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
 	outfile.write(tempstring+'\n')
