@@ -20,18 +20,35 @@ function CallArchScript(){
 	//var container = document.getElementById("container");
 	// Create request string
 	var requeststring="";
+	// Create legend string
+	var legendstring="";
+	var legendname = "";
+	var legendnum = "";
 	$( "input" ).each( function() { 
+		if(this.name.match( /^Name/ )){
+			//Always catch the party name, not just if the request string is empty.
+			legendname = this.value;
+		}
 		if(requeststring && this.name.match( /^Name/ )){
+			//If we are adding a name field, that means we're at the start of a party's info. End the previous party's info.
 			requeststring += "; ";
 		}
-		//Don't allow parties without delegates: a bit of a hack, but shouldn't be much of a limitation.
+		//Don't allow parties without delegates: if we have a number field, make the value at least 1.
+		//It's a bit of a hack, but shouldn't be much of a limitation.
 		if(this.name.match( /^Number/ )){
 			if(this.value < 1){this.value = 1;};
+			legendnum = this.value;
 		}
+		//If we are processing a colour string, add a # before the hex values.
 		if(this.name.match( /^Color/ )){
 			requeststring += "#";
+			var legendcol = this.value;
+			legendstring += "{{legend|#" + legendcol +"|" + legendname +": "+legendnum+" seats}} ";
 		}
+		//Append the actual value now,
 		requeststring += this.value;
+		//Append the party to the recommended legend string
+		//And if it's not a colour, we need a comma after it.
 		if(!this.name.match( /^Color/ )){
 			requeststring += ", ";
 		}
@@ -49,6 +66,8 @@ function CallArchScript(){
 		a.href = data;
 		postcontainer.appendChild(a);
 		postcontainer.appendChild(document.createElement("br"));
+		var newtext = document.createTextNode("Legend template for use in Wikipedia: " + legendstring);
+		postcontainer.appendChild(newtext);
 	});
 }
 </script>
