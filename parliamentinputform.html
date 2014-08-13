@@ -53,19 +53,29 @@ function CallArchScript(){
 			requeststring += ", ";
 		}
 	});
+	//Now post the request to the script which actually makes the diagram.
 	$.ajax({
 		type: "POST",
 		url: "newarch.py",
 		data: {inputlist: requeststring },
 	}).done( function(data,status){
 		var postcontainer = document.getElementById("postcontainer");
+		//Now add the svg image to the page
+		var img = document.createElement("img");
+		img.src = data;
+		postcontainer.appendChild(img);
+		//and a linebreak
+		postcontainer.appendChild(document.createElement("br"));
+		//Add a link with the new diagram
 		var a = document.createElement('a');
 		var linkText = document.createTextNode("SVG diagram - don't worry if it doesn't render properly in your browser, just download it.");
 		a.appendChild(linkText);
 		a.title = "SVG diagram";
 		a.href = data;
 		postcontainer.appendChild(a);
+		//and a linebreak
 		postcontainer.appendChild(document.createElement("br"));
+		//Now add the legend template text with the party names, colours and support.
 		var newtext = document.createTextNode("Legend template for use in Wikipedia: " + legendstring);
 		postcontainer.appendChild(newtext);
 		postcontainer.appendChild(document.createElement("br"));
