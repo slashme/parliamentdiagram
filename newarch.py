@@ -1,4 +1,4 @@
-#!/usr/pkg/bin/python
+#!/usr/bin/python
 import cgi, re, math, random, datetime
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
