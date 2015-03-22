@@ -1,5 +1,16 @@
-<html>
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
 <head>
+<style>
+.right {
+    display: inline-block;
+    width: 10em;
+}
+.left {
+    float: left;
+    width: 10em;
+}
+</style>
 <script type="text/javascript">
 document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js' type='text/javascript'>\<\/script>");
 </script>
@@ -8,7 +19,6 @@ document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.mi
 //Generate random color, based on http://stackoverflow.com/questions/1484506
 function getRandomColor() {
 	var letters = '0123456789ABCDEF'.split('');
-	//var color = '#'; // In my case, I don't want the leading #
 	var color = ''; // In my case, I don't want the leading #
 	for (var i = 0; i < 6; i++ ) {
 		color += letters[Math.floor(Math.random() * 16)];
@@ -16,11 +26,9 @@ function getRandomColor() {
 	return color;
 }
 function CallArchScript(){
-	// Container <div> where dynamic content will be placed
-	//var container = document.getElementById("container");
-	// Create request string
+	// Create request string: this is the request that is passed to the python script.
 	var requeststring="";
-	// Create legend string
+	// Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
 	var legendstring="";
 	var legendname = "";
 	var legendnum = "";
@@ -87,49 +95,51 @@ function addParty(){
 	// Container <div> where dynamic content will be placed
 	var container = document.getElementById("container");
 	// Count child nodes in div, and divide by two to get party count.
-	i=container.childElementCount / 6 + 1;
-	//Party name
-	var partytitle=document.createTextNode("Party " + i + " name");
+	i=(container.childElementCount+4)/7;
+	//Party name label
+	var partytitle=document.createElement('div');
+	partytitle.className = 'left';
+	partytitle.innerHTML = "Party " + i + " name";
 	container.appendChild(partytitle);
-	var input = document.createElement("input");
-	input.type = "text";
-	input.id = "pn";
-	input.name = "Name" + i;
-	input.value = "Party " + i;
+	//Party name input control
+	var input=document.createElement('div');
+	input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
 	container.appendChild(input);
-	container.appendChild(document.createElement("br"));
-	//Party support
-	var partysupport=document.createTextNode("Party " + i + " delegates");
+	//Party support name tag
+	var partysupport=document.createElement('div');
+	partysupport.className = 'left';
+	partysupport.innerHTML = "Party " + i + " delegates";
 	container.appendChild(partysupport);
-	var input = document.createElement("input");
-	input.type = "number";
-	input.name = "Number" + i;
-	input.value = i;
+        //Party support input control
+	var input=document.createElement('div');
+	input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >'
 	container.appendChild(input);
-	container.appendChild(document.createElement("br"));
-	//Party color
-	var partycolor=document.createTextNode("Party " + i + " color");
+	//Party color name tag
+	var partycolor=document.createElement('div');
+	partycolor.className = 'left';
+	partycolor.innerHTML = "Party " + i + " color";
 	container.appendChild(partycolor);
-	var input = document.createElement("input");
-	input.type = "text";
-	input.name = "Color" + i;
-	input.value = getRandomColor();
+        //Party color input control
+	var input=document.createElement('div');
+	input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
 	container.appendChild(input);
+        //Add a newline
 	container.appendChild(document.createElement("br"));
-	$( "input[name=Color" + i + "]").addClass('color');
+	//$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
 	jscolor.init();
 }
 </script>
-</head
+</head>
 <body>
 This is a tool to generate arch-shaped parliament diagrams.<br>
 The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
 I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
 To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party. Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram. To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.  If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br><br>
-<div id="container"/>
-Party 1 name <input type="text" name="Name1" value="Party 1"></input><br>
-Party 1 delegates <input type="number" value = 1 name="Number1"></input><br>
-Party 1 color <input class="color" type="text" value = AD1FFF name="Color1"></input><br>
+<div id="container">
+<div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
+<div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
+<div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+<br>
 </div>
 <div id="postcontainer" />
 <a href="#" id="AddPartyButton" onclick="addParty()">Add a party</a>
