@@ -109,6 +109,7 @@ function CallArchScript(){
 		var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
 		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
 		postparent.insertBefore(newpost, postcontainer);
+		newpost.setAttribute("id", "postcontainer");
 		//Now add the svg image to the page
 		var img = document.createElement("img");
 		img.src = data;
