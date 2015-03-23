@@ -105,29 +105,32 @@ function CallArchScript(){
 		url: "newarch.py",
 		data: {inputlist: requeststring },
 	}).done( function(data,status){
-		var postcontainer = document.getElementById("postcontainer");
+		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+		var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
+		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+		postparent.insertBefore(newpost, postcontainer);
 		//Now add the svg image to the page
 		var img = document.createElement("img");
 		img.src = data;
-		postcontainer.appendChild(img);
+		newpost.appendChild(img);
 		//and a linebreak
-		postcontainer.appendChild(document.createElement("br"));
+		newpost.appendChild(document.createElement("br"));
 		//Add a link with the new diagram
 		var a = document.createElement('a');
 		var linkText = document.createTextNode("SVG diagram - don't worry if it doesn't render properly in your browser, just download it.");
 		a.appendChild(linkText);
 		a.title = "SVG diagram";
 		a.href = data;
-		postcontainer.appendChild(a);
+		newpost.appendChild(a);
 		//and a linebreak
-		postcontainer.appendChild(document.createElement("br"));
+		newpost.appendChild(document.createElement("br"));
 		//Now add the legend template text with the party names, colours and support.
 		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-		postcontainer.appendChild(newtext);
-		postcontainer.appendChild(document.createElement("br"));
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
 		newtext = document.createTextNode(legendstring);
-		postcontainer.appendChild(newtext);
-		postcontainer.appendChild(document.createElement("br"));
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
 	});
 }
 </script>
@@ -198,8 +201,10 @@ function addParty(){
 <div class=button onclick="CallArchScript()">
   Make my diagram
 </div>
-<div id="postcontainer" class="block">
-<br>
+<div class="block">
+  <div id="postcontainer">
+    <br>
+  </div>
 </div>
 </body>
 </html>
