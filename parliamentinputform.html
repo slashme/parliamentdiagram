@@ -2,6 +2,13 @@
 <html dir="ltr" lang="en">
 <head>
 <style>
+.block {
+    position:relative;
+    margin-top:20px;
+    margin-bottom:15px;
+    border:1px solid #ddd;
+    border-radius:3px
+}
 .right {
     display: inline-block;
     width: 10em;
@@ -131,11 +138,15 @@ function addParty(){
 </script>
 </head>
 <body>
+<div class=block>
 This is a tool to generate arch-shaped parliament diagrams.<br>
 The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
 I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
+</div>
+<div class=block>
 To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party. Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram. To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.  If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br><br>
-<div id="container">
+</div>
+<div id="container" class=block>
 <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
 <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
 <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
