@@ -2,9 +2,37 @@
 <html dir="ltr" lang="en">
 <head>
 <style>
+.button {
+  background: #3498db;
+  background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+  background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+  background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+  background-image: -o-linear-gradient(top, #3498db, #2980b9);
+  background-image: linear-gradient(to bottom, #3498db, #2980b9);
+  -webkit-border-radius: 6;
+  -moz-border-radius: 6;
+  border-radius: 6px;
+  margin-top:5px;
+  margin-bottom:5px;
+  font-family: sans-serif;
+  color: #ffffff;
+  padding: 10px;
+  text-decoration: none;
+  text-align: center;
+  max-width: 50em;
+}
+.button:hover {
+  background: #3cb0fd;
+  background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+  text-decoration: none;
+}
 .block {
     position:relative;
-    margin-top:20px;
+    margin-top:15px;
     margin-bottom:15px;
     border:1px solid #ddd;
     border-radius:3px;
@@ -105,7 +133,8 @@ function addParty(){
 	// Container <div> where dynamic content will be placed
 	var container = document.getElementById("container");
 	// Count child nodes in div, and divide by two to get party count.
-	i=(container.childElementCount+4)/7;
+	i=(container.childElementCount-3)/7 + 1;
+	//i=container.childElementCount; //Code for debugging
 	//Party name label
 	var partytitle=document.createElement('div');
 	partytitle.className = 'left';
@@ -142,23 +171,31 @@ function addParty(){
 </head>
 <body>
 <div class=block>
-This is a tool to generate arch-shaped parliament diagrams.<br>
-The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
-I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
+  This is a tool to generate arch-shaped parliament diagrams.<br>
+  The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
+  I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
 </div>
 <div class=block>
-To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party. Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram. To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.  If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br><br>
+  To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
+  Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
+  To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.
+  If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br><br>
 </div>
-<div id="container" class=block>
-<div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
-<div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
-<div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
-<br>
+<div class=block>
+  <div id="container">
+    <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
+    <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
+    <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+    <br>
+  </div>
+</div>
+<div class=button onclick="addParty()">
+  Add a party
+</div>
+<div class=button onclick="CallArchScript()">
+  Make my diagram
 </div>
 <div id="postcontainer" class="block">
-<a href="#" id="AddPartyButton" onclick="addParty()">Add a party</a>
-<br>
-<a href="#" id="CreateDiagram" onclick="CallArchScript()">Make my diagram</a>
 <br>
 </div>
 </body>
