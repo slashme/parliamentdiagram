@@ -3,7 +3,7 @@ import cgi, re, math, random, datetime, sys
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
 #Create a filename that will be unique each time.  Old filed are deleted with a cron script.
-filenameprefix = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+filenameprefix = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))[:5]
 #Initialize useful calculated fields:
 #Total number of seats per number of rows in diagram:
 Totals=[ 3, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876, 997, 1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064, 3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263, 6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404]
