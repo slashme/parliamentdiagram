@@ -1,9 +1,17 @@
 #!/usr/bin/python
-import cgi, re, math, random, datetime, sys
+import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
+#Create always-positive hash of the request string:
+requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+#Check whether we have a file made from this exact string in the directory:
+for file in os.listdir("svgfiles"):
+    if file.count(str(requesthash)):
+        print("svgfiles/"+file)
+        sys.exit()
+#If we get here, we didn't find a matching request, so continue.
 #Create a filename that will be unique each time.  Old filed are deleted with a cron script.
-filenameprefix = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))[:5]
+svgfilename = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
 #Initialize useful calculated fields:
 #Total number of seats per number of rows in diagram:
 Totals=[ 3, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876, 997, 1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064, 3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263, 6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404]
@@ -44,7 +52,7 @@ if inputlist:
     #Maximum radius of spot is 0.5/rows; leave a bit of space.
     radius=0.4/rows
 # Open svg file for writing:
-    outfile=open(filenameprefix+'.svg','w')
+    outfile=open(svgfilename,'w')
     #Write svg header:
     outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
     outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
@@ -91,4 +99,4 @@ if inputlist:
     outfile.write('</svg>\n')
     outfile.close()
     #Pass the output filename to the calling page.
-    print filenameprefix+'.svg'
+    print svgfilename
