@@ -82,7 +82,7 @@ function CallArchScript(){
 			}
 		}
 	);
-	requeststring = "Democrats,"+Demnum+",#0000FF;Republicans,"+Repnum+",#FF0000;Independents,"+Indnum+",#C9C9C9;Vacant,"+Vacnum+",#6B6B6B";
+	requeststring = Vacant,"+Vacnum+",#6B6B6B";"Democrats,"+Demnum+",#0000FF;Republicans,"+Repnum+",#FF0000;Independents,"+Indnum+",#C9C9C9;
 	//Now post the request to the script which actually makes the diagram.
 	$.ajax({
 		type: "POST",
@@ -128,10 +128,10 @@ function CallArchScript(){
 </div>
 <div class=block>
   <div id="container">
-    <div class="left">Democrat seats   </div><input class="right" type="number" name="Dem" value=40><br>
-    <div class="left">Republican seats </div><input class="right" type="number" name="Rep" value=40><br>
-    <div class="left">Independent seats</div><input class="right" type="number" name="Ind" value=5><br>
-    <div class="left">Vacant seats     </div><input class="right" type="number" name="Vac" value=5><br>
+    <div class="left" style="font-weight:bold; color:blue"   >Democrat seats   </div><input class="right" type="number" name="Dem" value=40><br>
+    <div class="left" style="font-weight:bold; color:red"    >Republican seats </div><input class="right" type="number" name="Rep" value=40><br>
+    <div class="left" style="font-weight:bold; color:#C9C9C9">Independent seats</div><input class="right" type="number" name="Ind" value=0><br>
+    <div class="left" style="font-weight:bold; color:#6B6B6B">Vacant seats     </div><input class="right" type="number" name="Vac" value=0><br>
     <br>
   </div>
 </div>
