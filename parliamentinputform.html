@@ -118,10 +118,11 @@ function CallArchScript(){
 		newpost.appendChild(document.createElement("br"));
 		//Add a link with the new diagram
 		var a = document.createElement('a');
-		var linkText = document.createTextNode("SVG diagram - don't worry if it doesn't render properly in your browser, just download it.");
+		var linkText = document.createTextNode("Click to download your SVG diagram.");
 		a.appendChild(linkText);
 		a.title = "SVG diagram";
 		a.href = data;
+		a.download = data;
 		newpost.appendChild(a);
 		//and a linebreak
 		newpost.appendChild(document.createElement("br"));
