@@ -4,7 +4,7 @@ form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
 #Append input list to log file:
 logfile=open('log','a')
-logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist)
+logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
 logfile.close()
 #Create always-positive hash of the request string:
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
