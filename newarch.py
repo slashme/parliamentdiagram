@@ -61,9 +61,9 @@ if inputlist:
     outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
     outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
     outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
-    outfile.write('<!-- Created with the Wikimedia parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html) -->\n')
     #Make 350 px wide, 175 px high diagram with a 5 px blank border
     outfile.write('width="360" height="185">\n')
+    outfile.write('<!-- Created with the Wikimedia parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html) -->\n')
     outfile.write('<g>\n')
     #Print the number of seats in the middle at the bottom.
     outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:Sans">'+str(sumdelegates)+'</text>\n')
