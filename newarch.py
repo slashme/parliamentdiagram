@@ -2,15 +2,19 @@
 import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
+#Append input list to log file:
+logfile=open('log','a')
+logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist)
+logfile.close()
 #Create always-positive hash of the request string:
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 #Check whether we have a file made from this exact string in the directory:
 for file in os.listdir("svgfiles"):
-    if file.count(str(requesthash)):
+    if file.count(str(requesthash)): #We've done this diagram before, just serve it.
         print("svgfiles/"+file)
         sys.exit()
 #If we get here, we didn't find a matching request, so continue.
-#Create a filename that will be unique each time.  Old filed are deleted with a cron script.
+#Create a filename that will be unique each time.  Old files are deleted with a cron script.
 svgfilename = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
 #Initialize useful calculated fields:
 #Total number of seats per number of rows in diagram:
@@ -57,6 +61,7 @@ if inputlist:
     outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
     outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
     outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
+    outfile.write('<!-- Created with the Wikimedia parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html) -->\n')
     #Make 350 px wide, 175 px high diagram with a 5 px blank border
     outfile.write('width="360" height="185">\n')
     outfile.write('<g>\n')
