@@ -32,7 +32,10 @@ if inputlist:
       error=1
     else:
       i[1]=int(i[1]) #TODO: What happens if this fails? Shouldn't, because it's from an input form, though.
-      sumdelegates += i[1]
+    #Iterate over the list of party groups, adding the number of delegates to the correct one:
+    for g, n in sumdelegates.iteritems():
+    if re.search('left',i[3]):
+      sumdelegates['left'] += i[1]
     if len(i)<3:
       i.append("#%02x%02x%02x" % (random.randrange(255), random.randrange(255), random.randrange(255)))
     elif not re.match('^#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]$',i[2]):
