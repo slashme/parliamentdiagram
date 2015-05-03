@@ -5,9 +5,9 @@ inputlist = form.getvalue("inputlist", "")
 #For debugging:
 #inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066; Boring Party, 9, center, #555555; Neutral Party, 15, center, #663366'
 #Append input list to log file:
-logfile=open('log','a')
-logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
-logfile.close()
+#logfile=open('log','a')
+#logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
+#logfile.close()
 #Create always-positive hash of the request string:
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 #Check whether we have a file made from this exact string in the directory:
