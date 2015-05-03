@@ -60,7 +60,7 @@ if inputlist:
     #Always use the whole area for the head: this is speaker of parliament or whatever.
     for x in range(int(blockdensity['head'])):
       for y in range(int(blockdensity['head'])):
-        poslist['head'].append([x/blockdensity['head']*25+5,(3-y/blockdensity['head'])*25+5])
+        poslist['head'].append([x/blockdensity['head']*25+5,(3+y/blockdensity['head'])*25+5])
     #Left parties are in a block starting at 50,175 to 350,125
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
@@ -72,7 +72,7 @@ if inputlist:
     #Center parties are in a block starting at 175,100 to 275,75
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity)):
-        poslist['center'].append([x/maxdensity*25+175+5,(3+y/maxdensity)*25+5])
+        poslist['center'].append([x/maxdensity*25+125+5,(3+y/maxdensity)*25+5])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
