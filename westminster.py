@@ -1,20 +1,20 @@
 #!/usr/bin/python
 import cgi, re, math, random, datetime, sys, os
-#form = cgi.FieldStorage()
-#inputlist = form.getvalue("inputlist", "")
+form = cgi.FieldStorage()
+inputlist = form.getvalue("inputlist", "")
 #For debugging:
-inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066; Boring Party, 9, center, #555555; Neutral Party, 15, center, #663366'
+#inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066; Boring Party, 9, center, #555555; Neutral Party, 15, center, #663366'
 #Append input list to log file:
-#logfile=open('log','a')
-#logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
-#logfile.close()
+logfile=open('log','a')
+logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
+logfile.close()
 #Create always-positive hash of the request string:
-#requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 #Check whether we have a file made from this exact string in the directory:
-#for file in os.listdir("svgfiles"):
-#    if file.count(str(requesthash)): #We've done this diagram before, just serve it.
-#        print("svgfiles/"+file)
-#        sys.exit()
+for file in os.listdir("svgfiles"):
+    if file.count(str(requesthash)): #We've done this diagram before, just serve it.
+        print("svgfiles/"+file)
+        sys.exit()
 #If we get here, we didn't find a matching request, so continue.
 #Create a filename that will be unique each time.  Old files are deleted with a cron script.
 svgfilename = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
