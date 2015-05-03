@@ -51,7 +51,8 @@ if inputlist:
     blockdensity['right']=math.ceil(math.sqrt(sumdelegates['right']/24.0))
     blockdensity['center']=math.ceil(math.sqrt(sumdelegates['center']/4.0))
     blockdensity['head']=math.ceil(math.sqrt(sumdelegates['head']/1.0))
-    maxdensity=max(list(blockdensity.values()))
+    #Only look at the density outside of the speaker block.
+    maxdensity=max(blockdensity['left'],blockdensity['right'],blockdensity['center'])
     #We will draw this on a canvas that is 350x175px, so 25 times the unit size.
     #Initialise list of positions for the various blocks:
     poslist={'head':[], 'left':[], 'right':[], 'center':[]}
