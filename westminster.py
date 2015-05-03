@@ -83,22 +83,45 @@ if inputlist:
     outfile.write('<!-- Created with the Wikimedia westminster parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html) -->\n')
     outfile.write('<g id="diagram">\n')
     #Draw the head parties; first create a group for them:
-    outfile.write('  <g id="head">\n')
+    outfile.write('  <g id="headbench">\n')
     Counter=-1 #How many spots have we drawn yet for this group?
-    for i in [ party for party in partylist if party[2] == 'left' ]:
+    for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-      for Counter in range(Counter+1, Counter+partylist[i][1]+1):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
+      for Counter in range(Counter+1, Counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], 1/blockdensity['head'], 1/blockdensity['head'], 25/blockdensity['head'], 25/blockdensity['head'] )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
-    for i in range(len(partylist)):
-      #Make each party's blocks an svg group
-      outfile.write('  <g style="fill:'+partylist[i][3]+'" id="'+''.join(partylist[i][0].split())+'">\n')
-      for Counter in range(Counter+1, Counter+partylist[i][1]+1):
-        tempstring='    <circle cx="%.2f" cy="%.2f" r="%.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
+    #Draw the left parties; first create a group for them:
+    outfile.write('  <g id="leftbench">\n')
+    Counter=-1 #How many spots have we drawn yet for this group?
+    for i in [ party for party in partylist if party[2] == 'left' ]:
+      outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+      for Counter in range(Counter+1, Counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], 1/maxdensity, 1/maxdensity, 25/maxdensity, 25/maxdensity )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
+    outfile.write('  </g>\n')
+    #Draw the right parties; first create a group for them:
+    outfile.write('  <g id="rightbench">\n')
+    Counter=-1 #How many spots have we drawn yet for this group?
+    for i in [ party for party in partylist if party[2] == 'right' ]:
+      outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+      for Counter in range(Counter+1, Counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], 1/maxdensity, 1/maxdensity, 25/maxdensity, 25/maxdensity )
+	outfile.write(tempstring+'\n')
+      outfile.write('  </g>\n')
+    outfile.write('  </g>\n')
+    #Draw the center parties; first create a group for them:
+    outfile.write('  <g id="centerbench">\n')
+    Counter=-1 #How many spots have we drawn yet for this group?
+    for i in [ party for party in partylist if party[2] == 'center' ]:
+      outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+      for Counter in range(Counter+1, Counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], 1/maxdensity, 1/maxdensity, 25/maxdensity, 25/maxdensity )
+	outfile.write(tempstring+'\n')
+      outfile.write('  </g>\n')
+    outfile.write('  </g>\n')
     outfile.write('</g>\n')
     outfile.write('</svg>\n')
     outfile.close()
