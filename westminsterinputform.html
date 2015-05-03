@@ -120,7 +120,7 @@ function CallDiagramScript(){
               requeststring += '#';
               requeststring += partylist[i]['Color'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
-              legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} ";
+              if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "};
             }
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
