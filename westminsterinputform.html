@@ -48,6 +48,11 @@
     float: left;
     width: 10em;
 }
+.notice {
+  font-weight: bold;
+  font-size: 150%;
+  text-align: center;
+}
 </style>
 <script type="text/javascript">
 document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js' type='text/javascript'>\<\/script>");
@@ -212,6 +217,7 @@ function addParty(){
 </head>
 <body>
 <div class=block>
+  <div class="notice">This is alpha code. Please help to test it, but do not use it to generate diagrams for Wikipedia until we have a consensus on which layout and settings to use.</div><br>
   This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.<br>
   The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
   I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
@@ -226,9 +232,9 @@ function addParty(){
 </div>
 <div class=block>
   <div id="optioncontainer" class=block>
-    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 10 is almost a circle).<br>
+    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 10 is a circle).<br>
     Try out different values of spot spacing to separate the blocks (values will be truncated between 0 and 0.99: 0 is touching, 1 will give invisible spots.)</br>
-    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 1 ><br>
+    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 3 ><br>
     <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br>
   </div>
   <div id="container">
