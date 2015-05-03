@@ -68,10 +68,23 @@ function CallDiagramScript(){
         var requeststring="";
         // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
         var legendstring="";
-        var legendname = "";
-        var legendnum = "";
-        var partylist = new Array();
+        var legendname  ="";
+        var legendnum   ="";
+        var spotradius  ="0";
+        var spotspacing ="0";
+        var partylist   = new Array();
         $( "input" ).each( function() { 
+                if(this.name.match( /^radius/ )){
+                  spotradius=parseFloat(this.value);
+                  if(spotradius<0){spotradius=0}
+                  console.log(spotradius);
+                }
+                if(this.name.match( /^spacing/ )){
+                  spotspacing=parseFloat(this.value);
+                  if(spotspacing<0){spotspacing=0}
+                  if(spotspacing>0.99){spotspacing=0.99}
+                  console.log(spotradius);
+                }
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
                 }
@@ -92,7 +105,8 @@ function CallDiagramScript(){
                 }
         });
         var arrayLength = partylist.length;
-        console.log(arrayLength);
+        requeststring += "option.radius, "+spotradius.toFixed(2)+"; ";
+        requeststring += "option.spacing, "+spotspacing.toFixed(2)+"; ";
         for (var i = 1; i < arrayLength; i++) {
               requeststring += partylist[i]['Name'];
               requeststring += ', ';
@@ -213,10 +227,16 @@ function addParty(){
   You can conveniently make arch-shaped diagrams for US elections using <a href="http://tools.wmflabs.org/parliamentdiagram/USinputform.html">a US specific tool</a><br>
 </div>
 <div class=block>
+  <div id="optioncontainer" class=block>
+    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 10 is almost a circle).<br>
+    Try out different values of spot spacing to separate the blocks (values will be truncated between 0 and 0.99: 0 is touching, 1 will give invisible spots.)</br>
+    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 1 ><br>
+    <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br>
+  </div>
   <div id="container">
     <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
     <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
-    <div class="left">Party 1 group </div>
+    <div class="left">Party 1 group     </div>
     <select class="right" name="Group 1">
       <option value="left">Left</option>
       <option value="right">Right</option>

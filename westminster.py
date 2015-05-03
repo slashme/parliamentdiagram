@@ -2,8 +2,6 @@
 import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
-#For debugging:
-#inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066; Boring Party, 9, center, #555555; Neutral Party, 15, center, #663366'
 #Append input list to log file:
 #logfile=open('log','a')
 #logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
@@ -26,7 +24,14 @@ if inputlist:
   #error flag: This seems ugly, but what should I do?
   error=0
   for i in re.split("\s*;\s*",inputlist):
-    partylist.append(re.split('\s*,\s*', i))
+    #Strip options off the top
+    inputitem=re.split('\s*,\s*', i)
+    if inputitem[0]=="option.radius":
+      radius=float(inputitem[1])
+    elif inputitem[0]=="option.spacing":
+      spacing=float(inputitem[1])
+    else:
+      partylist.append(inputitem)
   for i in partylist:
     if len(i)<3: #Must contain at least: party name; number; party grouping (left/right/center/head)
       error=1
@@ -60,7 +65,7 @@ if inputlist:
     #Always use the whole area for the head: this is speaker of parliament or whatever.
     for x in range(int(blockdensity['head'])):
       for y in range(int(blockdensity['head'])):
-        poslist['head'].append([x/blockdensity['head']*25+5,(3+y/blockdensity['head'])*25+5])
+        poslist['head'].append([5+25/blockdensity['head']*(x+spacing/2),5+(3+(y+spacing/2)/blockdensity['head'])*25])
     #Left parties are in a block starting at 50,175 to 350,125
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
@@ -68,11 +73,11 @@ if inputlist:
     #Right parties are in a block starting at 50,50 to 350,0
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
-        poslist['right'].append([x/maxdensity*25+50+5,(y/maxdensity)*25+5])
+        poslist['right'].append([(x+spacing/2)/maxdensity*25+50+5,((y+spacing/2)/maxdensity)*25+5])
     #Center parties are in a block starting at 175,100 to 275,75
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity)):
-        poslist['center'].append([x/maxdensity*25+125+5,(3+y/maxdensity)*25+5])
+        poslist['center'].append([(x+spacing/2)/maxdensity*25+125+5,(3+(y+spacing/2)/maxdensity)*25+5])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
@@ -89,7 +94,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], 3/blockdensity['head'], 3/blockdensity['head'], 25/blockdensity['head'], 25/blockdensity['head'] )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], radius/blockdensity['head'], radius/blockdensity['head'], 25/blockdensity['head']*(1.0-spacing), 25/blockdensity['head']*(1.0-spacing) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -99,7 +104,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'left' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], 3/maxdensity, 3/maxdensity, 25/maxdensity, 25/maxdensity )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], radius/maxdensity, radius/maxdensity, 25/maxdensity*(1.0-spacing), 25/maxdensity*(1.0-spacing) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -109,7 +114,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'right' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], 3/maxdensity, 3/maxdensity, 25/maxdensity, 25/maxdensity )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], radius/maxdensity, radius/maxdensity, 25/maxdensity*(1.0-spacing), 25/maxdensity*(1.0-spacing) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -119,7 +124,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'center' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], 3/maxdensity, 3/maxdensity, 25/maxdensity, 25/maxdensity )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], radius/maxdensity, radius/maxdensity, 25/maxdensity*(1.0-spacing), 25/maxdensity*(1.0-spacing) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
