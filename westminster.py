@@ -3,7 +3,7 @@ import cgi, re, math, random, datetime, sys, os
 #form = cgi.FieldStorage()
 #inputlist = form.getvalue("inputlist", "")
 #For debugging:
-inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066'
+inputlist = 'Socialist Party, 34, left, #660066; Labour Party, 171, left, #FF0000; Conservative Party, 175, right, #000000; Socialist Party, 1, head, #660066; Boring Party, 9, center, #555555; Neutral Party, 15, center, #663366'
 #Append input list to log file:
 #logfile=open('log','a')
 #logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
@@ -59,19 +59,19 @@ if inputlist:
     #Always use the whole area for the head: this is speaker of parliament or whatever.
     for x in range(int(blockdensity['head'])):
       for y in range(int(blockdensity['head'])):
-        poslist['head'].append([x/blockdensity['head']*25,(4-y/blockdensity['head'])*25])
+        poslist['head'].append([x/blockdensity['head']*25+5,(3-y/blockdensity['head'])*25+5])
     #Left parties are in a block starting at 50,175 to 350,125
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
-        poslist['left'].append([x/maxdensity*25+50,(7-y/maxdensity)*25])
+        poslist['left'].append([x/maxdensity*25+50+5,(5+y/maxdensity)*25+5])
     #Right parties are in a block starting at 50,50 to 350,0
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
-        poslist['right'].append([x/maxdensity*25+50,(2-y/maxdensity)*25])
+        poslist['right'].append([x/maxdensity*25+50+5,(y/maxdensity)*25+5])
     #Center parties are in a block starting at 175,100 to 275,75
     for x in range(int(maxdensity*12)):
-      for y in range(int(maxdensity*2)):
-        poslist['center'].append([x/maxdensity*25+175,(4-y/maxdensity)*25])
+      for y in range(int(maxdensity)):
+        poslist['center'].append([x/maxdensity*25+175+5,(3+y/maxdensity)*25+5])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
