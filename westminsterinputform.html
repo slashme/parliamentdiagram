@@ -77,13 +77,11 @@ function CallDiagramScript(){
                 if(this.name.match( /^radius/ )){
                   spotradius=parseFloat(this.value);
                   if(spotradius<0){spotradius=0}
-                  console.log(spotradius);
                 }
                 if(this.name.match( /^spacing/ )){
                   spotspacing=parseFloat(this.value);
                   if(spotspacing<0){spotspacing=0}
                   if(spotspacing>0.99){spotspacing=0.99}
-                  console.log(spotradius);
                 }
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
@@ -117,7 +115,7 @@ function CallDiagramScript(){
               requeststring += '#';
               requeststring += partylist[i]['Color'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
-        console.log(requeststring);
+              legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} ";
             }
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
