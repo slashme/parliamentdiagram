@@ -3,7 +3,7 @@ import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
 #Append input list to log file:
-logfile=open('log','a')
+logfile=open('wmlog','a')
 logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
 logfile.close()
 #Create always-positive hash of the request string:
