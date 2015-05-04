@@ -3,9 +3,9 @@ import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
 #Append input list to log file:
-#logfile=open('log','a')
-#logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
-#logfile.close()
+logfile=open('log','a')
+logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
+logfile.close()
 #Create always-positive hash of the request string:
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 #Check whether we have a file made from this exact string in the directory:
