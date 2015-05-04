@@ -75,14 +75,14 @@ if inputlist:
       for y in range(int(maxdensity*2)):
         poslist['left'].append([x/maxdensity*25+50+5,(5+y/maxdensity)*25+5])
     poslist['left'].sort(key=lambda point: point[1])
-    poslist['left']=poslist['left'][:sumdelegates['left']]
+    poslist['left']=poslist['left'][:max(sumdelegates['left'],sumdelegates['right'])]
     poslist['left'].sort(key=lambda point: point[0])
     #Right parties are in a block starting at 50,50 to 350,0
     for x in range(int(maxdensity*12)):
       for y in range(int(maxdensity*2)):
         poslist['right'].append([(x+spacing/2)/maxdensity*25+50+5,((y+spacing/2)/maxdensity)*25+5])
     poslist['right'].sort(key=lambda point: -point[1])
-    poslist['right']=poslist['right'][:sumdelegates['right']]
+    poslist['right']=poslist['right'][:max(sumdelegates['left'],sumdelegates['right'])]
     poslist['right'].sort(key=lambda point: point[0])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
