@@ -54,12 +54,15 @@ if inputlist:
     #Cross-bench is by default a block of shape 1x4 at the back.
     #
     #If the number of rows in the wings is not defined, calculate it:
-    if not 'wingrows' in optionlist:
-      optionlist['wingrows']=math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12))*2
-    wingcols=math.ceil(max(sumdelegates['left'],sumdelegates['right'])/optionlist['wingrows'])
-    if not 'centercols' in optionlist: #If the number of columns in the cross-bench is not defined, calculate it:
-      optionlist['centercols']=math.ceil(math.sqrt(sumdelegates['center']/4))
-    centerrows=math.ceil(sumdelegates['center']/optionlist['centercols'])
+    if (not 'wingrows' in optionlist) or optionlist['wingrows']==0:
+      optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12.0))*2)
+    wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/optionlist['wingrows']))
+    if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
+      optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
+    try:
+      centerrows=math.ceil(sumdelegates['center']/optionlist['centercols'])
+    except ZeroDivisionError:
+      centerrows=0
     #Calculate the total number of columns in the diagram. First see how many rows for head + wings:
     if sumdelegates['head']:
       totalcols=max(wingcols+1,sumdelegates['head'])
@@ -70,6 +73,8 @@ if inputlist:
       totalcols += 1
       totalcols += optionlist['centercols']
       leftoffset=1 #Leave room for the Speaker's block to protrude on the left
+    else:
+      leftoffset=0 #Don't leave room for the Speaker's block to protrude on the left
     #Calculate the total number of rows in the diagram:
     totalrows = max(optionlist['wingrows']*2+1,centerrows)
     #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
@@ -82,7 +87,7 @@ if inputlist:
     #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
     centertop=5+blocksize*optionlist['wingrows']
     for x in range(sumdelegates['head']):
-      poslist['head'].append([5.0+blocksize*x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
+      poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
     #Cross-bench parties are 5 from the edge, vertically centered:
     for x in range(optionlist['centercols']):
       thiscol= min(centerrows,sumdelegates['center']-x*centerrows) #How many rows in this column of the cross-bench
