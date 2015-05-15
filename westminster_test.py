@@ -80,8 +80,8 @@ if inputlist:
     #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
     #So the diagram size is now fixed:
-    svgwidth  = blocksize*totalcols
-    svgheight = blocksize*totalrows
+    svgwidth  = blocksize*totalcols+10
+    svgheight = blocksize*totalrows+10
     #Initialise list of positions for the various diagram elements:
     poslist={'head':[], 'left':[], 'right':[], 'center':[]}
     #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
@@ -96,11 +96,11 @@ if inputlist:
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,(centertop-1-y+optionlist['spacing']/2)*blocksize])
+        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1+y-optionlist['spacing']/2)*blocksize])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,(centertop+1+y+optionlist['spacing']/2)*blocksize])
+        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1+y+optionlist['spacing']/2)*blocksize])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
@@ -108,7 +108,8 @@ if inputlist:
     outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
     outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
     #Make 350 px wide, 175 px high diagram with a 5 px blank border
-    outfile.write('width="360" height="185">\n')
+    tempstring='width="%.1f" height="%.1f">' % (svgwidth, svgheight)
+    outfile.write(tempstring+'\n')
     outfile.write('<!-- Created with the Wikimedia westminster parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html) -->\n')
     outfile.write('<g id="diagram">\n')
     #Draw the head parties; first create a group for them:
@@ -117,7 +118,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -127,7 +128,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'left' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -137,7 +138,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'right' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -147,7 +148,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'center' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
