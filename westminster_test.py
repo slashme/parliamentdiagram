@@ -28,7 +28,7 @@ if inputlist:
   error=0
   for i in re.split("\s*;\s*",inputlist):
     inputitem=re.split('\s*,\s*', i)
-    #Strip options off the top
+    #If it's an option, handle it separately
     if re.search("option",inputitem[0]):
       optionlist[inputitem[0][7:]]=float(inputitem[1])
     else:
@@ -47,44 +47,55 @@ if inputlist:
   if sumdelegates < 1:
     error=1
   if not error:
-    #Initial layout design (subject to change):
-    #Left and right are blocks of shape 12x2
-    #Head (Speaker or whatever) is a 1x1 block
-    #Center is a 1x4 block.
-    #What size are our blocks?
-    blockdensity = {} 
-    blockdensity['left']=math.ceil(math.sqrt(sumdelegates['left']/24.0))
-    blockdensity['right']=math.ceil(math.sqrt(sumdelegates['right']/24.0))
-    blockdensity['center']=math.ceil(math.sqrt(sumdelegates['center']/4.0))
-    blockdensity['head']=math.ceil(math.sqrt(sumdelegates['head']/1.0))
-    #Only look at the density outside of the speaker block.
-    maxdensity=max(blockdensity['left'],blockdensity['right'],blockdensity['center'])
-    #We will draw this on a canvas that is 350x175px, so 25 times the unit size.
-    #Initialise list of positions for the various blocks:
+    #Modified layout design:
+    #Left and right are by default blocks of shape 6x2
+    #Head (Speaker or whatever) is a single row of blocks down the middle,
+    #  starting one block left of the party blocks.
+    #Cross-bench is by default a block of shape 1x4 at the back.
+    #
+    #If the number of rows in the wings is not defined, calculate it:
+    if not 'wingrows' in optionlist:
+      optionlist['wingrows']=math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12))*2
+    wingcols=math.ceil(max(sumdelegates['left'],sumdelegates['right'])/optionlist['wingrows'])
+    if not 'centercols' in optionlist: #If the number of columns in the cross-bench is not defined, calculate it:
+      optionlist['centercols']=math.ceil(math.sqrt(sumdelegates['center']/4))
+    centerrows=math.ceil(sumdelegates['center']/optionlist['centercols'])
+    #Calculate the total number of columns in the diagram. First see how many rows for head + wings:
+    if sumdelegates['head']:
+      totalcols=max(wingcols+1,sumdelegates['head'])
+    else:
+      totalcols=wingcols
+    #Now, if there's a cross-bench, add an empty row plus the number of rows in the cross-bench:
+    if sumdelegates['center']:
+      totalcols += 1
+      totalcols += optionlist['centercols']
+      leftoffset=1 #Leave room for the Speaker's block to protrude on the left
+    #Calculate the total number of rows in the diagram:
+    totalrows = max(optionlist['wingrows']*2+1,centerrows)
+    #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
+    blocksize=350.0/max(totalcols,totalrows)
+    #So the diagram size is now fixed:
+    svgwidth  = blocksize*totalcols
+    svgheight = blocksize*totalrows
+    #Initialise list of positions for the various diagram elements:
     poslist={'head':[], 'left':[], 'right':[], 'center':[]}
-    #Head parties are in a block starting at 0,100 to 25,75
-    #Always use the whole area for the head: this is speaker of parliament or whatever.
-    for x in range(int(blockdensity['head'])):
-      for y in range(int(blockdensity['head'])):
-        poslist['head'].append([5+25/blockdensity['head']*(x+optionlist['spacing']/2),5+(3+(y+optionlist['spacing']/2)/blockdensity['head'])*25])
-    #Center parties are in a block starting at 175,100 to 275,75
-    for x in range(int(maxdensity*12)):
-      for y in range(int(maxdensity)):
-        poslist['center'].append([(x+optionlist['spacing']/2)/maxdensity*25+125+5,(3+(y+optionlist['spacing']/2)/maxdensity)*25+5])
-    #Left parties are in a block starting at 50,175 to 350,125
-    for x in range(int(maxdensity*12)):
-      for y in range(int(maxdensity*2)):
-        poslist['left'].append([x/maxdensity*25+50+5,(5+y/maxdensity)*25+5])
-    poslist['left'].sort(key=lambda point: point[1])
-    poslist['left']=poslist['left'][:max(sumdelegates['left'],sumdelegates['right'])]
-    poslist['left'].sort(key=lambda point: point[0])
-    #Right parties are in a block starting at 50,50 to 350,0
-    for x in range(int(maxdensity*12)):
-      for y in range(int(maxdensity*2)):
-        poslist['right'].append([(x+optionlist['spacing']/2)/maxdensity*25+50+5,((y+optionlist['spacing']/2)/maxdensity)*25+5])
-    poslist['right'].sort(key=lambda point: -point[1])
-    poslist['right']=poslist['right'][:max(sumdelegates['left'],sumdelegates['right'])]
-    poslist['right'].sort(key=lambda point: point[0])
+    #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
+    centertop=5+blocksize*optionlist['wingrows']
+    for x in range(sumdelegates['head']):
+      poslist['head'].append([5.0+blocksize*x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
+    #Cross-bench parties are 5 from the edge, vertically centered:
+    for x in range(optionlist['centercols']):
+      thiscol= min(centerrows,sumdelegates['center']-x*centerrows) #How many rows in this column of the cross-bench
+      for y in range(thiscol):
+        poslist['center'].append([355-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,(5+(355-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
+    #Left parties are in the top block:
+    for x in range(wingcols):
+      for y in range(optionlist['wingrows']):
+        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,(centertop-1-y+optionlist['spacing']/2)*blocksize])
+    #Right parties are in the bottom block:
+    for x in range(wingcols):
+      for y in range(optionlist['wingrows']):
+        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,(centertop+1+y+optionlist['spacing']/2)*blocksize])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
@@ -101,7 +112,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], optionlist['radius']/blockdensity['head'], optionlist['radius']/blockdensity['head'], 25/blockdensity['head']*(1.0-optionlist['spacing']), 25/blockdensity['head']*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -111,7 +122,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'left' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], optionlist['radius']/maxdensity, optionlist['radius']/maxdensity, 25/maxdensity*(1.0-optionlist['spacing']), 25/maxdensity*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -121,7 +132,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'right' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/maxdensity, optionlist['radius']/maxdensity, 25/maxdensity*(1.0-optionlist['spacing']), 25/maxdensity*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -131,7 +142,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'center' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], optionlist['radius']/maxdensity, optionlist['radius']/maxdensity, 25/maxdensity*(1.0-optionlist['spacing']), 25/maxdensity*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, 25/blocksize*(1.0-optionlist['spacing']), 25/blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
