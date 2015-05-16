@@ -1,11 +1,4 @@
 #!/usr/bin/python
-#david@davidexternal:~/dev/parliamentdiagram$ python westminster_test.py "option.radius, 1.00; option.spacing, 0.10; Party 1, 1, head, #AD1FFF; Party 2, 222, right, #179B29; Party 3, 7, center, #AD657D; Party 4, 4, left, #952828"
-#{'head': 1, 'right': 222, 'center': 7, 'left': 4}
-#1
-#Traceback (most recent call last):
-#  File "westminster_test.py", line 142, in <module>
-#    tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
-#IndexError: list index out of range
 import cgi, re, math, random, datetime, sys, os
 #form = cgi.FieldStorage()
 #inputlist = form.getvalue("inputlist", "")
@@ -63,7 +56,7 @@ if inputlist:
     #If the number of rows in the wings is not defined, calculate it:
     if (not 'wingrows' in optionlist) or optionlist['wingrows']==0:
       optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12.0))*2)
-    wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/optionlist['wingrows']))
+    wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/float(optionlist['wingrows'])))
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     try:
@@ -77,8 +70,12 @@ if inputlist:
     else:
       leftoffset=0 #Don't leave room for the Speaker's block to protrude on the left
       totalcols=wingcols
+    print >> sys.stderr , "sumdelegates"
     print >> sys.stderr , sumdelegates
-    print >> sys.stderr , leftoffset
+    print >> sys.stderr , "optionlist"
+    print >> sys.stderr , optionlist
+    print >> sys.stderr , "wingcols"
+    print >> sys.stderr , wingcols
     #Now, if there's a cross-bench, add an empty row plus the number of rows in the cross-bench:
     if sumdelegates['center']:
       totalcols += 1
@@ -101,6 +98,7 @@ if inputlist:
       thiscol= int(min(centerrows,sumdelegates['center']-x*centerrows)) #How many rows in this column of the cross-bench
       for y in range(thiscol):
         poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
+        #TODO: Sort this by rows.
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
