@@ -46,7 +46,7 @@
 }
 .left {
     float: left;
-    width: 10em;
+    width: 15em;
 }
 .notice {
   font-weight: bold;
@@ -77,6 +77,8 @@ function CallDiagramScript(){
         var legendnum   ="";
         var spotradius  ="0";
         var spotspacing ="0";
+        var wingrows  ="0";
+        var centercols  ="0";
         var partylist   = new Array();
         $( "input" ).each( function() { 
                 if(this.name.match( /^radius/ )){
@@ -86,7 +88,15 @@ function CallDiagramScript(){
                 if(this.name.match( /^spacing/ )){
                   spotspacing=parseFloat(this.value);
                   if(spotspacing<0){spotspacing=0}
-                  if(spotspacing>0.99){spotspacing=0.99}
+                  if(spotspacing>0.99){spotspacing=0.99} //don't allow spots of size 0.
+                }
+                if(this.name.match( /^wingrows/ )){
+                  wingrows=parseInt(this.value);
+                  if(wingrows<0){wingrows=0}
+                }
+                if(this.name.match( /^centercols/ )){
+                  centercols=parseInt(this.value);
+                  if(centercols<0){centercols=0}
                 }
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
@@ -110,6 +120,8 @@ function CallDiagramScript(){
         var arrayLength = partylist.length;
         requeststring += "option.radius, "+spotradius.toFixed(2)+"; ";
         requeststring += "option.spacing, "+spotspacing.toFixed(2)+"; ";
+        requeststring += "option.wingrows, "+wingrows+"; ";
+        requeststring += "option.centercols, "+centercols+"; ";
         for (var i = 1; i < arrayLength; i++) {
               requeststring += partylist[i]['Name'];
               requeststring += ', ';
@@ -123,6 +135,7 @@ function CallDiagramScript(){
               if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "};
             }
         //Now post the request to the script which actually makes the diagram.
+        console.log(requeststring)
         $.ajax({
                 type: "POST",
                 url: "westminster.py",
@@ -232,10 +245,14 @@ function addParty(){
 </div>
 <div class=block>
   <div id="optioncontainer" class=block>
-    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 10 is a circle).<br>
-    Try out different values of spot spacing to separate the blocks (values will be truncated between 0 and 0.99: 0 is touching, 1 will give invisible spots.)</br>
-    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 3 ><br>
+    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 0.5 is a circle).<br>
+    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 0.25 ><br>
+    Try out different values of spot spacing to separate the blocks (only values between 0 and 0.99 will be used: 0 means the spots touch; 1 will give invisible spots.)</br>
     <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br>
+    To use the automatic layout, leave "wing rows" and "cross-bench columns" at 0, otherwise use them to specify the number of rows in the left and right wings
+    of the diagram, and the number of columns in the cross-bench section, respectively.</br>
+    <div class="left">Wing rows           </div><input class="right" type="number" name="wingrows" value = 0 ><br>
+    <div class="left">Cross-bench columns </div><input class="right" type="number" name="centercols" value = 0 ><br>
   </div>
   <div id="container">
     <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
