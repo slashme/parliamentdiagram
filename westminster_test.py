@@ -56,11 +56,15 @@ if inputlist:
     #If the number of rows in the wings is not defined, calculate it:
     if (not 'wingrows' in optionlist) or optionlist['wingrows']==0:
       optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12.0))*2)
+    else:
+      optionlist['wingrows']=int(optionlist['wingrows'])
     wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/float(optionlist['wingrows'])))
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
+    else:
+      optionlist['centercols']=int(optionlist['centercols'])
     try:
-      centerrows=math.ceil(1.0*sumdelegates['center']/optionlist['centercols'])
+      centerrows=math.ceil(float(sumdelegates['center'])/optionlist['centercols'])
     except ZeroDivisionError:
       centerrows=0
     #Calculate the total number of columns in the diagram. First see how many rows for head + wings:
@@ -87,7 +91,7 @@ if inputlist:
     #Initialise list of positions for the various diagram elements:
     poslist={'head':[], 'left':[], 'right':[], 'center':[]}
     #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
-    centertop=5+blocksize*optionlist['wingrows']
+    centertop=svgheight/2-blocksize*(1-optionlist['spacing'])/2
     for x in range(sumdelegates['head']):
       poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
     #Cross-bench parties are 5 from the edge, vertically centered:
