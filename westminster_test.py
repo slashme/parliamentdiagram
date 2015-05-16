@@ -93,21 +93,21 @@ if inputlist:
     #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
     centertop=svgheight/2-blocksize*(1-optionlist['spacing'])/2
     for x in range(sumdelegates['head']):
-      poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
+      poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop])
     #Cross-bench parties are 5 from the edge, vertically centered:
     for x in range(optionlist['centercols']):
       thiscol= int(min(centerrows,sumdelegates['center']-x*centerrows)) #How many rows in this column of the cross-bench
       for y in range(thiscol):
-        poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
+        poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
         poslist['center'].sort(key=lambda point: point[1]) 
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1+y-optionlist['spacing']/2)*blocksize])
+        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1+y)*blocksize])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1+y+optionlist['spacing']/2)*blocksize])
+        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1+y)*blocksize])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
