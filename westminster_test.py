@@ -1,4 +1,11 @@
 #!/usr/bin/python
+#david@davidexternal:~/dev/parliamentdiagram$ python westminster_test.py "option.radius, 1.00; option.spacing, 0.10; Party 1, 1, head, #AD1FFF; Party 2, 222, right, #179B29; Party 3, 7, center, #AD657D; Party 4, 4, left, #952828"
+#{'head': 1, 'right': 222, 'center': 7, 'left': 4}
+#1
+#Traceback (most recent call last):
+#  File "westminster_test.py", line 142, in <module>
+#    tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+#IndexError: list index out of range
 import cgi, re, math, random, datetime, sys, os
 #form = cgi.FieldStorage()
 #inputlist = form.getvalue("inputlist", "")
