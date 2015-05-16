@@ -70,12 +70,6 @@ if inputlist:
     else:
       leftoffset=0 #Don't leave room for the Speaker's block to protrude on the left
       totalcols=wingcols
-    print >> sys.stderr , "sumdelegates"
-    print >> sys.stderr , sumdelegates
-    print >> sys.stderr , "optionlist"
-    print >> sys.stderr , optionlist
-    print >> sys.stderr , "wingcols"
-    print >> sys.stderr , wingcols
     #Now, if there's a cross-bench, add an empty row plus the number of rows in the cross-bench:
     if sumdelegates['center']:
       totalcols += 1
@@ -84,6 +78,9 @@ if inputlist:
     totalrows = max(optionlist['wingrows']*2+1,centerrows)
     #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
+    #To make the code later a bit neater, calculate the absolute radius now:
+    optionlist['radius']=min(0.5,optionlist['radius'])
+    radius=optionlist['radius']*blocksize*(1-optionlist['spacing'])
     #So the diagram size is now fixed:
     svgwidth  = blocksize*totalcols+10
     svgheight = blocksize*totalrows+10
@@ -124,7 +121,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -134,7 +131,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'left' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -144,7 +141,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'right' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
@@ -154,7 +151,7 @@ if inputlist:
     for i in [ party for party in partylist if party[2] == 'center' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], optionlist['radius']/blocksize, optionlist['radius']/blocksize, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
