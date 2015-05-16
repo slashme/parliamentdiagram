@@ -135,7 +135,6 @@ function CallDiagramScript(){
               if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "};
             }
         //Now post the request to the script which actually makes the diagram.
-        console.log(requeststring)
         $.ajax({
                 type: "POST",
                 url: "westminster.py",
