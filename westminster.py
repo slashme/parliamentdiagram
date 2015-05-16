@@ -55,7 +55,7 @@ if inputlist:
     #
     #If the number of rows in the wings is not defined, calculate it:
     if (not 'wingrows' in optionlist) or optionlist['wingrows']==0:
-      optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/12.0))*2)
+      optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/20.0))*2)
     else:
       optionlist['wingrows']=int(optionlist['wingrows'])
     wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/float(optionlist['wingrows'])))
