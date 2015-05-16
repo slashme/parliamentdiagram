@@ -98,7 +98,7 @@ if inputlist:
       thiscol= int(min(centerrows,sumdelegates['center']-x*centerrows)) #How many rows in this column of the cross-bench
       for y in range(thiscol):
         poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
-        #TODO: Sort this by rows.
+        poslist['center'].sort(key=lambda point: point[1]) 
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
