@@ -60,21 +60,22 @@ if inputlist:
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     try:
-      centerrows=math.ceil(sumdelegates['center']/optionlist['centercols'])
+      centerrows=math.ceil(1.0*sumdelegates['center']/optionlist['centercols'])
     except ZeroDivisionError:
       centerrows=0
     #Calculate the total number of columns in the diagram. First see how many rows for head + wings:
     if sumdelegates['head']:
       totalcols=max(wingcols+1,sumdelegates['head'])
+      leftoffset=1 #Leave room for the Speaker's block to protrude on the left
     else:
+      leftoffset=0 #Don't leave room for the Speaker's block to protrude on the left
       totalcols=wingcols
+    print >> sys.stderr , sumdelegates
+    print >> sys.stderr , leftoffset
     #Now, if there's a cross-bench, add an empty row plus the number of rows in the cross-bench:
     if sumdelegates['center']:
       totalcols += 1
       totalcols += optionlist['centercols']
-      leftoffset=1 #Leave room for the Speaker's block to protrude on the left
-    else:
-      leftoffset=0 #Don't leave room for the Speaker's block to protrude on the left
     #Calculate the total number of rows in the diagram:
     totalrows = max(optionlist['wingrows']*2+1,centerrows)
     #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
@@ -90,9 +91,9 @@ if inputlist:
       poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop+optionlist['spacing']/2*blocksize])
     #Cross-bench parties are 5 from the edge, vertically centered:
     for x in range(optionlist['centercols']):
-      thiscol= min(centerrows,sumdelegates['center']-x*centerrows) #How many rows in this column of the cross-bench
+      thiscol= int(min(centerrows,sumdelegates['center']-x*centerrows)) #How many rows in this column of the cross-bench
       for y in range(thiscol):
-        poslist['center'].append([355-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,(5+(355-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
+        poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x+optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
