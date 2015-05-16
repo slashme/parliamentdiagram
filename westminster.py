@@ -2,6 +2,7 @@
 import cgi, re, math, random, datetime, sys, os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
+#inputlist = sys.argv[1] #Uncomment for commandline debugging
 #Append input list to log file:
 logfile=open('wmlog','a')
 logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
@@ -78,7 +79,7 @@ if inputlist:
       totalcols += 1
       totalcols += optionlist['centercols']
     #Calculate the total number of rows in the diagram:
-    totalrows = max(optionlist['wingrows']*2+1,centerrows)
+    totalrows = max(optionlist['wingrows']*2+2,centerrows)
     #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
     #To make the code later a bit neater, calculate the absolute radius now:
@@ -102,11 +103,11 @@ if inputlist:
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1+y)*blocksize])
+        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
-        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1+y)*blocksize])
+        poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
