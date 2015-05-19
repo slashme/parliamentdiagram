@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import cgi, re, math, random, datetime, sys, os
-form = cgi.FieldStorage()
-inputlist = form.getvalue("inputlist", "")
-#inputlist = sys.argv[1] #Uncomment for commandline debugging
+#form = cgi.FieldStorage()
+#inputlist = form.getvalue("inputlist", "")
+inputlist = sys.argv[1] #Uncomment for commandline debugging
 #Append input list to log file:
 logfile=open('wmlog','a')
 logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
@@ -24,6 +24,8 @@ if inputlist:
   partylist=[]
   #Keep a running total of the number of delegates in each part of the diagram, for use later.
   sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0} 
+  #Keep a list of any empty seats we reserve to space out parties
+  emptyseats   = {'left': 0, 'right': 0, 'center': 0, 'head': 0} 
   #error flag: This seems ugly, but what should I do?
   error=0
   for i in re.split("\s*;\s*",inputlist):
@@ -56,9 +58,16 @@ if inputlist:
     #If the number of rows in the wings is not defined, calculate it:
     if (not 'wingrows' in optionlist) or optionlist['wingrows']==0:
       optionlist['wingrows']=int(math.ceil(math.sqrt(max(sumdelegates['left'],sumdelegates['right'])/20.0))*2)
-    else:
-      optionlist['wingrows']=int(optionlist['wingrows'])
-    wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/float(optionlist['wingrows'])))
+    #Whether or not it's defined; now make it a dict with a value for left and right - this may later not be the same any more.
+    optionlist['wingrows']={'left':int(optionlist['wingrows']), 'right':int(optionlist['wingrows'])}
+    if optionlist['cozy']:
+      wingcols=int(math.ceil(max(sumdelegates['left'],sumdelegates['right'])/float(optionlist['wingrows']['left'])))
+    else: #we will only allow one diagram column per party, so calculate how many empty seats to add to each wing's delegate count
+      for wing in ['left','right']:
+        for i in [ party for party in partylist if party[2] == wing ]:
+          emptyseats[wing] += optionlist['wingrows'][wing] - i[1] % optionlist['wingrows'][wing]
+      #Now calculate the number of columns in the diagram based on the spaced-out count; wingrows['left'] and right are still the same at this point.
+      wingcols=int(math.ceil(max(sumdelegates['left']+emptyseats['left'],sumdelegates['right']+emptyseats['right'])/float(optionlist['wingrows']['left'])))
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     else:
@@ -78,9 +87,9 @@ if inputlist:
     if sumdelegates['center']:
       totalcols += 1
       totalcols += optionlist['centercols']
-    #Calculate the total number of rows in the diagram:
-    totalrows = max(optionlist['wingrows']*2+2,centerrows)
-    #How big is a block? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
+    #Calculate the total number of rows in the diagram; wingrows left and right are still the same.
+    totalrows = max(optionlist['wingrows']['left']*2+2,centerrows)
+    #How big is a seat? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
     #To make the code later a bit neater, calculate the absolute radius now:
     optionlist['radius']=min(0.5,optionlist['radius'])
@@ -102,12 +111,22 @@ if inputlist:
         poslist['center'].sort(key=lambda point: point[1]) 
     #Left parties are in the top block:
     for x in range(wingcols):
-      for y in range(optionlist['wingrows']):
+      for y in range(optionlist['wingrows']['left']):
         poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
-    if optionlist['fullwidth']:
-      poslist['left'].sort(key=lambda point: -point[1])
-      poslist['left']=poslist['left'][:sumdelegates['left']]
-      poslist['left'].sort(key=lambda point: point[0])
+    if optionlist['fullwidth']: #In progress
+      if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram 
+        for i in range(optionlist['wingrows']['left'],1,-1):
+          tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
+          for j in [ party for party in partylist if party[2] == 'left' ]:
+            tempgaps += (i-1) - j[1] % (i-1)
+          if (sumdelegates['left'] + tempgaps > wingcols*(i-1)):
+          else: #it fits in i-1 rows
+            emptyseats['left'] = tempgaps
+
+        poslist['left'].sort(key=lambda point: -point[1])
+        poslist['left']=poslist['left'][:sumdelegates['left']]
+        poslist['left'].sort(key=lambda point: point[0])
+    #End: In progress
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
