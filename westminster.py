@@ -129,11 +129,20 @@ if inputlist:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['left']):
         poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
-    if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
+    if optionlist['fullwidth']:
+      if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
+        poslist['left'].sort(key=lambda point: -point[1])
+        poslist['left']=poslist['left'][:sumdelegates['left']]
+        poslist['left'].sort(key=lambda point: point[0])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['right']):
         poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
+    if optionlist['fullwidth']:
+      if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
+        poslist['right'].sort(key=lambda point: point[1])
+        poslist['right']=poslist['right'][:sumdelegates['right']]
+        poslist['right'].sort(key=lambda point: point[0])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
