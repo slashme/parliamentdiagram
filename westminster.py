@@ -109,32 +109,30 @@ if inputlist:
       for y in range(thiscol):
         poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
         poslist['center'].sort(key=lambda point: point[1]) 
-    #Left parties are in the top block:
     if optionlist['fullwidth']: #If we want each wing to use the full width of the diagram
-      if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram 
-        for i in range(optionlist['wingrows']['left'],1,-1):
-          tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
-          for j in [ party for party in partylist if party[2] == 'left' ]:
-            tempgaps += (i-1) - j[1] % (i-1)
-          if (sumdelegates['left'] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
-            break #break out of the for loop: all should be set up correctly.
-          else: #it fits in i-1 rows
-            emptyseats['left'] = tempgaps
-            optionlist['wingrows']['left']=i-1
-      else: #If we are not reserving blank seats to space out the diagram, just fit it suitably.
-        optionlist['wingrows']['left']=int(math.ceil(sumdelegates['left']/float(wingcols))) 
+      for wing in ['left','right']
+        if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram 
+          for i in range(optionlist['wingrows'][wing],1,-1):
+            tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
+            for j in [ party for party in partylist if party[2] == wing ]:
+              tempgaps += (i-1) - j[1] % (i-1)
+            if (sumdelegates[wing] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
+              break #break out of the for loop: all should be set up correctly.
+            else: #it fits in i-1 rows
+              emptyseats[wing] = tempgaps
+              optionlist['wingrows'][wing]=i-1
+        else: 
+          #If we are not reserving blank seats to space out the diagram, just fit it suitably.
+          #This will do nothing to the larger wing, but will slim down the smaller one.
+          optionlist['wingrows']['left']=int(math.ceil(sumdelegates['left']/float(wingcols))) 
+    #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['left']):
         poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
-    #End: In progress
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
         poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
-    if optionlist['fullwidth']:
-      poslist['right'].sort(key=lambda point: point[1])
-      poslist['right']=poslist['right'][:sumdelegates['right']]
-      poslist['right'].sort(key=lambda point: point[0])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
@@ -164,6 +162,8 @@ if inputlist:
       for Counter in range(Counter+1, Counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
+      if not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
+        Counter += optionlist['wingrows']['left'] - j[1] % optionlist['wingrows']['left']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the right parties; first create a group for them:
@@ -174,6 +174,8 @@ if inputlist:
       for Counter in range(Counter+1, Counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
+      if not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
+        Counter += optionlist['wingrows']['right'] - j[1] % optionlist['wingrows']['right']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the center parties; first create a group for them:
