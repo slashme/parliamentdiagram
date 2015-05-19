@@ -36,12 +36,13 @@ if inputlist:
     else:
       partylist.append(inputitem)
   for i in partylist:
-    if len(i)<3: #Must contain at least: party name; number; party grouping (left/right/center/head)
+    if len(i)!=4: #Must contain: party name; number; party grouping (left/right/center/head); colour.
       error=1
     elif re.search('[^0-9]', i[1]): #Must have at least a digit in the number
       error=1
     else:
       i[1]=int(i[1]) #TODO: What happens if this fails? Shouldn't, because it's from an input form, though.
+      i.append(0) #placeholder for empty seat count, for use when giving only one column per party.
     #Iterate over the list of party groups, adding the number of delegates to the correct one:
     for g, n in sumdelegates.iteritems(): #g is the group name in each case
       if re.search(g,i[2]):
@@ -65,7 +66,8 @@ if inputlist:
     else: #we will only allow one diagram column per party, so calculate how many empty seats to add to each wing's delegate count
       for wing in ['left','right']:
         for i in [ party for party in partylist if party[2] == wing ]:
-          emptyseats[wing] += optionlist['wingrows'][wing] - i[1] % optionlist['wingrows'][wing]
+          i[4] = optionlist['wingrows'][wing] - i[1] % optionlist['wingrows'][wing] #per-party count of empty seats needed to space out diagram
+          emptyseats[wing] += i[4] #per-wing count kept separately for convenience
       #Now calculate the number of columns in the diagram based on the spaced-out count; wingrows['left'] and right are still the same at this point.
       wingcols=int(math.ceil(max(sumdelegates['left']+emptyseats['left'],sumdelegates['right']+emptyseats['right'])/float(optionlist['wingrows']['left'])))
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
@@ -121,6 +123,9 @@ if inputlist:
             else: #it fits in i-1 rows
               emptyseats[wing] = tempgaps
               optionlist['wingrows'][wing]=i-1
+              #This is really ugly: is there a better way than just calculating again?
+              for j in [ party for party in partylist if party[2] == wing ]:
+                j[4] = (i-1) - j[1] % (i-1)
         else: 
           #If we are not reserving blank seats to space out the diagram, just fit it suitably.
           #This will do nothing to the larger wing, but will slim down the smaller one.
@@ -129,20 +134,36 @@ if inputlist:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['left']):
         poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
-    if optionlist['fullwidth']:
-      if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
-        poslist['left'].sort(key=lambda point: -point[1])
-        poslist['left']=poslist['left'][:sumdelegates['left']]
-        poslist['left'].sort(key=lambda point: point[0])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['right']):
         poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
-    if optionlist['fullwidth']:
-      if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
-        poslist['right'].sort(key=lambda point: point[1])
-        poslist['right']=poslist['right'][:sumdelegates['right']]
-        poslist['right'].sort(key=lambda point: point[0])
+    for wing in ['left','right']:
+      if optionlist['fullwidth']:
+        #First sort the spots - will need this whether or not it's cozy.
+        if wing=='right':
+          poslist[wing].sort(key=lambda point: point[1]) #sort by y coordinate if it's right wing
+        else:
+          poslist[wing].sort(key=lambda point: -point[1]) #sort by negative y coordinate if it's left wing
+        if optionlist['cozy']: #If we are smooshing them together without gaps, just fill from the bottom up
+          poslist[wing]=poslist[wing][:sumdelegates[wing]] #Trim the block to the exact number of delegates, so that filling from the left will fill the whole horizontal space.
+          poslist[wing].sort(key=lambda point: point[0]) #Sort by x coordinate again.
+        else: #Grab a block for each party; make the x coordinate of all the superfluous seats big, so that when it's sorted by x coordinate, they are not allocated.
+          poslist[wing].sort(key=lambda point: point[0]) #Sort by x coordinate again.
+          counter=0 #Number of seats in the parties we've done already
+          totspots=sumdelegates[wing]+emptyseats[wing] #total filled and necessarily blank seats per wing
+          extraspots=optionlist['wingrows'][wing]*wingcols - totspots #number of blank spots in this wing that need to be allocated to parties
+          for j in [ party for party in partylist if party[2] == wing ]:
+            pspots=j[1]+j[4] #total filled and necessarily blank seats per party
+            seatslice = poslist[wing][counter:counter+pspots+int(round((extraspots) * (pspots) / (totspots)))] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
+            counter += pspots+int(round((extraspots) * (pspots) / (totspots)))
+            if wing=='right':
+              seatslice.sort(key=lambda point: point[1]) #sort by y coordinate if it's right wing
+            else:
+              seatslice.sort(key=lambda point: -point[1]) #sort by negative y coordinate if it's left wing
+            for i in seatslice[j[1]:]: #These seats must be blanked
+              i[0]=999 #Set the x coordinate really big: canvas size is 360, so 999 is big enough. This changes the values in poslist, remember!
+          poslist[wing].sort(key=lambda point: point[0]) 
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
@@ -156,45 +177,41 @@ if inputlist:
     outfile.write('<g id="diagram">\n')
     #Draw the head parties; first create a group for them:
     outfile.write('  <g id="headbench">\n')
-    Counter=-1 #How many spots have we drawn yet for this group?
+    counter=-1 #How many spots have we drawn yet for this group?
     for i in [ party for party in partylist if party[2] == 'head' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-      for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][Counter][0], poslist['head'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+      for counter in range(counter+1, counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][counter][0], poslist['head'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the left parties; first create a group for them:
     outfile.write('  <g id="leftbench">\n')
-    Counter=-1 #How many spots have we drawn yet for this group?
+    counter=-1 #How many spots have we drawn yet for this group?
     for i in [ party for party in partylist if party[2] == 'left' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-      for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][Counter][0], poslist['left'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+      for counter in range(counter+1, counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
-      if not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
-        Counter += optionlist['wingrows']['left'] - i[1] % optionlist['wingrows']['left']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the right parties; first create a group for them:
     outfile.write('  <g id="rightbench">\n')
-    Counter=-1 #How many spots have we drawn yet for this group?
+    counter=-1 #How many spots have we drawn yet for this group?
     for i in [ party for party in partylist if party[2] == 'right' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-      for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][Counter][0], poslist['right'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+      for counter in range(counter+1, counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
-      if not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
-        Counter += optionlist['wingrows']['right'] - i[1] % optionlist['wingrows']['right']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the center parties; first create a group for them:
     outfile.write('  <g id="centerbench">\n')
-    Counter=-1 #How many spots have we drawn yet for this group?
+    counter=-1 #How many spots have we drawn yet for this group?
     for i in [ party for party in partylist if party[2] == 'center' ]:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-      for Counter in range(Counter+1, Counter+1+i[1]):
-        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][Counter][0], poslist['center'][Counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
+      for counter in range(counter+1, counter+1+i[1]):
+        tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][counter][0], poslist['center'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
