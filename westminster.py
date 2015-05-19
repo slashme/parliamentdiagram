@@ -110,22 +110,22 @@ if inputlist:
         poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
         poslist['center'].sort(key=lambda point: point[1]) 
     #Left parties are in the top block:
-    for x in range(wingcols):
-      for y in range(optionlist['wingrows']['left']):
-        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
-    if optionlist['fullwidth']: #In progress
+    if optionlist['fullwidth']: #If we want each wing to use the full width of the diagram
       if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram 
         for i in range(optionlist['wingrows']['left'],1,-1):
           tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
           for j in [ party for party in partylist if party[2] == 'left' ]:
             tempgaps += (i-1) - j[1] % (i-1)
-          if (sumdelegates['left'] + tempgaps > wingcols*(i-1)):
+          if (sumdelegates['left'] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
+            break #break out of the for loop: all should be set up correctly.
           else: #it fits in i-1 rows
             emptyseats['left'] = tempgaps
-
-        poslist['left'].sort(key=lambda point: -point[1])
-        poslist['left']=poslist['left'][:sumdelegates['left']]
-        poslist['left'].sort(key=lambda point: point[0])
+            optionlist['wingrows']['left']=i-1
+      else: #If we are not reserving blank seats to space out the diagram, just fit it suitably.
+        optionlist['wingrows']['left']=int(math.ceil(sumdelegates['left']/float(wingcols))) 
+    for x in range(wingcols):
+      for y in range(optionlist['wingrows']['left']):
+        poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
     #End: In progress
     #Right parties are in the bottom block:
     for x in range(wingcols):
