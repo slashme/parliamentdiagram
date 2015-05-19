@@ -48,7 +48,7 @@ if inputlist:
     error=1
   if not error:
     #Modified layout design:
-    #Left and right are by default blocks of shape 6x2
+    #Left and right are by default blocks of shape 5x1
     #Head (Speaker or whatever) is a single row of blocks down the middle,
     #  starting one block left of the party blocks.
     #Cross-bench is by default a block of shape 1x4 at the back.
@@ -104,10 +104,18 @@ if inputlist:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
         poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop-(1.5+y)*blocksize])
+    if optionlist['fullwidth']:
+      poslist['left'].sort(key=lambda point: -point[1])
+      poslist['left']=poslist['left'][:sumdelegates['left']]
+      poslist['left'].sort(key=lambda point: point[0])
     #Right parties are in the bottom block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']):
         poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
+    if optionlist['fullwidth']:
+      poslist['right'].sort(key=lambda point: point[1])
+      poslist['right']=poslist['right'][:sumdelegates['right']]
+      poslist['right'].sort(key=lambda point: point[0])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
