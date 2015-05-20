@@ -121,7 +121,7 @@ if inputlist:
             if (sumdelegates[wing] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
               break #break out of the for loop: all should be set up correctly.
             else: #it fits in i-1 rows
-              emptyseats[wing] = tempgaps
+              emptyseats[wing] = tempgaps #total necessarily empty seats per wing
               optionlist['wingrows'][wing]=i-1
               #This is really ugly: is there a better way than just calculating again?
               for j in [ party for party in partylist if party[2] == wing ]:
@@ -155,8 +155,12 @@ if inputlist:
           extraspots=optionlist['wingrows'][wing]*wingcols - totspots #number of blank spots in this wing that need to be allocated to parties
           for j in [ party for party in partylist if party[2] == wing ]:
             pspots=j[1]+j[4] #total filled and necessarily blank seats per party
-            seatslice = poslist[wing][counter:counter+pspots+int(round((extraspots) * (pspots) / (totspots)))] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
-            counter += pspots+int(round((extraspots) * (pspots) / (totspots)))
+            addspots = int(round(float(extraspots) * pspots / totspots)) #apportion the extra spots by party size
+            addspots += addspots%optionlist['wingrows'][wing] #Fill it up to a total column - note: pspots is already the right shape, so no need to use it here.
+            seatslice = poslist[wing][counter:counter+pspots+addspots] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
+            extraspots -= addspots #How many extra spots left to apportion now?
+            totspots -= pspots+addspots #Into how many spots do the remaining extra spots have to go?
+            counter  += pspots+addspots #Where are we in the wing list now?
             if wing=='right':
               seatslice.sort(key=lambda point: point[1]) #sort by y coordinate if it's right wing
             else:
