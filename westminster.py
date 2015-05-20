@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import cgi, re, math, random, datetime, sys, os
-#form = cgi.FieldStorage()
-#inputlist = form.getvalue("inputlist", "")
-inputlist = sys.argv[1] #Uncomment for commandline debugging
+form = cgi.FieldStorage()
+inputlist = form.getvalue("inputlist", "")
+#inputlist = sys.argv[1] #Uncomment for commandline debugging
 #Append input list to log file:
 logfile=open('wmlog','a')
 logfile.write(datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
