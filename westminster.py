@@ -164,6 +164,8 @@ if inputlist:
             for i in seatslice[j[1]:]: #These seats must be blanked
               i[0]=999 #Set the x coordinate really big: canvas size is 360, so 999 is big enough. This changes the values in poslist, remember!
           poslist[wing].sort(key=lambda point: point[0]) 
+      else: #if not fullwidth
+        poslist[wing].sort(key=lambda point: point[0]) 
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
