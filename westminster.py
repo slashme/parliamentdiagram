@@ -195,6 +195,8 @@ if inputlist:
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
+      if not optionlist['fullwidth'] and not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
+        counter += optionlist['wingrows']['left'] - i[1] % optionlist['wingrows']['left']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the right parties; first create a group for them:
@@ -205,6 +207,8 @@ if inputlist:
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
 	outfile.write(tempstring+'\n')
+      if not optionlist['fullwidth'] and not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
+        counter += optionlist['wingrows']['right'] - i[1] % optionlist['wingrows']['right']
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the center parties; first create a group for them:
