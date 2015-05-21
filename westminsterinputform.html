@@ -241,10 +241,10 @@ function addParty(){
 </head>
 <body>
 <div class=block>
-  <div class="notice">This is alpha code. Please help to test it, but do not use it to generate diagrams for Wikipedia until we have a consensus on which layout and settings to use.</div><br>
+  <div class="notice">This tool is in Beta testing. Please help to test it, but if you use it to generate diagrams for Wikipedia, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.</div><br>
   This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.<br>
   The code is <a href="https://github.com/slashme/parliamentdiagram">hosted at github</a>, and bug reports, feature requests and bug fixes are welcome.<br>
-  I have also created a discussion space under <a href="https://en.wikipedia.org/wiki/User_talk:Slashme/parliament.py">my Wikipedia user page.</a><br>
+  You can also reach me at<a href="https://en.wikipedia.org/wiki/User_talk:Slashme">my Wikipedia user talk page.</a><br>
 </div>
 <div class=block>
   To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
@@ -256,22 +256,29 @@ function addParty(){
 </div>
 <div class=block>
   <div id="optioncontainer" class=block>
-    Try out different values of corner radius to round out the blocks (negative values will be set to 0, and anything over 0.5 is a circle).<br>
-    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 0.25 ><br>
-    Try out different values of spot spacing to separate the blocks (only values between 0 and 0.99 will be used: 0 means the spots touch; 1 will give invisible spots.)</br>
+    Try out different values of corner radius to round out the blocks (negative
+    values will be set to 0, and anything over 0.5 is a circle). Many Wikipedia
+    diagrams use sharp-cornered squares (radius 0).<br>
+    <div class="left">Corner radius</div><input class="right" type="number" name="radius"  value = 0.0 ><br>
+    Try out different values of spot spacing to separate the blocks (only
+    values between 0 and 0.99 will be used: 0 means the spots touch; 1 will
+    give invisible spots.)</br>
     <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br>
-    To use the automatic layout, leave "wing rows" and "cross-bench columns" at 0, otherwise use them to specify the number of rows in the left and right wings
-    of the diagram, and the number of columns in the cross-bench section, respectively.</br>
+    To use the automatic layout, leave "wing rows" and "cross-bench columns" at
+    0, otherwise use them to specify the number of rows in the left and right
+    wings of the diagram, and the number of columns in the cross-bench section,
+    respectively.</br>
     <div class="left">Wing rows           </div><input class="right" type="number" name="wingrows" value = 0 ><br>
     <div class="left">Cross-bench columns </div><input class="right" type="number" name="centercols" value = 0 ><br>
-    Would you like the left and right wings to use the full width of the diagram, by making one wing thinner than the other?<br>
+    Would you like the left and right wings to use the full width of the
+    diagram, by making one wing thinner than the other?<br>
     <input type="checkbox" class="left" name="fullwidth" value="fullwidth" >Use full width <br>
     Would you like to allow parties to share a column in the diagram?<br>
     <input type="checkbox" class="left" name="cozy" value="cozy" checked>Let parties share columns<br>
   </div>
   <div id="container">
-    <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
-    <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
+    <div class="left">Party 1 name      </div><input class="right" type="text"   name="Name1"   value= "Party 1" ><br>
+    <div class="left">Party 1 delegates </div><input class="right" type="number" name="Number1" value = 1        ><br>
     <div class="left">Party 1 group     </div>
     <select class="right" name="Group 1">
       <option value="left">Left</option>
@@ -279,7 +286,7 @@ function addParty(){
       <option value="center">Cross-bench</option>
       <option value="head">Speaker</option>
     </select><br>
-    <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+    <div class="left">Party 1 color </div><input class="right color" type="text" name="Color1" value= AD1FFF ><br>
     <br>
   </div>
 </div>
