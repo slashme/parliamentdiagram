@@ -163,13 +163,15 @@ if inputlist:
             seatslice = poslist[wing][counter:counter+pspots+addspots] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
             extraspots -= addspots #How many extra spots left to apportion now?
             totspots -= pspots+addspots #Into how many spots do the remaining extra spots have to go?
-            counter  += pspots+addspots #Where are we in the wing list now?
+            if counter < (sumdelegates[wing]+emptyseats[wing])/2: #if we're still on the left of the diagram:
+              seatslice.sort(key=lambda point: -point[0]) #sort by negative x value
             if wing=='right':
               seatslice.sort(key=lambda point: point[1]) #sort by y coordinate if it's right wing
             else:
               seatslice.sort(key=lambda point: -point[1]) #sort by negative y coordinate if it's left wing
             for i in seatslice[j[1]:]: #These seats must be blanked
               i[0]=999 #Set the x coordinate really big: canvas size is 360, so 999 is big enough. This changes the values in poslist, remember!
+            counter  += pspots+addspots #Where are we in the wing list now?
           poslist[wing].sort(key=lambda point: point[0])
       else: #if not fullwidth and multirow
         poslist[wing].sort(key=lambda point: point[0])
