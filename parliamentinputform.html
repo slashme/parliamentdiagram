@@ -89,7 +89,12 @@ function CallArchScript(){
 		if(this.name.match( /^Color/ )){
 			requeststring += "#";
 			var legendcol = this.value;
-			legendstring += "{{legend|#" + legendcol +"|" + legendname +": "+legendnum+" seats}} ";
+                        if(legendnum=1){
+                          legendstring += "{{legend|#" + legendcol +"|" + legendname +": 1 seat}} "
+                        }
+                        else{
+                          legendstring += "{{legend|#" + legendcol +"|" + legendname +": "+legendnum+" seats}} "
+                        }
 		}
 		//Append the actual value now,
 		requeststring += this.value;
