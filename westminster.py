@@ -140,7 +140,7 @@ if inputlist:
       for y in range(optionlist['wingrows']['right']):
         poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize,centertop+(1.5+y)*blocksize])
     for wing in ['left','right']:
-      if optionlist['fullwidth']:
+      if optionlist['fullwidth'] and optionlist['wingrows'][wing] > 1: #If it's only one row, just fill from the left.
         #First sort the spots - will need this whether or not it's cozy.
         if wing=='right':
           poslist[wing].sort(key=lambda point: point[1]) #sort by y coordinate if it's right wing
