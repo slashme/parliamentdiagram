@@ -106,8 +106,7 @@ if inputlist:
       totalcols=wingcols
     #Now, if there's a cross-bench, add an empty row plus the number of rows in the cross-bench:
     if sumdelegates['center']:
-      totalcols += 1
-      totalcols += optionlist['centercols']
+      totalcols += 1 + optionlist['centercols']
     #Calculate the total number of rows in the diagram
     totalrows = max(optionlist['wingrows']['left']+optionlist['wingrows']['right']+2,centerrows)
     #How big is a seat? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
