@@ -112,7 +112,7 @@ if inputlist:
     #How big is a seat? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
     #To make the code later a bit neater, calculate the absolute radius now:
-    optionlist['radius']=min(0.5,optionlist['radius'])
+    optionlist['radius']=min(0.5,optionlist['radius']) #radius 0.5 is already a circle
     radius=optionlist['radius']*blocksize*(1-optionlist['spacing'])
     #So the diagram size is now fixed:
     svgwidth  = blocksize*totalcols+10
