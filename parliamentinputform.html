@@ -56,129 +56,129 @@ document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.mi
 <script type='text/javascript'>
 //Generate random color, based on http://stackoverflow.com/questions/1484506
 function getRandomColor() {
-	var letters = '0123456789ABCDEF'.split('');
-	var color = ''; // In my case, I don't want the leading #
-	for (var i = 0; i < 6; i++ ) {
-		color += letters[Math.floor(Math.random() * 16)];
-	}
-	return color;
+        var letters = '0123456789ABCDEF'.split('');
+        var color = ''; // In my case, I don't want the leading #
+        for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
 }
 function CallArchScript(){
-	// Create request string: this is the request that is passed to the python script.
-	var requeststring="";
-	// Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
-	var legendstring="";
-	var legendname = "";
-	var legendnum = "";
-	$( "input" ).each( function() { 
-		if(this.name.match( /^Name/ )){
-			//Always catch the party name, not just if the request string is empty.
-			legendname = this.value;
-		}
-		if(requeststring && this.name.match( /^Name/ )){
-			//If we are adding a name field, that means we're at the start of a party's info. End the previous party's info.
-			requeststring += "; ";
-		}
-		//Don't allow parties without delegates: if we have a number field, make the value at least 1.
-		//It's a bit of a hack, but shouldn't be much of a limitation.
-		if(this.name.match( /^Number/ )){
-			if(this.value < 1){this.value = 1;};
-			legendnum = this.value;
-		}
-		//If we are processing a colour string, add a # before the hex values.
-		if(this.name.match( /^Color/ )){
-			requeststring += "#";
-			var legendcol = this.value;
+        // Create request string: this is the request that is passed to the python script.
+        var requeststring="";
+        // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
+        var legendstring="";
+        var legendname = "";
+        var legendnum = "";
+        $( "input" ).each( function() { 
+                if(this.name.match( /^Name/ )){
+                        //Always catch the party name, not just if the request string is empty.
+                        legendname = this.value;
+                }
+                if(requeststring && this.name.match( /^Name/ )){
+                        //If we are adding a name field, that means we're at the start of a party's info. End the previous party's info.
+                        requeststring += "; ";
+                }
+                //Don't allow parties without delegates: if we have a number field, make the value at least 1.
+                //It's a bit of a hack, but shouldn't be much of a limitation.
+                if(this.name.match( /^Number/ )){
+                        if(this.value < 1){this.value = 1;};
+                        legendnum = this.value;
+                }
+                //If we are processing a colour string, add a # before the hex values.
+                if(this.name.match( /^Color/ )){
+                        requeststring += "#";
+                        var legendcol = this.value;
                         if(legendnum=1){
                           legendstring += "{{legend|#" + legendcol +"|" + legendname +": 1 seat}} "
                         }
                         else{
                           legendstring += "{{legend|#" + legendcol +"|" + legendname +": "+legendnum+" seats}} "
                         }
-		}
-		//Append the actual value now,
-		requeststring += this.value;
-		//Append the party to the recommended legend string
-		//And if it's not a colour, we need a comma after it.
-		if(!this.name.match( /^Color/ )){
-			requeststring += ", ";
-		}
-	});
-	//Now post the request to the script which actually makes the diagram.
-	$.ajax({
-		type: "POST",
-		url: "newarch.py",
-		data: {inputlist: requeststring },
-	}).done( function(data,status){
-		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-		var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
-		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
-		postparent.insertBefore(newpost, postcontainer);
-		newpost.setAttribute("id", "postcontainer");
-		//Now add the svg image to the page
-		var img = document.createElement("img");
-		img.src = data;
-		newpost.appendChild(img);
-		//and a linebreak
-		newpost.appendChild(document.createElement("br"));
-		//Add a link with the new diagram
-		var a = document.createElement('a');
-		var linkText = document.createTextNode("Click to download your SVG diagram.");
-		a.appendChild(linkText);
-		a.title = "SVG diagram";
-		a.href = data;
-		a.download = data;
-		newpost.appendChild(a);
-		//and a linebreak
-		newpost.appendChild(document.createElement("br"));
-		//Now add the legend template text with the party names, colours and support.
-		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-		newpost.appendChild(newtext);
-		newpost.appendChild(document.createElement("br"));
-		newtext = document.createTextNode(legendstring);
-		newpost.appendChild(newtext);
-		newpost.appendChild(document.createElement("br"));
-	});
+                }
+                //Append the actual value now,
+                requeststring += this.value;
+                //Append the party to the recommended legend string
+                //And if it's not a colour, we need a comma after it.
+                if(!this.name.match( /^Color/ )){
+                        requeststring += ", ";
+                }
+        });
+        //Now post the request to the script which actually makes the diagram.
+        $.ajax({
+                type: "POST",
+                url: "newarch.py",
+                data: {inputlist: requeststring },
+        }).done( function(data,status){
+                var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+                var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
+                var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+                postparent.insertBefore(newpost, postcontainer);
+                newpost.setAttribute("id", "postcontainer");
+                //Now add the svg image to the page
+                var img = document.createElement("img");
+                img.src = data;
+                newpost.appendChild(img);
+                //and a linebreak
+                newpost.appendChild(document.createElement("br"));
+                //Add a link with the new diagram
+                var a = document.createElement('a');
+                var linkText = document.createTextNode("Click to download your SVG diagram.");
+                a.appendChild(linkText);
+                a.title = "SVG diagram";
+                a.href = data;
+                a.download = data;
+                newpost.appendChild(a);
+                //and a linebreak
+                newpost.appendChild(document.createElement("br"));
+                //Now add the legend template text with the party names, colours and support.
+                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+                newpost.appendChild(newtext);
+                newpost.appendChild(document.createElement("br"));
+                newtext = document.createTextNode(legendstring);
+                newpost.appendChild(newtext);
+                newpost.appendChild(document.createElement("br"));
+        });
 }
 </script>
 <script type='text/javascript'>
 function addParty(){
-	// Container <div> where dynamic content will be placed
-	var container = document.getElementById("container");
-	// Count child nodes in div, and divide by two to get party count.
-	i=(container.childElementCount-3)/7 + 1;
-	//i=container.childElementCount; //Code for debugging
-	//Party name label
-	var partytitle=document.createElement('div');
-	partytitle.className = 'left';
-	partytitle.innerHTML = "Party " + i + " name";
-	container.appendChild(partytitle);
-	//Party name input control
-	var input=document.createElement('div');
-	input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
-	container.appendChild(input);
-	//Party support name tag
-	var partysupport=document.createElement('div');
-	partysupport.className = 'left';
-	partysupport.innerHTML = "Party " + i + " delegates";
-	container.appendChild(partysupport);
+        // Container <div> where dynamic content will be placed
+        var container = document.getElementById("container");
+        // Count child nodes in div, and divide by two to get party count.
+        i=(container.childElementCount-3)/7 + 1;
+        //i=container.childElementCount; //Code for debugging
+        //Party name label
+        var partytitle=document.createElement('div');
+        partytitle.className = 'left';
+        partytitle.innerHTML = "Party " + i + " name";
+        container.appendChild(partytitle);
+        //Party name input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
+        container.appendChild(input);
+        //Party support name tag
+        var partysupport=document.createElement('div');
+        partysupport.className = 'left';
+        partysupport.innerHTML = "Party " + i + " delegates";
+        container.appendChild(partysupport);
         //Party support input control
-	var input=document.createElement('div');
-	input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >'
-	container.appendChild(input);
-	//Party color name tag
-	var partycolor=document.createElement('div');
-	partycolor.className = 'left';
-	partycolor.innerHTML = "Party " + i + " color";
-	container.appendChild(partycolor);
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >'
+        container.appendChild(input);
+        //Party color name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " color";
+        container.appendChild(partycolor);
         //Party color input control
-	var input=document.createElement('div');
-	input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
-	container.appendChild(input);
-        //Add a newline
-	container.appendChild(document.createElement("br"));
-	//$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
-	jscolor.init();
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
+        container.appendChild(input);
+          //Add a newline
+        container.appendChild(document.createElement("br"));
+        //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
+        jscolor.init();
 }
 </script>
 </head>
