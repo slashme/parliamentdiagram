@@ -129,7 +129,7 @@ if inputlist:
         else: 
           #If we are not reserving blank seats to space out the diagram, just fit it suitably.
           #This will do nothing to the larger wing, but will slim down the smaller one.
-          optionlist['wingrows']['left']=int(math.ceil(sumdelegates['left']/float(wingcols))) 
+          optionlist['wingrows'][wing]=int(math.ceil(sumdelegates[wing]/float(wingcols))) 
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['left']):
