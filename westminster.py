@@ -23,9 +23,9 @@ if inputlist:
   #initialize list of parties
   partylist=[]
   #Keep a running total of the number of delegates in each part of the diagram, for use later.
-  sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0} 
+  sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
   #Keep a list of any empty seats we reserve to space out parties
-  emptyseats   = {'left': 0, 'right': 0, 'center': 0, 'head': 0} 
+  emptyseats   = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
   #error flag: This seems ugly, but what should I do?
   error=0
   for i in re.split("\s*;\s*",inputlist):
@@ -70,6 +70,26 @@ if inputlist:
           emptyseats[wing] += i[4] #per-wing count kept separately for convenience
       #Now calculate the number of columns in the diagram based on the spaced-out count; wingrows['left'] and right are still the same at this point.
       wingcols=int(math.ceil(max(sumdelegates['left']+emptyseats['left'],sumdelegates['right']+emptyseats['right'])/float(optionlist['wingrows']['left'])))
+    #Now slim down the diagram on one side if required:
+    if optionlist['fullwidth']: #If we want each wing to use the full width of the diagram
+      for wing in ['left','right']:
+        if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram
+          for i in range(optionlist['wingrows'][wing],1,-1):
+            tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
+            for j in [ party for party in partylist if party[2] == wing ]:
+              tempgaps += -j[1] % (i-1)
+            if (sumdelegates[wing] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
+              break #break out of the for loop: all should be set up correctly.
+            else: #it fits in i-1 rows
+              emptyseats[wing] = tempgaps #total necessarily empty seats per wing
+              optionlist['wingrows'][wing]=i-1
+              #This is really ugly: is there a better way than just calculating again?
+              for j in [ party for party in partylist if party[2] == wing ]:
+                j[4] =  -j[1] % (i-1)
+        else:
+          #If we are not reserving blank seats to space out the diagram, just fit it suitably.
+          #This will do nothing to the larger wing, but will slim down the smaller one.
+          optionlist['wingrows'][wing]=int(math.ceil(sumdelegates[wing]/float(wingcols)))
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     else:
@@ -89,8 +109,8 @@ if inputlist:
     if sumdelegates['center']:
       totalcols += 1
       totalcols += optionlist['centercols']
-    #Calculate the total number of rows in the diagram; wingrows left and right are still the same.
-    totalrows = max(optionlist['wingrows']['left']*2+2,centerrows)
+    #Calculate the total number of rows in the diagram
+    totalrows = max(optionlist['wingrows']['left']+optionlist['wingrows']['right']+2,centerrows)
     #How big is a seat? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize=350.0/max(totalcols,totalrows)
     #To make the code later a bit neater, calculate the absolute radius now:
@@ -102,7 +122,8 @@ if inputlist:
     #Initialise list of positions for the various diagram elements:
     poslist={'head':[], 'left':[], 'right':[], 'center':[]}
     #All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
-    centertop=svgheight/2-blocksize*(1-optionlist['spacing'])/2
+    centertop=svgheight/2-blocksize*(1-optionlist['spacing'])/2 #The top y-coordinate of the center block if the wings are balanced.
+    centertop += (optionlist['wingrows']['left']-optionlist['wingrows']['right'])*blocksize/2 # Move it down by half the difference of the wing widths
     for x in range(sumdelegates['head']):
       poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2),centertop])
     #Cross-bench parties are 5 from the edge, vertically centered:
@@ -110,26 +131,7 @@ if inputlist:
       thiscol= int(min(centerrows,sumdelegates['center']-x*centerrows)) #How many rows in this column of the cross-bench
       for y in range(thiscol):
         poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2)*blocksize,((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
-        poslist['center'].sort(key=lambda point: point[1]) 
-    if optionlist['fullwidth']: #If we want each wing to use the full width of the diagram
-      for wing in ['left','right']:
-        if not optionlist['cozy']: #If we are reserving blank seats to space out the diagram 
-          for i in range(optionlist['wingrows'][wing],1,-1):
-            tempgaps = 0 #temporary variable to hold the number of empty seats with i-1 rows
-            for j in [ party for party in partylist if party[2] == wing ]:
-              tempgaps += -j[1] % (i-1)
-            if (sumdelegates[wing] + tempgaps > wingcols*(i-1)): #if it doesn't fit into i-1 rows
-              break #break out of the for loop: all should be set up correctly.
-            else: #it fits in i-1 rows
-              emptyseats[wing] = tempgaps #total necessarily empty seats per wing
-              optionlist['wingrows'][wing]=i-1
-              #This is really ugly: is there a better way than just calculating again?
-              for j in [ party for party in partylist if party[2] == wing ]:
-                j[4] =  -j[1] % (i-1)
-        else: 
-          #If we are not reserving blank seats to space out the diagram, just fit it suitably.
-          #This will do nothing to the larger wing, but will slim down the smaller one.
-          optionlist['wingrows'][wing]=int(math.ceil(sumdelegates[wing]/float(wingcols))) 
+        poslist['center'].sort(key=lambda point: point[1])
     #Left parties are in the top block:
     for x in range(wingcols):
       for y in range(optionlist['wingrows']['left']):
@@ -170,9 +172,9 @@ if inputlist:
               seatslice.sort(key=lambda point: -point[1]) #sort by negative y coordinate if it's left wing
             for i in seatslice[j[1]:]: #These seats must be blanked
               i[0]=999 #Set the x coordinate really big: canvas size is 360, so 999 is big enough. This changes the values in poslist, remember!
-          poslist[wing].sort(key=lambda point: point[0]) 
+          poslist[wing].sort(key=lambda point: point[0])
       else: #if not fullwidth
-        poslist[wing].sort(key=lambda point: point[0]) 
+        poslist[wing].sort(key=lambda point: point[0])
     # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
