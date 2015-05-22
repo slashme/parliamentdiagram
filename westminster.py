@@ -44,7 +44,7 @@ if inputlist:
       i[1]=int(i[1]) #TODO: What happens if this fails? Shouldn't, because it's from an input form, though.
       i.append(0) #placeholder for empty seat count, for use when giving only one column per party.
     #Iterate over the list of party groups, adding the number of delegates to the correct one:
-    for g, n in sumdelegates.iteritems(): #g is the group name in each case
+    for g, n in sumdelegates.iteritems(): #g is the group name; n is the seat count for that group.
       if re.search(g,i[2]):
         sumdelegates[g] += i[1]
   if sumdelegates < 1:
