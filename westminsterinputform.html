@@ -143,9 +143,15 @@ function CallDiagramScript(){
               requeststring += '#';
               requeststring += partylist[i]['Color'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
-              if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "};
+              if (partylist[i]['Num'] == 1){
+                if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "}
+              }
+              else {
+                if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "}
+              }
             }
             console.log(requeststring);
+            console.log(legendstring);
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",

@@ -51,6 +51,7 @@
 </style>
 <script type="text/javascript">
 document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js' type='text/javascript'>\<\/script>");
+//document.write("\<script src='jquery.min.js' type='text/javascript'>\<\/script>"); //For local debugging
 </script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
@@ -63,47 +64,47 @@ function getRandomColor() {
         }
         return color;
 }
-function CallArchScript(){
+function CallDiagramScript(){
         // Create request string: this is the request that is passed to the python script.
         var requeststring="";
         // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
         var legendstring="";
         var legendname = "";
         var legendnum  = "";
+        var partylist   = new Array();
         $( "input" ).each( function() { 
                 if(this.name.match( /^Name/ )){
-                        //Always catch the party name, not just if the request string is empty.
-                        legendname = this.value;
-                }
-                if(requeststring && this.name.match( /^Name/ )){
-                        //If we are adding a name field, that means we're at the start of a party's info. End the previous party's info.
-                        requeststring += "; ";
+                  partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
                 }
                 //Don't allow parties without delegates: if we have a number field, make the value at least 1.
                 //It's a bit of a hack, but shouldn't be much of a limitation.
                 if(this.name.match( /^Number/ )){
-                        if(this.value < 1){this.value = 1;};
-                        legendnum = this.value;
+                  if(this.value < 1){this.value = 1;};
+                  partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
                 }
                 //If we are processing a colour string, add a # before the hex values.
                 if(this.name.match( /^Color/ )){
-                        requeststring += "#";
-                        var legendcol = this.value;
-                        if(legendnum=1){
-                          legendstring += "{{legend|#" + legendcol +"|" + legendname +": 1 seat}} "
-                        }
-                        else{
-                          legendstring += "{{legend|#" + legendcol +"|" + legendname +": "+legendnum+" seats}} "
-                        }
-                }
-                //Append the actual value now,
-                requeststring += this.value;
-                //Append the party to the recommended legend string
-                //And if it's not a colour, we need a comma after it.
-                if(!this.name.match( /^Color/ )){
-                        requeststring += ", ";
+                  partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
                 }
         });
+        var arrayLength = partylist.length;
+        for (var i = 1; i < arrayLength; i++) {
+              requeststring += partylist[i]['Name'];
+              requeststring += ', ';
+              requeststring += partylist[i]['Num'];
+              requeststring += ', ';
+              requeststring += '#';
+              requeststring += partylist[i]['Color'];
+              if ( i < (arrayLength - 1)){ requeststring += '; '}
+              if (partylist[i]['Num'] == 1){
+                legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "
+              }
+              else {
+                legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "
+              }
+            }
+            console.log(requeststring);
+            console.log(legendstring);
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",
@@ -164,7 +165,7 @@ function addParty(){
         container.appendChild(partysupport);
         //Party support input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >'
+        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >';
         container.appendChild(input);
         //Party color name tag
         var partycolor=document.createElement('div');
@@ -206,7 +207,7 @@ function addParty(){
 <div class=button onclick="addParty()">
   Add a party
 </div>
-<div class=button onclick="CallArchScript()">
+<div class=button onclick="CallDiagramScript()">
   Make my diagram
 </div>
 <div class="block">
