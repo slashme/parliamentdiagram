@@ -50,10 +50,9 @@ if inputlist:
   if sumdelegates < 1:
     error=1
   if not error:
-    #Modified layout design:
     #Left and right are by default blocks of shape 5x1
     #Head (Speaker or whatever) is a single row of blocks down the middle,
-    #  starting one block left of the party blocks.
+    #  starting one block left of the party blocks, with a half-block gap on either side.
     #Cross-bench is by default a block of shape 1x4 at the back.
     #
     #If the number of rows in the wings is not defined, calculate it:
