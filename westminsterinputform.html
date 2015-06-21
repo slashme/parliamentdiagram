@@ -135,73 +135,77 @@ function CallDiagramScript(){
         requeststring += "option.fullwidth, "+fullwidth+"; ";
         requeststring += "option.cozy, "+cozy+"; ";
         for (var i = 1; i < arrayLength; i++) {
-              requeststring += partylist[i]['Name'];
-              requeststring += ', ';
-              requeststring += partylist[i]['Num'];
-              requeststring += ', ';
-              requeststring += partylist[i]['Group'];
-              requeststring += ', ';
-              requeststring += '#';
-              requeststring += partylist[i]['Color'];
-              if ( i < (arrayLength - 1)){ requeststring += '; '}
-              if (partylist[i]['Num'] == 1){
-                if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "}
-              }
-              else {
-                if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "}
+          if(partylist[i]) {
+                requeststring += partylist[i]['Name'];
+                requeststring += ', ';
+                requeststring += partylist[i]['Num'];
+                requeststring += ', ';
+                requeststring += partylist[i]['Group'];
+                requeststring += ', ';
+                requeststring += '#';
+                requeststring += partylist[i]['Color'];
+                if ( i < (arrayLength - 1)){ requeststring += '; '}
+                if (partylist[i]['Num'] == 1){
+                  if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "}
+                }
+                else {
+                  if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "}
+                }
               }
             }
-            console.log(requeststring);
-            console.log(legendstring);
-        //Now post the request to the script which actually makes the diagram.
-        $.ajax({
-                type: "POST",
-                url: "westminster.py",
-                data: {inputlist: requeststring },
-        }).done( function(data,status){
-                var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-                var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
-                var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
-                postparent.insertBefore(newpost, postcontainer);
-                newpost.setAttribute("id", "postcontainer");
-                //Now add the svg image to the page
-                var img = document.createElement("img");
-                img.src = data;
-                newpost.appendChild(img);
-                //and a linebreak
-                newpost.appendChild(document.createElement("br"));
-                //Add a link with the new diagram
-                var a = document.createElement('a');
-                var linkText = document.createTextNode("Click to download your SVG diagram.");
-                a.appendChild(linkText);
-                a.title = "SVG diagram";
-                a.href = data;
-                a.download = data;
-                newpost.appendChild(a);
-                //and a linebreak
-                newpost.appendChild(document.createElement("br"));
-                //Now add the legend template text with the party names, colours and support.
-                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
-                newtext = document.createTextNode(legendstring);
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
-        });
+            if(arrayLength){
+              //Now post the request to the script which actually makes the diagram.
+              $.ajax({
+                      type: "POST",
+                      url: "westminster.py",
+                      data: {inputlist: requeststring },
+              }).done( function(data,status){
+                      var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+                      var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
+                      var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+                      postparent.insertBefore(newpost, postcontainer);
+                      newpost.setAttribute("id", "postcontainer");
+                      //Now add the svg image to the page
+                      var img = document.createElement("img");
+                      img.src = data;
+                      newpost.appendChild(img);
+                      //and a linebreak
+                      newpost.appendChild(document.createElement("br"));
+                      //Add a link with the new diagram
+                      var a = document.createElement('a');
+                      var linkText = document.createTextNode("Click to download your SVG diagram.");
+                      a.appendChild(linkText);
+                      a.title = "SVG diagram";
+                      a.href = data;
+                      a.download = data;
+                      newpost.appendChild(a);
+                      //and a linebreak
+                      newpost.appendChild(document.createElement("br"));
+                      //Now add the legend template text with the party names, colours and support.
+                      var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+                      newpost.appendChild(newtext);
+                      newpost.appendChild(document.createElement("br"));
+                      newtext = document.createTextNode(legendstring);
+                      newpost.appendChild(newtext);
+                      newpost.appendChild(document.createElement("br"));
+              });
+              console.log(requeststring);
+              console.log(legendstring);
+            }
 }
 
 function addParty(){
         // Party list <div> where dynamic content will be placed
         var partylistcontainer = document.getElementById("partylistcontainer");
-        //New party's number: one more than the total of parties so far:
-        var i=1;
-        console.log(i);
+        //New party's number: one more than the largest party number so far:
+        i=0;
         $( "div" ).each( function() { 
-          i=max(i,/[0-9]+$/.exec(this.name)[0]);
-          console.log(i);
+            if(this.id.match( /^party[0-9]+$/ )){
+                i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
+              }
           }
+        )
         i++;
-        console.log(i);
         //Party name label
         var newpartydiv=document.createElement('div');
         newpartydiv.id="party" + i;
