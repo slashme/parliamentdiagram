@@ -191,35 +191,36 @@ function CallDiagramScript(){
 </script>
 <script type='text/javascript'>
 function addParty(){
-        // Container <div> where dynamic content will be placed
-        var container = document.getElementById("container");
-        // Count child nodes in div, and divide by two to get party count.
-        //i=(container.childElementCount-3)/10 + 1;
-        i=(container.childElementCount+5)/9;
-        //i=container.childElementCount; //Code for debugging
+        // Party list <div> where dynamic content will be placed
+        var partylistcontainer = document.getElementById("partylistcontainer");
+        //New party's number: one more than the total of parties so far:
+        i=partylistcontainer.childElementCount+1;
         //Party name label
+        var newpartydiv=document.createElement('div');
+        newpartydiv.id="party" + i;
+        partylistcontainer.appendChild(newpartydiv);
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
         partytitle.innerHTML = "Party " + i + " name";
-        container.appendChild(partytitle);
+        newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Party support name tag
         var partysupport=document.createElement('div');
         partysupport.className = 'left';
         partysupport.innerHTML = "Party " + i + " delegates";
-        container.appendChild(partysupport);
+        newpartydiv.appendChild(partysupport);
         //Party support input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >';
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Party group name tag
         var partygroup=document.createElement('div');
         partygroup.className = 'left';
         partygroup.innerHTML = "Party " + i + " group";
-        container.appendChild(partygroup);
+        newpartydiv.appendChild(partygroup);
         //Party group input control
         var input=document.createElement('div');
         input.innerHTML = '<select class="right" name="Group' +  i + '" >\n'+
@@ -228,18 +229,18 @@ function addParty(){
           '  <option value="center">Cross-bench</option>\n'+
           '  <option value="head">Speaker</option>\n'+
           '</select>';
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Party color name tag
         var partycolor=document.createElement('div');
         partycolor.className = 'left';
         partycolor.innerHTML = "Party " + i + " color";
-        container.appendChild(partycolor);
+        newpartydiv.appendChild(partycolor);
         //Party color input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Add a newline
-        container.appendChild(document.createElement("br"));
+        newpartydiv.appendChild(document.createElement("br"));
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
         jscolor.init();
 }
@@ -281,18 +282,20 @@ function addParty(){
     Would you like to allow parties to share a column in the diagram?<br>
     <input type="checkbox" class="left" name="cozy" value="cozy" checked>Let parties share columns<br>
   </div>
-  <div id="container">
-    <div class="left">Party 1 name      </div><input class="right" type="text"   name="Name1"   value= "Party 1" ><br>
-    <div class="left">Party 1 delegates </div><input class="right" type="number" name="Number1" value = 1        ><br>
-    <div class="left">Party 1 group     </div>
-    <select class="right" name="Group 1">
-      <option value="left">Left</option>
-      <option value="right">Right</option>
-      <option value="center">Cross-bench</option>
-      <option value="head">Speaker</option>
-    </select><br>
-    <div class="left">Party 1 color </div><input class="right color" type="text" name="Color1" value= AD1FFF ><br>
-    <br>
+  <div id="partylistcontainer">
+    <div id="party1">
+      <div class="left">Party 1 name      </div><input class="right" type="text"   name="Name1"   value= "Party 1" ><br>
+      <div class="left">Party 1 delegates </div><input class="right" type="number" name="Number1" value = 1        ><br>
+      <div class="left">Party 1 group     </div>
+      <select class="right" name="Group 1">
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="center">Cross-bench</option>
+        <option value="head">Speaker</option>
+      </select><br>
+      <div class="left">Party 1 color </div><input class="right color" type="text" name="Color1" value= AD1FFF ><br>
+      <br>
+    </div>
   </div>
 </div>
 <div class=button onclick="addParty()">
