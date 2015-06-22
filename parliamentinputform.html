@@ -64,6 +64,7 @@ function getRandomColor() {
         }
         return color;
 }
+
 function CallDiagramScript(){
         // Create request string: this is the request that is passed to the python script.
         var requeststring="";
@@ -89,6 +90,7 @@ function CallDiagramScript(){
         });
         var arrayLength = partylist.length;
         for (var i = 1; i < arrayLength; i++) {
+          if(partylist[i]) {
               requeststring += partylist[i]['Name'];
               requeststring += ', ';
               requeststring += partylist[i]['Num'];
@@ -102,9 +104,9 @@ function CallDiagramScript(){
               else {
                 legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "
               }
+              }
             }
-            console.log(requeststring);
-            console.log(legendstring);
+            if(arrayLength){
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",
@@ -140,46 +142,67 @@ function CallDiagramScript(){
                 newpost.appendChild(newtext);
                 newpost.appendChild(document.createElement("br"));
         });
+        console.log(requeststring);
+        console.log(legendstring);
+      }
 }
-</script>
-<script type='text/javascript'>
+
 function addParty(){
-        // Container <div> where dynamic content will be placed
-        var container = document.getElementById("container");
-        // Count child nodes in div, and divide by two to get party count.
-        i=(container.childElementCount-3)/7 + 1;
-        //i=container.childElementCount; //Code for debugging
+        // Party list <div> where dynamic content will be placed
+        var partylistcontainer = document.getElementById("partylistcontainer");
+        //New party's number: one more than the largest party number so far:
+        i=0;
+        $( "div" ).each( function() { 
+            if(this.id.match( /^party[0-9]+$/ )){
+                i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
+              }
+          }
+        )
+        i++;
+        var newpartydiv=document.createElement('div');
+        newpartydiv.id="party" + i;
+        partylistcontainer.appendChild(newpartydiv);
         //Party name label
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
         partytitle.innerHTML = "Party " + i + " name";
-        container.appendChild(partytitle);
+        newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Party support name tag
         var partysupport=document.createElement('div');
         partysupport.className = 'left';
         partysupport.innerHTML = "Party " + i + " delegates";
-        container.appendChild(partysupport);
+        newpartydiv.appendChild(partysupport);
         //Party support input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >';
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
         //Party color name tag
         var partycolor=document.createElement('div');
         partycolor.className = 'left';
         partycolor.innerHTML = "Party " + i + " color";
-        container.appendChild(partycolor);
+        newpartydiv.appendChild(partycolor);
         //Party color input control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
-        container.appendChild(input);
+        newpartydiv.appendChild(input);
+        var delbutton=document.createElement('div');
+        delbutton.className = 'button';
+        delbutton.innerHTML = "Delete party " + i;
+        delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
+        newpartydiv.appendChild(delbutton);
           //Add a newline
-        container.appendChild(document.createElement("br"));
+        newpartydiv.appendChild(document.createElement("br"));
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
         jscolor.init();
+}
+function deleteParty(i){
+  var delparty = document.getElementById("party"+i);
+  var partylistcontainer = document.getElementById("partylistcontainer");
+  partylistcontainer.removeChild(delparty);
 }
 </script>
 </head>
@@ -197,11 +220,14 @@ function addParty(){
   If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br>
 </div>
 <div class=block>
-  <div id="container">
-    <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
-    <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
-    <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
-    <br>
+  <div id="partylistcontainer">
+    <div id="party1">
+      <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
+      <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
+      <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+        <div class="button" onclick="deleteParty(1)">Delete party 1</div><br>
+      <br>
+    </div>
   </div>
 </div>
 <div class=button onclick="addParty()">
