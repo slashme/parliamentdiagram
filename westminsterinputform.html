@@ -96,7 +96,7 @@ function CallDiagramScript(){
                 //
                 //if bigparty is pointing to a non-null member of the party list, check whether the current member has larger support, and if so point to it instead.
                 if(partylist[bigparty]) {
-                  if(partylist[i]['Num'] > partylist[bigparty]['Num']) {
+                  if(parseInt(partylist[i]['Num']) > parseInt(partylist[bigparty]['Num'])) {
                     bigparty=i;
                   }
                 }
