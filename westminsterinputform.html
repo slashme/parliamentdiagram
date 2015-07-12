@@ -59,7 +59,8 @@ function CallDiagramScript(){
                   if(this.checked){cozy="1"}
                 }
                 if(this.name.match( /^autospeaker/ )){
-                  if(this.checked){autospeaker="1"}
+                  autospeaker=parseInt(this.value);
+                  if(autospeaker<0){autospeaker=0}
                 }
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
@@ -95,7 +96,7 @@ function CallDiagramScript(){
                 //
                 //if bigparty is pointing to a non-null member of the party list, check whether the current member has larger support, and if so point to it instead.
                 if(partylist[bigparty]) {
-                  if(partylist[i]['Num'] > partylist[bigparty]['Num']) {
+                  if(parseInt(partylist[i]['Num']) > parseInt(partylist[bigparty]['Num'])) {
                     bigparty=i;
                   }
                 }
@@ -122,7 +123,9 @@ function CallDiagramScript(){
         if(autospeaker){
             requeststring += '; ';
             requeststring += partylist[bigparty]['Name'];
-            requeststring += ', 1, head, #';
+            requeststring += ', ';
+            requeststring += autospeaker;
+            requeststring += ', head, #';
             requeststring += partylist[bigparty]['Color'];
         }
             if(arrayLength){
@@ -254,7 +257,8 @@ function deleteParty(i){
   If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br>
 </div>
 <div class=block>
-  <div id="optioncontainer" class=block>
+  <div id="spotshapeoptioncontainer" class=block>
+    <h3>Spot shape options</h3>
     Try out different values of corner radius to round out the blocks (negative
     values will be set to 0, and anything over 0.5 is a circle). Many Wikipedia
     diagrams use sharp-cornered squares (radius 0).<br>
@@ -263,21 +267,27 @@ function deleteParty(i){
     values between 0 and 0.99 will be used: 0 means the spots touch; 1 will
     give invisible spots.)</br>
     <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br>
+  </div>
+  <div id="layoutoptioncontainer" class=block>
+    <h3>Layout options</h3>
     To use the automatic layout, leave "wing rows" and "cross-bench columns" at
     0, otherwise use them to specify the number of rows in the left and right
     wings of the diagram, and the number of columns in the cross-bench section,
     respectively.</br>
     <div class="left">Wing rows           </div><input class="right" type="number" name="wingrows" value = 0 ><br>
     <div class="left">Cross-bench columns </div><input class="right" type="number" name="centercols" value = 0 ><br>
+    <br>
     Would you like the left and right wings to use the full width of the
     diagram, by making one wing thinner than the other?<br>
     <input type="checkbox" class="left" name="fullwidth" value="fullwidth" >Use full width <br>
     Would you like to allow parties to share a column in the diagram?<br>
     <input type="checkbox" class="left" name="cozy" value="cozy" checked>Let parties share columns<br>
-    Automatically create a single "speaker" spot with the colour of the largest party, without adding it as a separate party:<br>
-    <input type="checkbox" class="left" name="autospeaker" value="autospeaker" >Automatic "speaker" spot<br>
+    <br>
+    To create a group of spots for "speakers" or similar functions, you can add parties with the "group" set to "Speaker". To automatically create one or more "speaker" spots with the colour of the largest party, without creating them as separate parties, you can just type a number in the checkbox below:<br>
+    <div class="left">Speaker spots</div><input class="right" type="number" name="autospeaker" value = 0 ><br>
   </div>
-  <div id="partylistcontainer">
+  <div id="partylistcontainer" class=block>
+    <h3>List of parties</h3>
     <div id="party1">
       <div class="left">Party 1 name      </div><input class="right" type="text"   name="Name1"   value= "Party 1" ><br>
       <div class="left">Party 1 delegates </div><input class="right" type="number" name="Number1" value = 1        ><br>
