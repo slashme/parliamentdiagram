@@ -31,7 +31,9 @@ function CallDiagramScript(){
         var centercols  ="0";
         var fullwidth   ="0";
         var cozy        ="0";
+        var autospeaker ="0";
         var partylist   = new Array();
+        var bigparty    = 1; //this variable will hold the index of the party with the biggest support: used for creating an auto-speaker spot.
         $( "input" ).each( function() { 
                 if(this.name.match( /^radius/ )){
                   spotradius=parseFloat(this.value);
@@ -55,6 +57,9 @@ function CallDiagramScript(){
                 }
                 if(this.name.match( /^cozy/ )){
                   if(this.checked){cozy="1"}
+                }
+                if(this.name.match( /^autospeaker/ )){
+                  if(this.checked){autospeaker="1"}
                 }
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
@@ -84,13 +89,26 @@ function CallDiagramScript(){
         requeststring += "option.cozy, "+cozy+"; ";
         for (var i = 1; i < arrayLength; i++) {
           if(partylist[i]) {
+                //Find the biggest party while going through the list - this is
+                //such a cheap operation that I'm not going to bother to check 
+                //each time whether "autospeaker" is checked.
+                //
+                //if bigparty is pointing to a non-null member of the party list, check whether the current member has larger support, and if so point to it instead.
+                if(partylist[bigparty]) {
+                  if(partylist[i]['Num'] > partylist[bigparty]['Num']) {
+                    bigparty=i;
+                  }
+                }
+                //if bigparty is not pointing to a non-null member of the party list, point to the current member instead.
+                else {
+                  bigparty=i;
+                }
                 requeststring += partylist[i]['Name'];
                 requeststring += ', ';
                 requeststring += partylist[i]['Num'];
                 requeststring += ', ';
                 requeststring += partylist[i]['Group'];
-                requeststring += ', ';
-                requeststring += '#';
+                requeststring += ', #';
                 requeststring += partylist[i]['Color'];
                 if ( i < (arrayLength - 1)){ requeststring += '; '}
                 if (partylist[i]['Num'] == 1){
@@ -99,8 +117,14 @@ function CallDiagramScript(){
                 else {
                   if (partylist[i]['Group'] != "head"){legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "}
                 }
-              }
-            }
+          }
+        }
+        if(autospeaker){
+            requeststring += '; ';
+            requeststring += partylist[bigparty]['Name'];
+            requeststring += ', 1, head, #';
+            requeststring += partylist[bigparty]['Color'];
+        }
             if(arrayLength){
               //Now post the request to the script which actually makes the diagram.
               $.ajax({
@@ -250,6 +274,8 @@ function deleteParty(i){
     <input type="checkbox" class="left" name="fullwidth" value="fullwidth" >Use full width <br>
     Would you like to allow parties to share a column in the diagram?<br>
     <input type="checkbox" class="left" name="cozy" value="cozy" checked>Let parties share columns<br>
+    Automatically create a single "speaker" spot with the colour of the largest party, without adding it as a separate party:<br>
+    <input type="checkbox" class="left" name="autospeaker" value="autospeaker" checked>Automatic "speaker" spot<br>
   </div>
   <div id="partylistcontainer">
     <div id="party1">
