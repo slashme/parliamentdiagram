@@ -160,7 +160,7 @@ if inputlist:
             except ZeroDivisionError: #if totspots is 0, don't add spots
               addspots=0
             addspots += -addspots%optionlist['wingrows'][wing] #Fill it up to a total column - note: pspots is already the right shape, so no need to use it here.
-            seatslice = poslist[wing][counter:counter+pspots+addspots] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
+            seatslice = poslist[wing][counter:counter+pspots+addspots] #Grab the slice of seats to work on. Sorting this doesn't affect poslist, but assigning does.
             extraspots -= addspots #How many extra spots left to apportion now?
             totspots -= pspots+addspots #Into how many spots do the remaining extra spots have to go?
             if counter < (sumdelegates[wing]+emptyseats[wing])/2: #if we're still on the left of the diagram:
