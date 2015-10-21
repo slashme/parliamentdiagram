@@ -157,8 +157,8 @@ if inputlist:
             pspots=j[1]+j[4] #total filled and necessarily blank seats per party
             try:
               addspots = int(round(float(extraspots) * pspots / totspots)) #apportion the extra spots by party size
-            except ZeroDivisionError: #if totspots is 0, that's OK; don't do anything.
-              pass
+            except ZeroDivisionError: #if totspots is 0, don't add spots
+              addspots=0
             addspots += -addspots%optionlist['wingrows'][wing] #Fill it up to a total column - note: pspots is already the right shape, so no need to use it here.
             seatslice = poslist[wing][counter:counter+pspots+addspots] #Grab the slice of seats to work on. Sorting this doesn't affect postlist, but assigning does.
             extraspots -= addspots #How many extra spots left to apportion now?
