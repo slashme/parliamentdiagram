@@ -872,8 +872,7 @@ function makeUploadLink(inputname, linkdata){
 				fname = this.value
 			}
 	});
-	//a.href = document.URL + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
-	a.href = document.URL + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
 	var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
 	postcontainer.appendChild(a);
         postcontainer.appendChild(document.createElement("br"));
