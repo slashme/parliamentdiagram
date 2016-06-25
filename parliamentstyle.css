@@ -66,3 +66,20 @@
   font-size: 150%;
   text-align: center;
 }
+.info, .success, .warning, .error, .validation {
+border: 1px solid;
+margin: 10px 0px;
+padding:15px 10px 15px 50px;
+}
+.info {
+color: #00529B;
+}
+.success {
+color: #4F8A10;
+}
+.warning {
+color: #9F6000;
+}
+.error {
+color: #D8000C;
+}

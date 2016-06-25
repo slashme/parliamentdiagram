@@ -458,8 +458,8 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'file' => '@' . $filetosend,
 	) ;
 
-	//$params['ignorewarnings'] = 1 ; //test version
-	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; //normal version
+	$params['ignorewarnings'] = 1 ; //test version
+	//if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; //normal version
 
 	$res = doApiQuery( $params , $ch , 'upload' );
 
@@ -887,13 +887,23 @@ function deleteParty(i){
 <?php //Print the status of the last upload
 if ( $last_res ) { //if there is a "last result" from an attempted Commons upload
 	if ( $last_res->upload->warnings ) {
+		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {
-			echo "Warning \"".$k."\": ".$v."<br />";
+			if ( $k == 'exists' ) {
+				echo "Warning: File already exists <br />";
+			} else {
+				echo "Warning \"".$k."\": ".$v."<br />";
+			}
 		}
+		echo "</div>\n";
 	} elseif ($last_res->error) {
+		echo "<div class='error'>";
 		echo "Error: " . $last_res->error->info . "<br />";
+		echo "</div>\n";
 	} elseif ( $last_res->upload->result == 'Success' ) {
+		echo "<div class='success'>";
 		echo "Image successfully uploaded";
+		echo "</div>\n";
 	} else { //something else went wrong, so show some debug info.
 		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
 	}
