@@ -116,7 +116,7 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 		break;
 
 	case 'upload':
-		doUpload($_GET['uri'], $_GET['filename'], "Test file, please ignore", "Testing API upload", 0);
+		doUpload($_GET['uri'], $_GET['filename'], "Test file, please ignore", "Testing API upload", $_GET['ignore']);
 		break;
 
 	case 'identify':
@@ -458,8 +458,7 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'file' => '@' . $filetosend,
 	) ;
 
-	$params['ignorewarnings'] = 1 ; //test version
-	//if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; //normal version
+	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; 
 
 	$res = doApiQuery( $params , $ch , 'upload' );
 
@@ -890,7 +889,8 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {
 			if ( $k == 'exists' ) {
-				echo "Warning: File already exists <br />";
+				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".$_GET['filename'].">".$_GET['filename']."</a> already exists.";
+				if ( $last_res->upload->result != 'Success' ) {echo "If you have confirmed that you want to overwrite it, <a href=https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1>click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
 			}
