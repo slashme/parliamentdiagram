@@ -108,7 +108,7 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 		return;
 
 	case 'upload':
-		doUpload($_GET['uri'], $_GET['filename'], "Test file, please ignore", "Testing API upload", $_GET['ignore']);
+		doUpload($_GET['uri'], $_GET['filename'], $_GET['pagecontent'], "Testing API upload", $_GET['ignore']);
 		break;
 
 	case 'identify':
@@ -696,6 +696,13 @@ function CallDiagramScript(){
                 newpost.appendChild(a);
                 //and a linebreak
                 newpost.appendChild(document.createElement("br"));
+                //Now add the legend template text with the party names, colours and support.
+                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+                newpost.appendChild(newtext);
+                newpost.appendChild(document.createElement("br"));
+                newtext = document.createTextNode(legendstring);
+                newpost.appendChild(newtext);
+                newpost.appendChild(document.createElement("br"));
 		//File upload name label
 		var filenametitle=document.createElement('div');
 		filenametitle.className = 'left';
@@ -710,18 +717,9 @@ function CallDiagramScript(){
 		var uploadlinkbutton=document.createElement('div');
 		uploadlinkbutton.className = 'button';
 		uploadlinkbutton.innerHTML = "Make upload link";
-		var tempstring='makeUploadLink("' + inputname + '", "' + data + '")';
-		console.log(tempstring);
-		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'")');
+		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		newpost.appendChild(uploadlinkbutton);
                 //and a linebreak
-                newpost.appendChild(document.createElement("br"));
-                //Now add the legend template text with the party names, colours and support.
-                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
-                newtext = document.createTextNode(legendstring);
-                newpost.appendChild(newtext);
                 newpost.appendChild(document.createElement("br"));
         });
         console.log(requeststring);
@@ -781,7 +779,7 @@ function addParty(){
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
         jscolor.init();
 }
-function makeUploadLink(inputname, linkdata){
+function makeUploadLink(inputname, linkdata, legendtext){
 	var a = document.createElement('a');
 	var fname="";
 	$( "input" ).each( function() { 
@@ -792,7 +790,7 @@ function makeUploadLink(inputname, linkdata){
 	fname = fname.replace(/(.svg)*$/i, ".svg");
 	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
 	a.appendChild(linkText);
-	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + legendtext + " {{PD-shape}} {{Information |description = |date = |source = [https://https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]";
 	a.setAttribute('target', '_blank');
 	var uploadlinkcontainer = document.getElementById("uploadlinkcontainer"); 
 	uploadlinkcontainer.innerHTML = "";
