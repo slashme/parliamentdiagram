@@ -1,6 +1,7 @@
 <?php
 /**
  * Written in 2013 by Brad Jorsch
+ * Hacked in 2016 by David Richfield
  *
  * To the extent possible under law, the author(s) have dedicated all copyright 
  * and related and neighboring rights to this software to the public domain 
@@ -43,11 +44,6 @@ $mwOAuthIW = 'c';
  * Set this to the API endpoint
  */
 $apiUrl = 'https://commons.wikimedia.org/w/api.php';
-
-/**
- * Set this to Special:MyTalk on the above wiki
- */
-$mytalkUrl = 'https://commons.wikimedia.org/wiki/Special:MyTalk#Hello.2C_world';
 
 /**
  * This should normally be "500". But Tool Labs insists on overriding valid 500
@@ -110,10 +106,6 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 	case 'authorize':
 		doAuthorizationRedirect();
 		return;
-
-	case 'edit':
-		doEdit();
-		break;
 
 	case 'upload':
 		doUpload($_GET['uri'], $_GET['filename'], "Test file, please ignore", "Testing API upload", $_GET['ignore']);
@@ -475,66 +467,6 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
  * Perform a generic edit
  * @return void
  */
-function doEdit() {
-	global $mwOAuthIW;
-
-	$ch = null;
-
-	// First fetch the username
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'query',
-		'meta' => 'userinfo',
-	), $ch );
-
-	if ( isset( $res->error->code ) && $res->error->code === 'mwoauth-invalid-authorization' ) {
-		// We're not authorized!
-		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a> to do that.';
-		echo '<hr>';
-		return;
-	}
-
-	if ( !isset( $res->query->userinfo ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Bad API response: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-		exit(0);
-	}
-	if ( isset( $res->query->userinfo->anon ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Not logged in. (How did that happen?)';
-		exit(0);
-	}
-	$page = 'User talk:' . $res->query->userinfo->name;
-
-	// Next fetch the edit token
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'tokens',
-		'type' => 'edit',
-	), $ch );
-	if ( !isset( $res->tokens->edittoken ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Bad API response: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-		exit(0);
-	}
-	$token = $res->tokens->edittoken;
-
-	// Now perform the edit
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'edit',
-		'title' => $page,
-		'section' => 'new',
-		'sectiontitle' => 'Hello, world',
-		'text' => 'This message was posted using the OAuth Hello World application, and should be seen as coming from yourself. To revoke this application\'s access to your account, visit [[:' . $mwOAuthIW . ':Special:OAuthManageMyGrants]]. ~~~~',
-		'summary' => '/* Hello, world */ Hello from OAuth!',
-		'watchlist' => 'nochange',
-		'token' => $token,
-	), $ch );
-
-	echo 'API edit result: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-	echo '<hr>';
-}
 
 /**
  * Request a JWT and verify it
