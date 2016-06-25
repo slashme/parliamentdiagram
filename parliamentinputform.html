@@ -66,6 +66,7 @@ function CallDiagramScript(){
                 url: "newarch.py",
                 data: {inputlist: requeststring },
         }).done( function(data,status){
+                data=data.trim();
                 var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
                 var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
                 var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
