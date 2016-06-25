@@ -900,13 +900,14 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		echo "<div class='error'>";
 		echo "Error: " . $last_res->error->info . "<br />";
 		echo "</div>\n";
-	} elseif ( $last_res->upload->result == 'Success' ) {
-		echo "<div class='success'>";
-		echo "Image successfully uploaded";
-		echo "</div>\n";
 	} else { //something else went wrong, so show some debug info.
 		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
 	}
+	if ( $last_res->upload->result == 'Success' ) {
+		echo "<div class='success'>";
+		echo "Image successfully uploaded";
+		echo "</div>\n";
+	} 
 }
 ?></div>
 <div class=block>
