@@ -789,6 +789,7 @@ function makeUploadLink(inputname, linkdata){
 				fname = this.value
 			}
 	});
+	fname = fname.replace(/(.svg)*$/i, ".svg");
 	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
 	a.appendChild(linkText);
 	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
