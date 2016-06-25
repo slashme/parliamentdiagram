@@ -116,7 +116,7 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 		break;
 
 	case 'upload':
-		doUpload($_GET['uri'],$_GET['filename'], "Test file, please ignore", "Testing API upload", 0);
+		doUpload($_GET['uri'], $_GET['filename'], "Test file, please ignore", "Testing API upload", 0);
 		break;
 
 	case 'identify':
@@ -414,25 +414,25 @@ function doApiQuery( $post, &$ch = null , $mode = '' ) {
 
 function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewarnings ) {
 
+	// First fetch the username
+	$res = doApiQuery( array(
+		'format' => 'json',
+		'action' => 'query',
+		'meta' => 'userinfo',
+	), $ch );
+
+	if ( isset( $res->error->code ) && $res->error->code === 'mwoauth-invalid-authorization' ) {
+		// We're not authorized!
+		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize" target = "_blank">here</a> to do that.';
+		echo '<hr>';
+		return;
+	}
+
 	if ( $new_file_name == '' ) {
 		$a = explode ( '/' , $filetosend ) ;
 		$new_file_name = array_pop ( $a ) ;
 	}
 	$new_file_name = ucfirst ( str_replace ( ' ' , '_' , $new_file_name ) ) ;
-
-	// Download file
-//	$basedir = '/data/project/magnustools/tmp' ;
-//	$tmpfile = tempnam ( $basedir , 'doUploadFromURL' ) ;
-//	copy($url, $tmpfile) ;
-
-//	if ( isset ( $_REQUEST['test'] ) ) {
-////			$new_file_name = utf8_decode ( $new_file_name ) ;
-//		print "<hr/>$new_file_name<br/>\n" ;
-//		print "$url<br/>\n" ;
-//		print "Size: " . filesize($tmpfile) . "<br/>\n" ;
-//		unlink ( $tmpfile ) ;
-//		exit ( 0 ) ;
-//	}
 
 	// Next fetch the edit token
 	$ch = null;
@@ -444,7 +444,6 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 
 	if ( !isset( $res->query->tokens->csrftoken ) ) {
 		$error = 'Bad API response [doUpload]: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>' ;
-//		unlink ( $tmpfile ) ;
 		return false ;
 	}
 	$token = $res->query->tokens->csrftoken;
@@ -459,24 +458,14 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'file' => '@' . $filetosend,
 	) ;
 
-	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ;
+	//$params['ignorewarnings'] = 1 ; //test version
+	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; //normal version
 
 	$res = doApiQuery( $params , $ch , 'upload' );
 
-//	unlink ( $tmpfile ) ;
-	
-//	if ( isset ( $_REQUEST['test'] ) ) {
-//		print "<pre>" ; print_r ( $params ) ; print "</pre>" ;
-//		print "<pre>" ; print_r ( $res ) ; print "</pre>" ;
-//	}
-
-
-	echo gettype($res), "\n";
+	global $last_res ;
 	$last_res = $res ;
 	if ( $res->upload->result != 'Success' ) {
-	echo 'API result: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-	echo '<hr>';
-		$error = $res->upload->result ;
 		return false ;
 	}
 
@@ -787,14 +776,13 @@ function CallDiagramScript(){
 		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '"   value= "My_Parliament.svg" >';
 		newpost.appendChild(input);
                 //Button to add a link to upload the new diagram
-        var uploadlinkbutton=document.createElement('div');
-        uploadlinkbutton.className = 'button';
-        uploadlinkbutton.innerHTML = "Make upload link";
-        //uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + inputname + '", "' + data + '")');
-        var tempstring='makeUploadLink("' + inputname + '", "' + data + '")';
-	console.log(tempstring);
-        uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'")');
-        newpost.appendChild(uploadlinkbutton);
+		var uploadlinkbutton=document.createElement('div');
+		uploadlinkbutton.className = 'button';
+		uploadlinkbutton.innerHTML = "Make upload link";
+		var tempstring='makeUploadLink("' + inputname + '", "' + data + '")';
+		console.log(tempstring);
+		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'")');
+		newpost.appendChild(uploadlinkbutton);
                 //and a linebreak
                 newpost.appendChild(document.createElement("br"));
                 //Now add the legend template text with the party names, colours and support.
@@ -873,6 +861,7 @@ function makeUploadLink(inputname, linkdata){
 			}
 	});
 	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
+	a.setAttribute('target', '_blank');
 	var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
 	postcontainer.appendChild(a);
         postcontainer.appendChild(document.createElement("br"));
@@ -895,7 +884,21 @@ function deleteParty(i){
   Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
   To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.
   If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br>
-</div>
+<?php //Print the status of the last upload
+if ( $last_res ) { //if there is a "last result" from an attempted Commons upload
+	if ( $last_res->upload->warnings ) {
+		foreach ( $last_res->upload->warnings as $k => $v ) {
+			echo "Warning \"".$k."\": ".$v."<br />";
+		}
+	} elseif ($last_res->error) {
+		echo "Error: " . $last_res->error->info . "<br />";
+	} elseif ( $last_res->upload->result == 'Success' ) {
+		echo "Image successfully uploaded";
+	} else { //something else went wrong, so show some debug info.
+		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
+	}
+}
+?></div>
 <div class=block>
   <div id="partylistcontainer">
     <div id="party1">
