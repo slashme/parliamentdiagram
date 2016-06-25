@@ -783,19 +783,20 @@ function addParty(){
 }
 function makeUploadLink(inputname, linkdata){
 	var a = document.createElement('a');
-	var linkText = document.createTextNode("Click to upload your SVG diagram.");
-	a.appendChild(linkText);
 	var fname="";
 	$( "input" ).each( function() { 
 			if(this.name == inputname){
 				fname = this.value
 			}
 	});
+	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
+	a.appendChild(linkText);
 	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname;
 	a.setAttribute('target', '_blank');
-	var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-	postcontainer.appendChild(a);
-        postcontainer.appendChild(document.createElement("br"));
+	var uploadlinkcontainer = document.getElementById("uploadlinkcontainer"); 
+	uploadlinkcontainer.innerHTML = "";
+	uploadlinkcontainer.appendChild(a);
+        uploadlinkcontainer.appendChild(document.createElement("br"));
 }
 function deleteParty(i){
   var delparty = document.getElementById("party"+i);
@@ -842,6 +843,8 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 	} 
 }
 ?></div>
+<div id="uploadlinkcontainer" class=block>
+</div>
 <div class=block>
   <div id="partylistcontainer">
     <div id="party1">
