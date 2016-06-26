@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+ <head>
+  <meta charset="UTF-8" />
+  <title>OAuth Test</title>
+  <link rel="stylesheet" type="text/css" href="parliamentstyle.css">
+ </head>
+ <body>
 <?php
 /**
  * Written in 2013 by Brad Jorsch
@@ -35,19 +43,9 @@ $mwOAuthAuthorizeUrl = 'https://commons.wikimedia.org/wiki/Special:OAuth/authori
 $mwOAuthUrl = 'https://commons.wikimedia.org/w/index.php?title=Special:OAuth';
 
 /**
- * Set this to the interwiki prefix for the OAuth central wiki.
- */
-$mwOAuthIW = 'c';
-
-/**
  * Set this to the API endpoint
  */
 $apiUrl = 'https://commons.wikimedia.org/w/api.php';
-
-/**
- * Set this to Special:MyTalk on the above wiki
- */
-$mytalkUrl = 'https://commons.wikimedia.org/wiki/Special:MyTalk#Hello.2C_world';
 
 /**
  * This should normally be "500". But Tool Labs insists on overriding valid 500
@@ -100,34 +98,7 @@ if ( isset( $_GET['oauth_verifier'] ) && $_GET['oauth_verifier'] ) {
 	fetchAccessToken();
 }
 
-// Take any requested action
-switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
-	case 'download':
-		header( 'Content-Type: text/plain' );
-		readfile( __FILE__ );
-		return;
-
-	case 'authorize':
-		doAuthorizationRedirect();
-		return;
-
-	case 'edit':
-		doEdit();
-		break;
-
-	case 'upload':
-		doUpload($_GET['uri'], "", "Test file, please ignore", "Testing API upload", 0);
-		break;
-
-	case 'identify':
-		doIdentify();
-		break;
-
-	case 'testspecial':
-		doTestSpecial();
-		break;
-}
-
+if ( isset( $_GET['action'] ) && $_GET['action'] == 'authorize') { doAuthorizationRedirect(); } else { doIdentify(); }
 
 // ******************** CODE ********************
 
@@ -227,7 +198,10 @@ function doAuthorizationRedirect() {
 	$token = json_decode( $data );
 	if ( is_object( $token ) && isset( $token->error ) ) {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Error retrieving token: ' . htmlspecialchars( $token->error );
+		echo '<div class="error">';
+		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
+		echo 'Maybe everything is OK: Try <a href="http://tools.wmflabs.org/parliamentdiagram">this link.</a>';
+		echo '</div>';
 		exit(0);
 	}
 	if ( !is_object( $token ) || !isset( $token->key ) || !isset( $token->secret ) ) {
@@ -294,7 +268,10 @@ function fetchAccessToken() {
 	$token = json_decode( $data );
 	if ( is_object( $token ) && isset( $token->error ) ) {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Error retrieving token: ' . htmlspecialchars( $token->error );
+		echo '<div class="error">';
+		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
+		echo 'Maybe everything is OK: Try <a href="http://tools.wmflabs.org/parliamentdiagram">this link.</a>';
+		echo '</div>';
 		exit(0);
 	}
 	if ( !is_object( $token ) || !isset( $token->key ) || !isset( $token->secret ) ) {
@@ -410,144 +387,6 @@ function doApiQuery( $post, &$ch = null , $mode = '' ) {
 	return $ret ;
 }
 
-
-
-function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewarnings ) {
-
-	if ( $new_file_name == '' ) {
-		$a = explode ( '/' , $filetosend ) ;
-		$new_file_name = array_pop ( $a ) ;
-	}
-	$new_file_name = ucfirst ( str_replace ( ' ' , '_' , $new_file_name ) ) ;
-
-	// Download file
-//	$basedir = '/data/project/magnustools/tmp' ;
-//	$tmpfile = tempnam ( $basedir , 'doUploadFromURL' ) ;
-//	copy($url, $tmpfile) ;
-
-//	if ( isset ( $_REQUEST['test'] ) ) {
-////			$new_file_name = utf8_decode ( $new_file_name ) ;
-//		print "<hr/>$new_file_name<br/>\n" ;
-//		print "$url<br/>\n" ;
-//		print "Size: " . filesize($tmpfile) . "<br/>\n" ;
-//		unlink ( $tmpfile ) ;
-//		exit ( 0 ) ;
-//	}
-
-	// Next fetch the edit token
-	$ch = null;
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'query' ,
-		'meta' => 'tokens'
-	), $ch, "upload" );
-
-	if ( !isset( $res->query->tokens->csrftoken ) ) {
-		$error = 'Bad API response [doUpload]: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>' ;
-//		unlink ( $tmpfile ) ;
-		return false ;
-	}
-	$token = $res->query->tokens->csrftoken;
-
-	$params = array(
-		'format' => 'json',
-		'action' => 'upload' ,
-		'filename' => $new_file_name ,
-		'comment' => $comment ,
-		'text' => $desc ,
-		'token' => $token ,
-		'file' => '@' . $filetosend,
-	) ;
-
-	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ;
-
-	$res = doApiQuery( $params , $ch , 'upload' );
-
-//	unlink ( $tmpfile ) ;
-	
-//	if ( isset ( $_REQUEST['test'] ) ) {
-//		print "<pre>" ; print_r ( $params ) ; print "</pre>" ;
-//		print "<pre>" ; print_r ( $res ) ; print "</pre>" ;
-//	}
-
-
-	echo gettype($res), "\n";
-	$last_res = $res ;
-	if ( $res->upload->result != 'Success' ) {
-	echo 'API result: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-	echo '<hr>';
-		$error = $res->upload->result ;
-		return false ;
-	}
-
-	return true ;
-}
-
-/**
- * Perform a generic edit
- * @return void
- */
-function doEdit() {
-	global $mwOAuthIW;
-
-	$ch = null;
-
-	// First fetch the username
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'query',
-		'meta' => 'userinfo',
-	), $ch );
-
-	if ( isset( $res->error->code ) && $res->error->code === 'mwoauth-invalid-authorization' ) {
-		// We're not authorized!
-		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a> to do that.';
-		echo '<hr>';
-		return;
-	}
-
-	if ( !isset( $res->query->userinfo ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Bad API response: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-		exit(0);
-	}
-	if ( isset( $res->query->userinfo->anon ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Not logged in. (How did that happen?)';
-		exit(0);
-	}
-	$page = 'User talk:' . $res->query->userinfo->name;
-
-	// Next fetch the edit token
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'tokens',
-		'type' => 'edit',
-	), $ch );
-	if ( !isset( $res->tokens->edittoken ) ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Bad API response: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-		exit(0);
-	}
-	$token = $res->tokens->edittoken;
-
-	// Now perform the edit
-	$res = doApiQuery( array(
-		'format' => 'json',
-		'action' => 'edit',
-		'title' => $page,
-		'section' => 'new',
-		'sectiontitle' => 'Hello, world',
-		'text' => 'This message was posted using the OAuth Hello World application, and should be seen as coming from yourself. To revoke this application\'s access to your account, visit [[:' . $mwOAuthIW . ':Special:OAuthManageMyGrants]]. ~~~~',
-		'summary' => '/* Hello, world */ Hello from OAuth!',
-		'watchlist' => 'nochange',
-		'token' => $token,
-	), $ch );
-
-	echo 'API edit result: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-	echo '<hr>';
-}
-
 /**
  * Request a JWT and verify it
  * @return void
@@ -637,74 +476,15 @@ function doIdentify() {
 		exit(0);
 	}
 
-	echo 'JWT payload: <pre>' . htmlspecialchars( var_export( $payload, 1 ) ) . '</pre>';
-	echo '<hr>';
-}
-
-function doTestSpecial() {
-	global $mwOAuthUrl, $gUserAgent, $gConsumerKey, $gTokenKey, $gConsumerSecret;
-
-	$url = str_replace( 'Special:OAuth', 'Special:MyPage', $mwOAuthUrl );
-	$headerArr = array(
-		// OAuth information
-		'oauth_consumer_key' => $gConsumerKey,
-		'oauth_token' => $gTokenKey,
-		'oauth_version' => '1.0',
-		'oauth_nonce' => md5( microtime() . mt_rand() ),
-		'oauth_timestamp' => time(),
-
-		// We're using secret key signatures here.
-		'oauth_signature_method' => 'HMAC-SHA1',
-	);
-	$signature = sign_request( 'GET', $url, $headerArr );
-	$headerArr['oauth_signature'] = $signature;
-
-	$header = array();
-	foreach ( $headerArr as $k => $v ) {
-		$header[] = rawurlencode( $k ) . '="' . rawurlencode( $v ) . '"';
-	}
-	$header = 'Authorization: OAuth ' . join( ', ', $header );
-
-	$ch = curl_init();
-	curl_setopt( $ch, CURLOPT_URL, $url );
-	curl_setopt( $ch, CURLOPT_HTTPHEADER, array( $header ) );
-	//curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
-	curl_setopt( $ch, CURLOPT_USERAGENT, $gUserAgent );
-	curl_setopt( $ch, CURLOPT_HEADER, 1 );
-	curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-	curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 0 );
-	$data = curl_exec( $ch );
-	if ( !$data ) {
-		header( "HTTP/1.1 $errorCode Internal Server Error" );
-		echo 'Curl error: ' . htmlspecialchars( curl_error( $ch ) );
-		exit(0);
-	}
-
-	echo 'Redirect response from Special:MyPage: <pre>' . htmlspecialchars( $data ) . '</pre>';
-	echo '<hr>';
+	echo "<div class='success'>";
+	echo 'You have authorized the parliament diagram tool to post on behalf of ' . htmlspecialchars(  $payload->username ) . '. You can now close this window.';
+	echo "</div>\n";
 }
 
 // ******************** WEBPAGE ********************
 
-?><!DOCTYPE html>
-<html lang="en" dir="ltr">
- <head>
-  <meta charset="UTF-8" />
-  <title>OAuth Test</title>
- </head>
- <body>
-<p>
-This is a test page. To make a parliament diagram, go to <a href="https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html">https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html</a>.
+?><p>
 </p>
-
-<h2>Try it out!</h2>
-<ul>
- <li><a href="<?php echo htmlspecialchars( $_SERVER['SCRIPT_NAME'] );?>?action=authorize">Authorize this application</a></li>
- <li><a href="<?php echo htmlspecialchars( $_SERVER['SCRIPT_NAME'] );?>?action=edit">Post to your talk page</a></li>
- <li><a href="<?php echo htmlspecialchars( $_SERVER['SCRIPT_NAME'] );?>?action=upload&uri=/data/project/parliamentdiagram/public_html/test_parliupload.svg">Upload a file</a></li>
- <li><a href="<?php echo htmlspecialchars( $_SERVER['SCRIPT_NAME'] );?>?action=identify">Verify your identity</a></li>
- <li><a href="<?php echo htmlspecialchars( $mytalkUrl );?>">Visit your talk page</a></li>
-</ul>
 
 </body>
 </html>
