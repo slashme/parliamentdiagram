@@ -914,7 +914,7 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 	} elseif ($last_res->error) {
 		echo "<div class='error'>";
 		if (  $last_res->error->code === 'mwoauth-invalid-authorization' ) {
-			echo 'To authorise this application to upload under your name, go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a>, then come back and reload this page.';
+			echo 'To authorise this application to upload under your name, go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a>, and then click on the upload link again.';
 		} else {
 			echo "Error: " . $last_res->error->info . "<br />";
 		}
@@ -942,7 +942,7 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
       <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
       <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
       <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
-        <div class="button deletebutton" onclick="deleteParty(1)">Delete party 1</div><br>
+      <div class="button deletebutton" onclick="deleteParty(1)">Delete party 1</div><br>
       <br>
     </div>
   </div>
