@@ -770,8 +770,8 @@ function CallDiagramScript(){
                 newpost.appendChild(document.createElement("br"));
 		//File upload name label
 		var filenametitle=document.createElement('div');
-		filenametitle.className = 'left';
-		filenametitle.innerHTML = "Target filename";
+		filenametitle.className = 'left greendiv';
+		filenametitle.innerHTML = "Filename to upload:";
 		newpost.appendChild(filenametitle);
 		//File upload name input control
 		var input=document.createElement('div');
@@ -895,7 +895,7 @@ function deleteParty(i){
   To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.
   If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br>
 <?php //Print the status of the last upload
-if ( $last_res ) { //if there is a "last result" from an attempted Commons upload
+if ( isset ($last_res )) { //if there is a "last result" from an attempted Commons upload
 	if ( $last_res->upload->warnings ) {
 		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {

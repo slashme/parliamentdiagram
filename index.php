@@ -477,7 +477,7 @@ function doIdentify() {
 	}
 
 	echo "<div class='success'>";
-	echo 'You have authorized the parliament diagram tool to post on behalf of ' . htmlspecialchars(  $payload->username ) . '. You can now close this window.';
+	echo 'You have authorized the parliament diagram tool to post on behalf of ' . htmlspecialchars(  $payload->username ) . '. You can now close this window and click the upload link again.';
 	echo "</div>\n";
 }
 
