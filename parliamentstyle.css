@@ -17,15 +17,6 @@
   text-align: center;
   max-width: 50em;
 }
-.deletebutton {
-  background: #db3434;
-  background-image: -webkit-linear-gradient(top, #db3434, #b92929);
-  background-image: -moz-linear-gradient(top, #db3434, #b92929);
-  background-image: -ms-linear-gradient(top, #db3434, #b92929);
-  background-image: -o-linear-gradient(top, #db3434, #b92929);
-  background-image: linear-gradient(to bottom, #db3434, #b92929);
-  max-width: 50%;
-}
 .button:hover {
   background: #3cb0fd;
   background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
@@ -34,6 +25,31 @@
   background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
   background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
   text-decoration: none;
+}
+.greenbutton {
+  background: #34db34;
+  background-image: -webkit-linear-gradient(top, #34db34, #29b929);
+  background-image: -moz-linear-gradient(top, #34db34, #29b929);
+  background-image: -ms-linear-gradient(top, #34db34, #29b929);
+  background-image: -o-linear-gradient(top, #34db34, #29b929);
+  background-image: linear-gradient(to bottom, #34db34, #29b929);
+}
+.greenbutton:hover {
+  background: #3cfd3c;
+  background-image: -webkit-linear-gradient(top, #3cfd3c, #34db34);
+  background-image: -moz-linear-gradient(top, #3cfd3c, #34db34);
+  background-image: -ms-linear-gradient(top, #3cfd3c, #34db34);
+  background-image: -o-linear-gradient(top, #3cfd3c, #34db34);
+  background-image: linear-gradient(to bottom, #3cfd3c, #34db34);
+}
+.deletebutton {
+  background: #db3434;
+  background-image: -webkit-linear-gradient(top, #db3434, #b92929);
+  background-image: -moz-linear-gradient(top, #db3434, #b92929);
+  background-image: -ms-linear-gradient(top, #db3434, #b92929);
+  background-image: -o-linear-gradient(top, #db3434, #b92929);
+  background-image: linear-gradient(to bottom, #db3434, #b92929);
+  max-width: 50%;
 }
 .deletebutton:hover {
   background: #fd3c3c;
@@ -53,6 +69,9 @@
     padding: 5px;
     max-width: 50em;
 }
+.greendiv {
+  background: #34db34;
+}
 .right {
     display: inline-block;
     width: 10em;
@@ -65,4 +84,21 @@
   font-weight: bold;
   font-size: 150%;
   text-align: center;
+}
+.info, .success, .warning, .error, .validation {
+border: 1px solid;
+margin: 10px 0px;
+padding:15px 10px 15px 50px;
+}
+.info {
+color: #00529B;
+}
+.success {
+color: #4F8A10;
+}
+.warning {
+color: #9F6000;
+}
+.error {
+color: #D8000C;
 }
