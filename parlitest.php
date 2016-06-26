@@ -853,7 +853,7 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	fname = fname.replace(/(.svg)*$/i, ".svg");
 	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
 	a.appendChild(linkText);
-	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + legendtext + " {{PD-shape}} {{Information |description = |date = |source = [https://https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]";
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent(legendtext + " {{PD-shape}} {{Information |description = |date = |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
 	a.setAttribute('target', '_blank');
 	var uploadlinkcontainer = document.getElementById("uploadlinkcontainer"); 
 	uploadlinkcontainer.innerHTML = "";
@@ -884,8 +884,8 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {
 			if ( $k == 'exists' ) {
-				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".$_GET['filename'].">".$_GET['filename']."</a> already exists.";
-				if ( $last_res->upload->result != 'Success' ) {echo "If you have confirmed that you want to overwrite it, <a href=https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1>click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";}
+				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a> already exists.";
+				if ( $last_res->upload->result != 'Success' ) {echo "If you have confirmed that you want to overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
 			}
