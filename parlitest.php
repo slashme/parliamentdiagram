@@ -108,7 +108,7 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 		return;
 
 	case 'upload':
-		doUpload($_GET['uri'], $_GET['filename'], $_GET['pagecontent'], "Testing API upload", $_GET['ignore']);
+		doUpload($_GET['uri'], $_GET['filename'], $_GET['pagecontent'], "Direct upload from parliament tool", $_GET['ignore']);
 		break;
 
 	case 'edit':
@@ -435,7 +435,7 @@ function doEdit() {
 		echo 'Not logged in. (How did that happen?)';
 		exit(0);
 	}
-	$page = 'User talk:' . $res->query->userinfo->name;
+	$page = 'File:' . $_GET['filename'];
 
 	// Next fetch the edit token
 	$res = doApiQuery( array(
@@ -455,16 +455,13 @@ function doEdit() {
 		'format' => 'json',
 		'action' => 'edit',
 		'title' => $page,
-		'section' => 'new',
-		'sectiontitle' => 'Hello, world',
-		'text' => 'This message was posted using the OAuth Hello World application, and should be seen as coming from yourself. To revoke this application\'s access to your account, visit [[:' . $mwOAuthIW . ':Special:OAuthManageMyGrants]]. ~~~~',
-		'summary' => '/* Hello, world */ Hello from OAuth!',
-		'watchlist' => 'nochange',
+		'text' => $_GET['pagecontent'],
+		'summary' => 'Updating page info via parliament diagram tool',
 		'token' => $token,
 	), $ch );
 
-	echo 'API edit result: <pre>' . htmlspecialchars( var_export( $res, 1 ) ) . '</pre>';
-	echo '<hr>';
+	global $last_res ;
+	$last_res = $res ;
 }
 
 function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewarnings ) {
@@ -853,7 +850,21 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	fname = fname.replace(/(.svg)*$/i, ".svg");
 	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
 	a.appendChild(linkText);
-	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent(legendtext + " {{PD-shape}} {{Information |description = |date = |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
+	var today = new Date();
+	var DD = today.getDate();
+	var MM = today.getMonth()+1;
+	var YYYY = today.getFullYear();
+
+	if(DD<10) {
+		DD='0'+DD
+	} 
+
+	if(MM<10) {
+		MM='0'+MM
+	} 
+
+	today = YYYY+'-'+MM+'-'+DD;
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( " {{PD-shape}} {{Information |description ="+ legendtext +" |date = "+today+" |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
 	a.setAttribute('target', '_blank');
 	var uploadlinkcontainer = document.getElementById("uploadlinkcontainer"); 
 	uploadlinkcontainer.innerHTML = "";
@@ -885,7 +896,11 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		foreach ( $last_res->upload->warnings as $k => $v ) {
 			if ( $k == 'exists' ) {
 				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a> already exists.";
-				if ( $last_res->upload->result != 'Success' ) {echo "If you have confirmed that you want to overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";}
+				if ( $last_res->upload->result != 'Success' ) {
+					echo "If you have confirmed that you want to overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";
+				} else {
+					echo "Your file was uploaded, but still has the previous info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
+				}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
 			}
@@ -895,12 +910,17 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		echo "<div class='error'>";
 		echo "Error: " . $last_res->error->info . "<br />";
 		echo "</div>\n";
-	} else { //something else went wrong, so show some debug info.
+	} elseif ( $last_res->upload->result != 'Success' && $last_res->edit->result != 'Success' ) { //something went wrong, so show some debug info.
 		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
 	}
 	if ( $last_res->upload->result == 'Success' ) {
 		echo "<div class='success'>";
 		echo "Image successfully uploaded";
+		echo "</div>\n";
+	} 
+	if ( $last_res->edit->result == 'Success' ) {
+		echo "<div class='success'>";
+		echo "Image description successfully updated for <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
 	} 
 }
