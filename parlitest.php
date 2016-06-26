@@ -418,10 +418,13 @@ function doEdit() {
 		'meta' => 'userinfo',
 	), $ch );
 
+	global $last_res ;
+	$last_res = $res ;
+
 	if ( isset( $res->error->code ) && $res->error->code === 'mwoauth-invalid-authorization' ) {
-		// We're not authorized!
-		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a> to do that.';
-		echo '<hr>';
+		// We're not authorized! Commented out message: it's now going to alert in the standard section.
+		// echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a> to do that.';
+		// echo '<hr>';
 		return;
 	}
 
@@ -473,10 +476,12 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'meta' => 'userinfo',
 	), $ch );
 
+	global $last_res ;
+	$last_res = $res ;
+
 	if ( isset( $res->error->code ) && $res->error->code === 'mwoauth-invalid-authorization' ) {
-		// We're not authorized!
-		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize" target = "_blank">here</a> to do that.';
-		echo '<hr>';
+		// We're not authorized! Commented out next lines: message will appear in standard announcement page.
+		// echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize" target = "_blank">here</a> to do that.';
 		return;
 	}
 
@@ -908,7 +913,11 @@ if ( $last_res ) { //if there is a "last result" from an attempted Commons uploa
 		echo "</div>\n";
 	} elseif ($last_res->error) {
 		echo "<div class='error'>";
-		echo "Error: " . $last_res->error->info . "<br />";
+		if (  $last_res->error->code === 'mwoauth-invalid-authorization' ) {
+			echo 'To authorise this application to upload under your name, go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a>, then come back and reload this page.';
+		} else {
+			echo "Error: " . $last_res->error->info . "<br />";
+		}
 		echo "</div>\n";
 	} elseif ( $last_res->upload->result != 'Success' && $last_res->edit->result != 'Success' ) { //something went wrong, so show some debug info.
 		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
