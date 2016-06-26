@@ -896,10 +896,19 @@ You can now directly upload arch-style diagrams to Wikimedia commons with this n
 <div class=block>
   This is a tool to generate arch-shaped parliament diagrams.<br>
   <br>
-  To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
-  Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
-  To use the diagram in Wikipedia, I recommend uploading it to Wikimedia Commons.
-  If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br>
+  To use this tool, fill in the name and support of each party in the
+  legislature, clicking "add party" whenever you need to add a new party.  Then
+  click "Make my diagram", and a link will appear to your SVG diagram. You
+  can then freely download and use the diagram, but to use the diagram in
+  Wikipedia, you shoud upload it to Wikimedia Commons. You can now do this
+  directly, by clicking on the green button to create an upload link. Until I
+  get around to fixing the user-interface, this link will appear just above the
+  party list. Click on the link and follow the instructions: it will upload the
+  file under your username, with the list of parties already present in the
+  file description.  This tool will automatically add your file to the 
+  <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a>
+  category, but you will probably want to categorise it in more detail after
+  uploading.<br>
 <?php //Print the status of the last upload
 if ( isset ($last_res )) { //if there is a "last result" from an attempted Commons upload
 	if ( $last_res->upload->warnings ) {
