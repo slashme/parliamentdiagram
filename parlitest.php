@@ -775,8 +775,8 @@ function CallDiagramScript(){
 		newpost.appendChild(input);
                 //Button to add a link to upload the new diagram
 		var uploadlinkbutton=document.createElement('div');
-		uploadlinkbutton.className = 'button';
-		uploadlinkbutton.innerHTML = "Make upload link";
+		uploadlinkbutton.className = 'button greenbutton';
+		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons";
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		newpost.appendChild(uploadlinkbutton);
                 //and a linebreak
