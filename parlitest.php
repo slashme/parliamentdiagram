@@ -781,7 +781,7 @@ function CallDiagramScript(){
                 //Button to add a link to upload the new diagram
 		var uploadlinkbutton=document.createElement('div');
 		uploadlinkbutton.className = 'button greenbutton';
-		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons";
+		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons - link appears at top of page for now.";
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		newpost.appendChild(uploadlinkbutton);
                 //and a linebreak
@@ -887,6 +887,12 @@ function deleteParty(i){
 <div class=block id=header>
   <script type='text/javascript'>$( "#header" ).load( "header.html" )</script>
 </div>
+<div class="greendiv block" align="center">
+  <b>Direct upload functionality in beta test</b>
+</div>
+<div class="block" align="center">
+You can now directly upload arch-style diagrams to Wikimedia commons with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+</div>
 <div class=block>
   This is a tool to generate arch-shaped parliament diagrams.<br>
   <br>
@@ -906,6 +912,13 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 				} else {
 					echo "Your file was uploaded, but still has the previous info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
 				}
+			} elseif ( $k == 'exists-normalized' ) {
+				echo "Warning: A file with a similar name already exists.";
+				if ( $last_res->upload->result != 'Success' ) {
+					echo "<a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this link to upload an SVG version.</a>.";
+				} else {
+					echo "Your file was uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>, but might still have old info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
+				}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
 			}
@@ -924,7 +937,7 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 	}
 	if ( $last_res->upload->result == 'Success' ) {
 		echo "<div class='success'>";
-		echo "Image successfully uploaded";
+		echo "Image successfully uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
 	} 
 	if ( $last_res->edit->result == 'Success' ) {
