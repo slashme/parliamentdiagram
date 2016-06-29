@@ -741,16 +741,16 @@ function CallDiagramScript(){
         }).done( function(data,status){
 		data=data.trim();
                 var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-                var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
-                var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
-                postparent.insertBefore(newpost, postcontainer);
-                newpost.setAttribute("id", "postcontainer");
+		while (postcontainer.hasChildNodes()) {
+		    postcontainer.removeChild(postcontainer.lastChild);
+		}
                 //Now add the svg image to the page
                 var img = document.createElement("img");
                 img.src = data;
-                newpost.appendChild(img);
+		img.setAttribute("id", "SVGdiagram");
+                postcontainer.appendChild(img);
                 //and a linebreak
-                newpost.appendChild(document.createElement("br"));
+                postcontainer.appendChild(document.createElement("br"));
                 //Add a link with the new diagram
                 var a = document.createElement('a');
                 var linkText = document.createTextNode("Click to download your SVG diagram.");
@@ -758,34 +758,35 @@ function CallDiagramScript(){
                 a.title = "SVG diagram";
                 a.href = data;
                 a.download = data;
-                newpost.appendChild(a);
+                postcontainer.appendChild(a);
                 //and a linebreak
-                newpost.appendChild(document.createElement("br"));
+                postcontainer.appendChild(document.createElement("br"));
                 //Now add the legend template text with the party names, colours and support.
                 var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
+                postcontainer.appendChild(newtext);
+                postcontainer.appendChild(document.createElement("br"));
                 newtext = document.createTextNode(legendstring);
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
+                postcontainer.appendChild(newtext);
+                postcontainer.appendChild(document.createElement("br"));
+                postcontainer.appendChild(document.createElement("br"));
 		//File upload name label
 		var filenametitle=document.createElement('div');
 		filenametitle.className = 'left greendiv';
 		filenametitle.innerHTML = "Filename to upload:";
-		newpost.appendChild(filenametitle);
+		postcontainer.appendChild(filenametitle);
 		//File upload name input control
 		var input=document.createElement('div');
 		inputname = data.replace(/.*\//,'').replace(/.svg\s*$/,'');
 		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '"   value= "My_Parliament.svg" >';
-		newpost.appendChild(input);
+		postcontainer.appendChild(input);
                 //Button to add a link to upload the new diagram
 		var uploadlinkbutton=document.createElement('div');
 		uploadlinkbutton.className = 'button greenbutton';
-		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons - link appears at top of page for now.";
+		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons.";
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
-		newpost.appendChild(uploadlinkbutton);
+		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
-                newpost.appendChild(document.createElement("br"));
+                postcontainer.appendChild(document.createElement("br"));
         });
         console.log(requeststring);
         console.log(legendstring);
@@ -847,6 +848,8 @@ function addParty(){
 function makeUploadLink(inputname, linkdata, legendtext){
 	var a = document.createElement('a');
 	var fname="";
+	//This is kind of dumb: I'm iterating through all the inputs on the
+	//page to find any that match the name that's being called. FIXME
 	$( "input" ).each( function() { 
 			if(this.name == inputname){
 				fname = this.value
@@ -855,6 +858,7 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	fname = fname.replace(/(.svg)*$/i, ".svg");
 	var linkText = document.createTextNode("Click to upload "+fname+" to Wikimedia Commons");
 	a.appendChild(linkText);
+	//Now get today's date and format it suitably for use in Wikimedia Commons templates:
 	var today = new Date();
 	var DD = today.getDate();
 	var MM = today.getMonth()+1;
@@ -869,12 +873,13 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	} 
 
 	today = YYYY+'-'+MM+'-'+DD;
+	//Now build the query URL that will be used to upload the image to Commons:
 	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( " {{PD-shape}} {{Information |description ="+ legendtext +" |date = "+today+" |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
 	a.setAttribute('target', '_blank');
-	var uploadlinkcontainer = document.getElementById("uploadlinkcontainer"); 
-	uploadlinkcontainer.innerHTML = "";
-	uploadlinkcontainer.appendChild(a);
-        uploadlinkcontainer.appendChild(document.createElement("br"));
+	var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
+	var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
+	diagramparent.insertBefore(a, SVGdiagram.nextSibling); //Insert our new node after the diagram
+	diagramparent.insertBefore(document.createElement("br"), SVGdiagram.nextSibling); //Insert a linebreak after the diagram
 }
 function deleteParty(i){
   var delparty = document.getElementById("party"+i);
@@ -891,7 +896,7 @@ function deleteParty(i){
   <b>Direct upload functionality in beta test</b>
 </div>
 <div class="block" align="center">
-You can now directly upload arch-style diagrams to Wikimedia commons with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+You can now directly upload arch-style diagrams to Wikimedia Commons under your own username with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
 </div>
 <div class=block>
   This is a tool to generate arch-shaped parliament diagrams.<br>
@@ -907,8 +912,7 @@ You can now directly upload arch-style diagrams to Wikimedia commons with this n
   file under your username, with the list of parties already present in the
   file description.  This tool will automatically add your file to the 
   <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a>
-  category, but you will probably want to categorise it in more detail after
-  uploading.<br>
+  category, but you should categorise it in more detail after uploading.<br>
 <?php //Print the status of the last upload
 if ( isset ($last_res )) { //if there is a "last result" from an attempted Commons upload
 	if ( $last_res->upload->warnings ) {
@@ -956,7 +960,6 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 	} 
 }
 ?></div>
-<div id="uploadlinkcontainer" class=block>
 </div>
 <div class=block>
   <div id="partylistcontainer">
