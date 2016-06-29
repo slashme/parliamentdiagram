@@ -906,11 +906,10 @@ You can now directly upload arch-style diagrams to Wikimedia Commons under your 
   click "Make my diagram", and a link will appear to your SVG diagram. You
   can then freely download and use the diagram, but to use the diagram in
   Wikipedia, you shoud upload it to Wikimedia Commons. You can now do this
-  directly, by clicking on the green button to create an upload link. Until I
-  get around to fixing the user-interface, this link will appear just above the
-  party list. Click on the link and follow the instructions: it will upload the
-  file under your username, with the list of parties already present in the
-  file description.  This tool will automatically add your file to the 
+  directly, by clicking on the green button to create an upload link. Click on
+  the link and follow the instructions: it will upload the file under your
+  username, with the list of parties already present in the file description.
+  This tool will automatically add your file to the 
   <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a>
   category, but you should categorise it in more detail after uploading.<br>
 <?php //Print the status of the last upload
