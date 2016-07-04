@@ -458,7 +458,7 @@ function doEdit() {
 		'format' => 'json',
 		'action' => 'edit',
 		'title' => $page,
-		'text' => str_replace ( '|other versions' , htmlspecialchars( $last_res->query->userinfo->name).'|other versions' , $_GET['pagecontent']),
+		'text' => str_replace ( '|other versions' , htmlspecialchars( '[[User:'.$last_res->query->userinfo->name.']]').'|other versions' , $_GET['pagecontent']),
 		'summary' => 'Updating page info via parliament diagram tool',
 		'token' => $token,
 	), $ch );
