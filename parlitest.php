@@ -874,7 +874,7 @@ function makeUploadLink(inputname, linkdata, legendtext){
 
 	today = YYYY+'-'+MM+'-'+DD;
 	//Now build the query URL that will be used to upload the image to Commons:
-	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( " {{PD-shape}} {{Information |description ="+ legendtext +" |date = "+today+" |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( " {{translate|switch=yes}} {{PD-shape}} {{Information |description ="+ legendtext +" |date = "+today+" |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
 	a.setAttribute('target', '_blank');
 	var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
 	var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
