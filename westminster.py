@@ -92,7 +92,10 @@ if inputlist:
     if (not 'centercols' in optionlist) or optionlist['centercols']==0: #If the number of columns in the cross-bench is not defined, calculate it:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     else:
-      optionlist['centercols']=int(optionlist['centercols'])
+      try:
+	optionlist['centercols']=int(optionlist['centercols'])
+      except ValueError: #TODO: This is a hack - I seem to be getting a NaN here for some reason, need to fix it properly.
+	optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0))) #Do the same calculation as above if it's not a number.
     try:
       centerrows=math.ceil(float(sumdelegates['center'])/optionlist['centercols'])
     except ZeroDivisionError:
