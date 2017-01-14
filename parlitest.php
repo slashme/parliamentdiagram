@@ -108,7 +108,9 @@ switch ( isset( $_GET['action'] ) ? $_GET['action'] : '' ) {
 		return;
 
 	case 'upload':
-		doUpload($_GET['uri'], $_GET['filename'], $_GET['pagecontent'], "Direct upload from parliament tool", $_GET['ignore']);
+		$ignore=0;
+		if (isset( $_GET['ignore'] )) {$ignore=1;} //Whether to ignore warnings. Test for presence of this parameter to avoid spamming error log.
+		doUpload($_GET['uri'], $_GET['filename'], $_GET['pagecontent'], "Direct upload from parliament tool", $ignore);
 		break;
 
 	case 'edit':
@@ -914,7 +916,7 @@ You can now directly upload arch-style diagrams to Wikimedia Commons under your 
   category, but you should categorise it in more detail after uploading.<br>
 <?php //Print the status of the last upload
 if ( isset ($last_res )) { //if there is a "last result" from an attempted Commons upload
-	if ( $last_res->upload->warnings ) {
+	if (isset($last_res->upload) && $last_res->upload->warnings ) {
 		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {
 			if ( $k == 'exists' ) {
@@ -936,7 +938,7 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 			}
 		}
 		echo "</div>\n";
-	} elseif ($last_res->error) {
+	} elseif (isset($last_res->error)) {
 		echo "<div class='error'>";
 		if (  $last_res->error->code === 'mwoauth-invalid-authorization' ) {
 			echo 'To authorise this application to upload under your name, go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a>, and then click on the upload link again.';
@@ -944,15 +946,15 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 			echo "Error: " . $last_res->error->info . "<br />";
 		}
 		echo "</div>\n";
-	} elseif ( $last_res->upload->result != 'Success' && $last_res->edit->result != 'Success' ) { //something went wrong, so show some debug info.
+	} elseif (isset($last_res->upload) && $last_res->upload->result != 'Success' && $last_res->edit->result != 'Success' ) { //something went wrong, so show some debug info.
 		echo 'API result: <pre>' . htmlspecialchars( var_export( $last_res, 1 ) ) . '</pre>';
 	}
-	if ( $last_res->upload->result == 'Success' ) {
+	if (isset($last_res->upload) && $last_res->upload->result == 'Success' ) {
 		echo "<div class='success'>";
 		echo "Image successfully uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
 	} 
-	if ( $last_res->edit->result == 'Success' ) {
+	if (isset($last_res->edit) && $last_res->edit->result == 'Success' ) {
 		echo "<div class='success'>";
 		echo "Image description successfully updated for <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
