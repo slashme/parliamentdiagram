@@ -678,7 +678,7 @@ function doTestSpecial() {
 <head>
 <link rel="stylesheet" type="text/css" href="parliamentstyle.css">
 <script type="text/javascript">
-document.write("\<script src='//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js' type='text/javascript'>\<\/script>");
+document.write("\<script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'>\<\/script>");
 //document.write("\<script src='jquery.min.js' type='text/javascript'>\<\/script>"); //For local debugging
 </script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
