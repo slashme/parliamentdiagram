@@ -67,37 +67,58 @@ function CallDiagramScript(){
                 data: {inputlist: requeststring },
         }).done( function(data,status){
                 data=data.trim();
-                var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-                var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
-                var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
-                postparent.insertBefore(newpost, postcontainer);
-                newpost.setAttribute("id", "postcontainer");
-                //Now add the svg image to the page
-                var img = document.createElement("img");
-                img.src = data;
-                newpost.appendChild(img);
-                //and a linebreak
-                newpost.appendChild(document.createElement("br"));
-                //Add a link with the new diagram
-                var a = document.createElement('a');
-                var linkText = document.createTextNode("Click to download your SVG diagram.");
-                a.appendChild(linkText);
-                a.title = "SVG diagram";
-                a.href = data;
-                a.download = data;
-                newpost.appendChild(a);
-                //and a linebreak
-                newpost.appendChild(document.createElement("br"));
-                //Now add the legend template text with the party names, colours and support.
-                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
-                newtext = document.createTextNode(legendstring);
-                newpost.appendChild(newtext);
-                newpost.appendChild(document.createElement("br"));
-        });
-        console.log(requeststring);
-        console.log(legendstring);
+		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+		var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
+		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+		postparent.insertBefore(newpost, postcontainer);
+		newpost.setAttribute("id", "postcontainer");
+		//Now add the svg image to the page
+		var img = document.createElement("img");
+		img.src = data;
+		newpost.appendChild(img);
+		//and a linebreak
+		newpost.appendChild(document.createElement("br"));
+		//Add a link with the new diagram
+		var a = document.createElement('a');
+		var linkText = document.createTextNode("Click to download your SVG diagram.");
+		a.appendChild(linkText);
+		a.title = "SVG diagram";
+		a.href = data;
+		a.download = data;
+		newpost.appendChild(a);
+		//add a linebreak
+		newpost.appendChild(document.createElement("br"));
+		//Now add the legend template text with the party names, colours and support.
+		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
+		newtext = document.createTextNode(legendstring);
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
+        })
+	.fail( function(xhr, textStatus, errorThrown) { //data doesn't contain "svg", so post an error message instead
+		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+		var postparent = postcontainer.parentNode; //This will get the parent div that contains all the graphs
+		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+		postparent.insertBefore(newpost, postcontainer);
+		newpost.setAttribute("id", "postcontainer");
+		var errordiv=document.createElement('div');
+		errordiv.id="error";
+		errordiv.className = 'error';
+		errordiv.innerHTML = "Oops, your diagram wasn't successfully generated! Maybe you have more than 31061 seats. If not, please raise a bug report.";
+		newpost.appendChild(errordiv);
+		//add a linebreak
+		newpost.appendChild(document.createElement("br"));
+		//Even though we failed, still add the legend template text with the party names, colours and support.
+		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
+		newtext = document.createTextNode(legendstring);
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));}
+	);
+        console.log(requeststring); // log to console for debug purposes
+        console.log(legendstring); // log to console for debug purposes
       }
 }
 
