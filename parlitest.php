@@ -743,7 +743,7 @@ function CallDiagramScript(){
         }).done( function(data,status){
 		data=data.trim();
                 var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-		while (postcontainer.hasChildNodes()) {
+		while (postcontainer.hasChildNodes()) { //Remove old images
 		    postcontainer.removeChild(postcontainer.lastChild);
 		}
                 //Now add the svg image to the page
@@ -789,7 +789,29 @@ function CallDiagramScript(){
 		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
                 postcontainer.appendChild(document.createElement("br"));
-        });
+        })
+	.fail( function(xhr, textStatus, errorThrown) { //data doesn't contain "svg", so post an error message instead
+		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+		while (postcontainer.hasChildNodes()) { //Remove old images
+		    postcontainer.removeChild(postcontainer.lastChild);
+		}
+		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+		postcontainer.appendChild(newpost);
+		var errordiv=document.createElement('div');
+		errordiv.id="error";
+		errordiv.className = 'error';
+		errordiv.innerHTML = "Oops, your diagram wasn't successfully generated! Maybe you have more than 31061 seats. If not, please raise a bug report.";
+		newpost.appendChild(errordiv);
+		//add a linebreak
+		newpost.appendChild(document.createElement("br"));
+		//Even though we failed, still add the legend template text with the party names, colours and support.
+		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));
+		newtext = document.createTextNode(legendstring);
+		newpost.appendChild(newtext);
+		newpost.appendChild(document.createElement("br"));}
+	);
         console.log(requeststring);
         console.log(legendstring);
       }
