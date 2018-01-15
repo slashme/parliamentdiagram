@@ -62,7 +62,11 @@ if inputlist:
     outfile.write('<!-- Created with the Wikimedia parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html) -->\n')
     outfile.write('<g>\n')
     #Print the number of seats in the middle at the bottom.
-    outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:Sans-serif">'+str(sumdelegates)+'</text>\n')
+<<<<<<< HEAD
+    outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">'+str(sumdelegates)+'</text>\n')
+=======
+    outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">'+str(sumdelegates)+'</text>\n')
+>>>>>>> 66f67bd63cd72083945c25053d2f663aa1a1fa2a
     #Create list of centre spots
     poslist=[]
     for i in range(1,rows):
