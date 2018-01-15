@@ -711,9 +711,20 @@ function CallDiagramScript(){
                   if(this.value < 1){this.value = 1;};
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
                 }
-                //If we are processing a colour string, add a # before the hex values.
                 if(this.name.match( /^Color/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
+                }
+		//If we're processing a border checkbox, only add "none" if it's not checked.
+                if(this.name.match( /^Border/ )){
+		  if(!this.checked){
+		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']="none";
+		  }
+                }
+		//If we're processing a border color, don't overwrite a "none" value.
+                if(this.name.match( /^BColor/ )){
+                  if(partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']!="none"){
+		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']=this.value;
+		  }
                 }
         });
         var arrayLength = partylist.length;
@@ -725,6 +736,9 @@ function CallDiagramScript(){
               requeststring += ', ';
               requeststring += '#';
               requeststring += partylist[i]['Color'];
+              requeststring += ', ';
+              if(partylist[i]['BColor'] !="none"){requeststring += '#'};
+              requeststring += partylist[i]['BColor'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
               if (partylist[i]['Num'] == 1){
                 legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "
@@ -859,6 +873,24 @@ function addParty(){
         var input=document.createElement('div');
         input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
         newpartydiv.appendChild(input);
+        //Party border checkbox name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " border";
+        newpartydiv.appendChild(partycolor);
+        //Party border checkbox control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="checkbox" name="Border' +  i + '" >'
+        newpartydiv.appendChild(input);
+        //Party border color name tag
+        var partybcolor=document.createElement('div');
+        partybcolor.className = 'left';
+        partybcolor.innerHTML = "Party " + i + " border color";
+        newpartydiv.appendChild(partybcolor);
+        //Party border color input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right color" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
+        newpartydiv.appendChild(input);
         var delbutton=document.createElement('div');
         delbutton.className = 'button deletebutton';
         delbutton.innerHTML = "Delete party " + i;
@@ -987,9 +1019,11 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 <div class=block>
   <div id="partylistcontainer">
     <div id="party1">
-      <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
-      <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
-      <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+      <div class="left">Party 1 name            </div><input class="right"       type="text"     name="Name1"    value= "Party 1" ><br>
+      <div class="left">Party 1 delegates       </div><input class="right"       type="number"   name="Number1"  value = 1        ><br>
+      <div class="left">Party 1 color           </div><input class="right color" type="text"     name="Color1"   value= AD1FFF    ><br>
+      <div class="left">Party 1 border          </div><input class="right"       type="checkbox" name="Border1"                   ><br>
+      <div class="left">Party 1 border color    </div><input class="right color" type="text"     name="BColor1"  value= 000000    ><br>
       <div class="button deletebutton" onclick="deleteParty(1)">Delete party 1</div><br>
       <br>
     </div>

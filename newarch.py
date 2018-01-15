@@ -29,7 +29,7 @@ if inputlist:
   for i in re.split("\s*;\s*",inputlist):
     partylist.append(re.split('\s*,\s*', i))
   for i in partylist:
-    if len(i)<2:
+    if len(i)<4:
       error=1
     elif re.search('[^0-9]', i[1]):
       error=1
@@ -38,10 +38,6 @@ if inputlist:
       sumdelegates += i[1]
       if sumdelegates > Totals[-1]:
         error=1
-    if len(i)<3:
-      i.append("#%02x%02x%02x" % (random.randrange(255), random.randrange(255), random.randrange(255)))
-    elif not re.match('^#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]$',i[2]):
-      i[2]=("#%02x%02x%02x" % (random.randrange(255), random.randrange(255), random.randrange(255)))
   if sumdelegates < 1:
     error=1
   if not error:
@@ -66,7 +62,7 @@ if inputlist:
     outfile.write('<!-- Created with the Wikimedia parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html) -->\n')
     outfile.write('<g>\n')
     #Print the number of seats in the middle at the bottom.
-    outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:Sans">'+str(sumdelegates)+'</text>\n')
+    outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:Sans-serif">'+str(sumdelegates)+'</text>\n')
     #Create list of centre spots
     poslist=[]
     for i in range(1,rows):
@@ -95,7 +91,7 @@ if inputlist:
     Counter=-1 #How many spots have we drawn?
     for i in range(len(partylist)):
       #Make each party's blocks an svg group
-      outfile.write('  <g style="fill:'+partylist[i][2]+'" id="'+''.join(partylist[i][0].split())+'">\n')
+      outfile.write('  <g style="fill:'+partylist[i][2]+'; stroke:'+partylist[i][3]+'" id="'+''.join(partylist[i][0].split())+'">\n')
       for Counter in range(Counter+1, Counter+partylist[i][1]+1):
         tempstring='    <circle cx="%.2f" cy="%.2f" r="%.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
 	outfile.write(tempstring+'\n')
