@@ -948,9 +948,6 @@ function deleteParty(i){
 <div class=block id=header>
   <script type='text/javascript'>$( "#header" ).load( "header.html" )</script>
 </div>
-<div class="greendiv block" align="center">
-  <b>Direct upload functionality in beta test</b>
-</div>
 <div class="block">
 You can now directly upload arch-style diagrams to Wikimedia Commons under your own username with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
 </div>
