@@ -955,7 +955,7 @@ You can now directly upload arch-style diagrams to Wikimedia Commons under your 
   This is a tool to generate arch-shaped parliament diagrams.<br>
   <br>
   To use this tool, fill in the name and support of each party in the
-  legislature, clicking "add party" whenever you need to add a new party.  Then
+  legislature, clicking "Add a party" whenever you need to add a new party.  Then
   click "Make my diagram", and a link will appear to your SVG diagram. You
   can then freely download and use the diagram, but to use the diagram in
   Wikipedia, you should upload it to Wikimedia Commons. You can now do this
