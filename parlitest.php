@@ -677,10 +677,10 @@ function doTestSpecial() {
 <html dir="ltr" lang="en">
 <head>
 <link rel="stylesheet" type="text/css" href="parliamentstyle.css">
-<script type="text/javascript">
-document.write("\<script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'>\<\/script>");
+<!--
 //document.write("\<script src='jquery.min.js' type='text/javascript'>\<\/script>"); //For local debugging
-</script>
+-->
+<script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
 //Generate random color, based on http://stackoverflow.com/questions/1484506
