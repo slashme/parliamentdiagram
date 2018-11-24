@@ -973,7 +973,11 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 			if ( $k == 'exists' ) {
 				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a> already exists.";
 				if ( $last_res->upload->result != 'Success' ) {
+					if ($_GET['filename'] == 'My Parliament.svg') {
+					echo "This is a testing file, which you can overwrite by clicking <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">this link.</a> If you abuse this feature, you will be blocked.";
+					} else {
 					echo "If you have confirmed that you want to overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";
+					}
 				} else {
 					echo "Your file was uploaded, but still has the previous info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
 				}
