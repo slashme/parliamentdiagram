@@ -793,12 +793,40 @@ function CallDiagramScript(){
 		//File upload name input control
 		var input=document.createElement('div');
 		inputname = data.replace(/.*\//,'').replace(/.svg\s*$/,'');
-		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '"   value= "My_Parliament.svg" >';
+		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
 		postcontainer.appendChild(input);
+		//Year label
+		var yeartitle=document.createElement('div');
+		yeartitle.className = 'left greendiv';
+		yeartitle.innerHTML = "Election year:";
+		postcontainer.appendChild(yeartitle);
+		//Year input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value="2018" oninput="updateFilename()" >';
+		postcontainer.appendChild(input);
+		//Country label
+		var countrytitle=document.createElement('div');
+		countrytitle.className = 'left greendiv';
+		countrytitle.innerHTML = "Country:";
+		postcontainer.appendChild(countrytitle);
+		//Country input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
+		postcontainer.appendChild(input);
+		//Body label
+		var bodytitle=document.createElement('div');
+		bodytitle.className = 'left greendiv';
+		bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
+		postcontainer.appendChild(bodytitle);
+		//Body input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
+		postcontainer.appendChild(input);
+                postcontainer.appendChild(document.createElement("br"));
                 //Button to add a link to upload the new diagram
 		var uploadlinkbutton=document.createElement('div');
 		uploadlinkbutton.className = 'button greenbutton';
-		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons.";
+		uploadlinkbutton.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
@@ -829,6 +857,22 @@ function CallDiagramScript(){
         console.log(requeststring);
         console.log(legendstring);
       }
+}
+ 
+function updateFilename(){
+	newFilename="";
+	if (document.getElementById("country").value) {newFilename = document.getElementById("country").value}
+	if (document.getElementById("body").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("body").value
+	} 
+	if (document.getElementById("year").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("year").value
+	}
+	if (newFilename=="") {newFilename = "My_Parliament"}
+	newFilename += ".svg";
+	document.getElementById("inputFilename").value = newFilename;
 }
 
 function addParty(){
