@@ -813,6 +813,15 @@ function CallDiagramScript(){
 		var input=document.createElement('div');
 		input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
 		postcontainer.appendChild(input);
+		//Locality label
+		var localitytitle=document.createElement('div');
+		localitytitle.className = 'left greendiv';
+		localitytitle.innerHTML = "Locality:";
+		postcontainer.appendChild(localitytitle);
+		//Locality input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
+		postcontainer.appendChild(input);
 		//Body label
 		var bodytitle=document.createElement('div');
 		bodytitle.className = 'left greendiv';
@@ -862,6 +871,10 @@ function CallDiagramScript(){
 function updateFilename(){
 	newFilename="";
 	if (document.getElementById("country").value) {newFilename = document.getElementById("country").value}
+	if (document.getElementById("locality").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("locality").value
+	} 
 	if (document.getElementById("body").value) {
 		if (newFilename) {newFilename += "_"}
 		newFilename += document.getElementById("body").value
