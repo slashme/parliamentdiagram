@@ -1045,6 +1045,13 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 				} else {
 					echo "Your file was uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>, but might still have old info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
 				}
+			} elseif ( $k == 'duplicate' ) {
+				echo "Warning: A file with exactly that content already exists.<br />";
+				if ( $last_res->upload->result != 'Success' ) {
+					echo "<a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this link to upload anyway.</a>.<br />";
+				} else {
+					echo "Your file was uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a><br />";
+				}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
 			}
