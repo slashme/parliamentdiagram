@@ -514,7 +514,7 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'comment' => $comment ,
 		'text' => $desc ,
 		'token' => $token ,
-		'file' => '@' . $filetosend,
+		'file' => new CurlFile($filetosend, 'image/svg'),
 	) ;
 
 	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; 
