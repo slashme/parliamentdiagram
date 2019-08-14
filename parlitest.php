@@ -514,7 +514,7 @@ function doUpload ( $filetosend , $new_file_name , $desc , $comment , $ignorewar
 		'comment' => $comment ,
 		'text' => $desc ,
 		'token' => $token ,
-		'file' => '@' . $filetosend,
+		'file' => new CurlFile($filetosend, 'image/svg'),
 	) ;
 
 	if ( $ignorewarnings ) $params['ignorewarnings'] = 1 ; 
@@ -677,10 +677,10 @@ function doTestSpecial() {
 <html dir="ltr" lang="en">
 <head>
 <link rel="stylesheet" type="text/css" href="parliamentstyle.css">
-<script type="text/javascript">
-document.write("\<script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'>\<\/script>");
+<!--
 //document.write("\<script src='jquery.min.js' type='text/javascript'>\<\/script>"); //For local debugging
-</script>
+-->
+<script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
 //Generate random color, based on http://stackoverflow.com/questions/1484506
@@ -711,9 +711,20 @@ function CallDiagramScript(){
                   if(this.value < 1){this.value = 1;};
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
                 }
-                //If we are processing a colour string, add a # before the hex values.
                 if(this.name.match( /^Color/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
+                }
+		//If we're processing a border checkbox, only add "none" if it's not checked.
+                if(this.name.match( /^Border/ )){
+		  if(!this.checked){
+		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']="none";
+		  }
+                }
+		//If we're processing a border color, don't overwrite a "none" value.
+                if(this.name.match( /^BColor/ )){
+                  if(partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']!="none"){
+		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']=this.value;
+		  }
                 }
         });
         var arrayLength = partylist.length;
@@ -725,6 +736,9 @@ function CallDiagramScript(){
               requeststring += ', ';
               requeststring += '#';
               requeststring += partylist[i]['Color'];
+              requeststring += ', ';
+              if(partylist[i]['BColor'] !="none"){requeststring += '#'};
+              requeststring += partylist[i]['BColor'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
               if (partylist[i]['Num'] == 1){
                 legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "
@@ -779,12 +793,49 @@ function CallDiagramScript(){
 		//File upload name input control
 		var input=document.createElement('div');
 		inputname = data.replace(/.*\//,'').replace(/.svg\s*$/,'');
-		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '"   value= "My_Parliament.svg" >';
+		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
 		postcontainer.appendChild(input);
+		//Year label
+		var yeartitle=document.createElement('div');
+		yeartitle.className = 'left greendiv';
+		yeartitle.innerHTML = "Election year:";
+		postcontainer.appendChild(yeartitle);
+		//Year input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value="2018" oninput="updateFilename()" >';
+		postcontainer.appendChild(input);
+		//Country label
+		var countrytitle=document.createElement('div');
+		countrytitle.className = 'left greendiv';
+		countrytitle.innerHTML = "Country:";
+		postcontainer.appendChild(countrytitle);
+		//Country input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
+		postcontainer.appendChild(input);
+		//Locality label
+		var localitytitle=document.createElement('div');
+		localitytitle.className = 'left greendiv';
+		localitytitle.innerHTML = "Locality:";
+		postcontainer.appendChild(localitytitle);
+		//Locality input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
+		postcontainer.appendChild(input);
+		//Body label
+		var bodytitle=document.createElement('div');
+		bodytitle.className = 'left greendiv';
+		bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
+		postcontainer.appendChild(bodytitle);
+		//Body input control
+		var input=document.createElement('div');
+		input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
+		postcontainer.appendChild(input);
+                postcontainer.appendChild(document.createElement("br"));
                 //Button to add a link to upload the new diagram
 		var uploadlinkbutton=document.createElement('div');
 		uploadlinkbutton.className = 'button greenbutton';
-		uploadlinkbutton.innerHTML = "Create link for direct upload to Wikimedia Commons.";
+		uploadlinkbutton.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
@@ -815,6 +866,26 @@ function CallDiagramScript(){
         console.log(requeststring);
         console.log(legendstring);
       }
+}
+ 
+function updateFilename(){
+	newFilename="";
+	if (document.getElementById("country").value) {newFilename = document.getElementById("country").value}
+	if (document.getElementById("locality").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("locality").value
+	} 
+	if (document.getElementById("body").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("body").value
+	} 
+	if (document.getElementById("year").value) {
+		if (newFilename) {newFilename += "_"}
+		newFilename += document.getElementById("year").value
+	}
+	if (newFilename=="") {newFilename = "My_Parliament"}
+	newFilename += ".svg";
+	document.getElementById("inputFilename").value = newFilename;
 }
 
 function addParty(){
@@ -859,6 +930,24 @@ function addParty(){
         var input=document.createElement('div');
         input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
         newpartydiv.appendChild(input);
+        //Party border checkbox name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " border";
+        newpartydiv.appendChild(partycolor);
+        //Party border checkbox control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="checkbox" name="Border' +  i + '" >'
+        newpartydiv.appendChild(input);
+        //Party border color name tag
+        var partybcolor=document.createElement('div');
+        partybcolor.className = 'left';
+        partybcolor.innerHTML = "Party " + i + " border color";
+        newpartydiv.appendChild(partybcolor);
+        //Party border color input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right color" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
+        newpartydiv.appendChild(input);
         var delbutton=document.createElement('div');
         delbutton.className = 'button deletebutton';
         delbutton.innerHTML = "Delete party " + i;
@@ -898,7 +987,7 @@ function makeUploadLink(inputname, linkdata, legendtext){
 
 	today = YYYY+'-'+MM+'-'+DD;
 	//Now build the query URL that will be used to upload the image to Commons:
-	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( " {{PD-shape}} {{Information |description ="+ legendtext +" |date = "+today+" |source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool] |author = |other versions = }} [[Category:Election apportionment diagrams]]");
+	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( "== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool]\n|author = \n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n");
 	a.setAttribute('target', '_blank');
 	var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
 	var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
@@ -916,9 +1005,6 @@ function deleteParty(i){
 <div class=block id=header>
   <script type='text/javascript'>$( "#header" ).load( "header.html" )</script>
 </div>
-<div class="greendiv block" align="center">
-  <b>Direct upload functionality in beta test</b>
-</div>
 <div class="block">
 You can now directly upload arch-style diagrams to Wikimedia Commons under your own username with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
 </div>
@@ -926,7 +1012,7 @@ You can now directly upload arch-style diagrams to Wikimedia Commons under your 
   This is a tool to generate arch-shaped parliament diagrams.<br>
   <br>
   To use this tool, fill in the name and support of each party in the
-  legislature, clicking "add party" whenever you need to add a new party.  Then
+  legislature, clicking "Add a party" whenever you need to add a new party.  Then
   click "Make my diagram", and a link will appear to your SVG diagram. You
   can then freely download and use the diagram, but to use the diagram in
   Wikipedia, you should upload it to Wikimedia Commons. You can now do this
@@ -944,7 +1030,11 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 			if ( $k == 'exists' ) {
 				echo "Warning: The file <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a> already exists.";
 				if ( $last_res->upload->result != 'Success' ) {
+					if (($_GET['filename'] == 'My Parliament.svg') || ($_GET['filename'] == 'My_Parliament.svg')) {
+					echo "This is a testing file, which you can overwrite by clicking <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">this link.</a> If you abuse this feature, you will be blocked.";
+					} else {
 					echo "If you have confirmed that you want to overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this dangerous link to upload a new version.</a> If you abuse this feature, you will be blocked.";
+					}
 				} else {
 					echo "Your file was uploaded, but still has the previous info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
 				}
@@ -954,6 +1044,13 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 					echo "<a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this link to upload an SVG version.</a>.";
 				} else {
 					echo "Your file was uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>, but might still have old info text. To overwrite it, <a href=\"https://" . $_SERVER['HTTP_HOST'] .str_replace( 'upload' , 'edit' , $_SERVER['REQUEST_URI'])."\">click here</a>";
+				}
+			} elseif ( $k == 'duplicate' ) {
+				echo "Warning: A file with exactly that content already exists.<br />";
+				if ( $last_res->upload->result != 'Success' ) {
+					echo "<a href=\"https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']."&ignore=1\">click this link to upload anyway.</a>.<br />";
+				} else {
+					echo "Your file was uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a><br />";
 				}
 			} else {
 				echo "Warning \"".$k."\": ".$v."<br />";
@@ -987,9 +1084,11 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 <div class=block>
   <div id="partylistcontainer">
     <div id="party1">
-      <div class="left">Party 1 name      </div><input class="right"       type="text"   name="Name1"   value= "Party 1" ><br>
-      <div class="left">Party 1 delegates </div><input class="right"       type="number" name="Number1" value = 1        ><br>
-      <div class="left">Party 1 color     </div><input class="right color" type="text"   name="Color1"  value= AD1FFF    ><br>
+      <div class="left">Party 1 name            </div><input class="right"       type="text"     name="Name1"    value= "Party 1" ><br>
+      <div class="left">Party 1 delegates       </div><input class="right"       type="number"   name="Number1"  value = 1        ><br>
+      <div class="left">Party 1 color           </div><input class="right color" type="text"     name="Color1"   value= AD1FFF    ><br>
+      <div class="left">Party 1 border          </div><input class="right"       type="checkbox" name="Border1"                   ><br>
+      <div class="left">Party 1 border color    </div><input class="right color" type="text"     name="BColor1"  value= 000000    ><br>
       <div class="button deletebutton" onclick="deleteParty(1)">Delete party 1</div><br>
       <br>
     </div>
