@@ -1062,7 +1062,8 @@ function deleteParty(i){
   <script type='text/javascript'>$( "#header" ).load( "header.html" )</script>
 </div>
 <div class="block">
-You can now directly upload arch-style diagrams to Wikimedia Commons under your own username with this new interface. Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+It is now possible to get the list of parties from a previous diagram that uses the legend templates that this tool creates. Try it out by putting the name of an existing diagram on Commons into the text box below.
+Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
 </div>
 <div class=block>
   This is a tool to generate arch-shaped parliament diagrams.<br>
@@ -1138,7 +1139,7 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 ?></div>
 </div>
 <div id="infile">
-  <div class="left">Get example from:</div><input class="right"       type="text"     name="infile"    value= "File:My_Parliament.svg" ><br>
+  <div class="left">Get list of parties from:</div><input class="right"       type="text"     name="infile"    value= "File:My_Parliament.svg" ><br>
 <div class=button id="getfile">Get party list</div>
 </div>
 <div class=block>
