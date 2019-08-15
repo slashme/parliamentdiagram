@@ -20,7 +20,7 @@
  * - consumerKey: The "consumer token" given to you when registering your app
  * - consumerSecret: The "secret token" given to you when registering your app
  */
-$inifile = '/data/project/parliamentdiagram/oauth-enduser.ini';
+$inifile = '/var/www/oauth-enduser.ini';
 
 /**
  * Set this to the Special:OAuth/authorize URL. 
@@ -693,6 +693,38 @@ function getRandomColor() {
         return color;
 }
 
+$(document).ready(function() {
+	$('#getfile').click(function(){
+	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=File%3AMy%20Parliament.svg&rvprop=content&rvlimit=1&callback=?";
+	  $.ajax({
+	    dataType: "json",
+	    url: wikiurl,
+	  })
+		  .done(function(data){
+			  console.log(data);
+			  $.each(data.query.pages, function(i,item){
+				  wikitext=item.revisions[0]['*'];
+			  });
+	var res = wikitext.split("{{legend");
+	len=res.length;
+	regex2=": ";
+	regex3=" seats}}";
+ 
+	for(i=1; i<len; i++)
+	    {
+		res[i];
+		console.log(res[i].slice(2,8));
+		seatnum = res[i].search(regex2);
+		console.log(res[i].slice(9,seatnum));
+		seatsend = res[i].search(regex3);
+		console.log(res[i].slice(seatnum+2,seatsend));
+
+	    }
+
+		  });
+	});
+});
+
 function CallDiagramScript(){
         // Create request string: this is the request that is passed to the python script.
         var requeststring="";
@@ -956,7 +988,7 @@ function addParty(){
           //Add a newline
         newpartydiv.appendChild(document.createElement("br"));
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
-        jscolor.init();
+        //jscolor.init();
 }
 function makeUploadLink(inputname, linkdata, legendtext){
 	var a = document.createElement('a');
@@ -1080,6 +1112,10 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 	} 
 }
 ?></div>
+</div>
+<div id="infile">
+  <div class="left">Get example from:</div><input class="right"       type="text"     name="infile"    value= "File:My_Parliament.svg" ><br>
+<div class=button id="getfile">Get party list</div>
 </div>
 <div class=block>
   <div id="partylistcontainer">
