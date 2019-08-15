@@ -698,6 +698,7 @@ $(document).ready(function() {
 			  });
 	var res = wikitext.split("{{legend");
 	len=res.length;
+	if(len<2){alert("legend template not detected, cannot auto-fill party list.")};
 	
 	regex2=": ";
 	regex3=" seats}}";
