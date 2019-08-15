@@ -798,7 +798,7 @@ function CallDiagramScript(){
               }
               }
             }
-            if(arrayLength && totalseats){
+            if(arrayLength && totalseats > 0){
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",
