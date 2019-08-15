@@ -686,7 +686,7 @@ function doTestSpecial() {
 
 $(document).ready(function() {
 	$('#getfile').click(function(){
-	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").value()+"&rvprop=content&rvlimit=1&callback=?";
+	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").val()+"&rvprop=content&rvlimit=1&callback=?";
 	  $.ajax({
 	    dataType: "json",
 	    url: wikiurl,
