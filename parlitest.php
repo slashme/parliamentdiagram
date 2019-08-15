@@ -709,6 +709,7 @@ $(document).ready(function() {
 		partydata[i-1]=[];
 		partydata[i-1][0]=res[i].slice(2,8);
 		seatnum = res[i].search(regex2);
+		if(seatnum == -1){alert("Can't find number of seats, this is probably an old diagram.")};
 		partydata[i-1][1]=res[i].slice(9,seatnum);
 //		seatsend = res[i].search(regex3);
 //		partydata[i-1][2]=res[i].slice(seatnum+2,seatsend);
