@@ -961,12 +961,12 @@ function addParty(newname="", newcolor=""){
         //Party name label
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
-	if(newname==""){newname="Party " + i + " name"}
+	if(newname==""){newname="Party " + i }
         partytitle.innerHTML = "Party " +  i ;
         newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value=' + newname + '>'
+        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
         newpartydiv.appendChild(input);
         //Party support name tag
         var partysupport=document.createElement('div');
