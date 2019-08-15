@@ -852,7 +852,7 @@ function CallDiagramScript(){
 		postcontainer.appendChild(yeartitle);
 		//Year input control
 		var input=document.createElement('div');
-		input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value="2018" oninput="updateFilename()" >';
+		input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value='+(new Date()).getFullYear()+' oninput="updateFilename()" >';
 		postcontainer.appendChild(input);
 		//Country label
 		var countrytitle=document.createElement('div');
