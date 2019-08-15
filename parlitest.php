@@ -707,21 +707,37 @@ $(document).ready(function() {
 			  });
 	var res = wikitext.split("{{legend");
 	len=res.length;
+	
 	regex2=": ";
 	regex3=" seats}}";
+	//create array to hold party data
+	partydata=[];
  
 	for(i=1; i<len; i++)
 	    {
-		res[i];
-		console.log(res[i].slice(2,8));
+		partydata[i-1]=[];
+		partydata[i-1][0]=res[i].slice(2,8);
 		seatnum = res[i].search(regex2);
-		console.log(res[i].slice(9,seatnum));
+		partydata[i-1][1]=res[i].slice(9,seatnum);
 		seatsend = res[i].search(regex3);
-		console.log(res[i].slice(seatnum+2,seatsend));
-
+		partydata[i-1][2]=res[i].slice(seatnum+2,seatsend);
 	    }
+	console.log(partydata);
+	// Delete all parties first
+        // Select party list <div>
+        var partylistcontainer = document.getElementById("partylistcontainer");
+        //Find out how many parties we have
+        numparties=0;
+        $( "div" ).each( function() { 
+            if(this.id.match( /^party[0-9]+$/ )){
+		    deleteParty( parseInt(/[0-9]+$/.exec(this.id)[0] ));
+              }
+          }
+        );
 
-		  });
+	//Generate parties from array: TODO
+
+	  });
 	});
 });
 
