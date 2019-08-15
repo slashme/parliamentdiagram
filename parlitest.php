@@ -683,15 +683,6 @@ function doTestSpecial() {
 <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
-//Generate random color, based on http://stackoverflow.com/questions/1484506
-function getRandomColor() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = ''; // In my case, I don't want the leading #
-        for (var i = 0; i < 6; i++ ) {
-                color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-}
 
 $(document).ready(function() {
 	$('#getfile').click(function(){
@@ -743,6 +734,16 @@ $(document).ready(function() {
 	  });
 	});
 });
+
+//Generate random color, based on http://stackoverflow.com/questions/1484506
+function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = ''; // In my case, I don't want the leading #
+        for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+}
 
 function CallDiagramScript(){
         // Create request string: this is the request that is passed to the python script.
