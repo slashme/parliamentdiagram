@@ -798,7 +798,7 @@ function CallDiagramScript(){
               }
               }
             }
-            if(arrayLength && totalseats > 0){
+            if(totalseats > 0){
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",
@@ -916,6 +916,10 @@ function CallDiagramScript(){
         console.log(requeststring);
         console.log(legendstring);
       }
+	    else
+	    {
+	    alert("There are no delegates in your parliament. Cannot generate a diagram!");
+	    }
 }
  
 function updateFilename(){
