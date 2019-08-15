@@ -686,7 +686,7 @@ function doTestSpecial() {
 
 $(document).ready(function() {
 	$('#getfile').click(function(){
-	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=File%3AMy%20Parliament.svg&rvprop=content&rvlimit=1&callback=?";
+	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").value()+"&rvprop=content&rvlimit=1&callback=?";
 	  $.ajax({
 	    dataType: "json",
 	    url: wikiurl,
@@ -1140,7 +1140,7 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 ?></div>
 </div>
 <div id="infile">
-  <div class="left">Get list of parties from:</div><input class="right"       type="text"     name="infile"    value= "File:My_Parliament.svg" ><br>
+  <div class="left">Get list of parties from:</div><input class="right" type="text" name="infile" id="inputfile" value= "File:My_Parliament.svg" ><br>
 <div class=button id="getfile">Get party list</div>
 </div>
 <div class=block>
