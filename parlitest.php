@@ -20,7 +20,7 @@
  * - consumerKey: The "consumer token" given to you when registering your app
  * - consumerSecret: The "secret token" given to you when registering your app
  */
-$inifile = '/w/api.php?action=query&format=json&prop=revisions&titles=File%3AMy%20Parliament.svg&rvprop=content&rvlimit=1';
+$inifile = '/data/project/parliamentdiagram/oauth-enduser.ini';
 
 /**
  * Set this to the Special:OAuth/authorize URL. 
