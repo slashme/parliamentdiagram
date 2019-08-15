@@ -759,7 +759,11 @@ function CallDiagramScript(){
                 //Don't allow parties without delegates: if we have a number field, make the value at least 1.
                 //It's a bit of a hack, but shouldn't be much of a limitation.
                 if(this.name.match( /^Number/ )){
-                  if(this.value < 1){this.value = 1;};
+			if(this.value < 1){
+				alert("There are parties with no delegates, a diagram will not be generated");
+				break;
+		       	};
+		};
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
                 }
                 if(this.name.match( /^Color/ )){
