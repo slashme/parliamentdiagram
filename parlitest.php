@@ -751,19 +751,13 @@ function CallDiagramScript(){
         var legendstring="";
         var legendname = "";
         var legendnum  = "";
+	var totalseats = 0; //count total seats to check for empty diagram
         var partylist   = new Array();
         $( "input" ).each( function() { 
                 if(this.name.match( /^Name/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
                 }
-                //Don't allow parties without delegates: if we have a number field, make the value at least 1.
-                //It's a bit of a hack, but shouldn't be much of a limitation.
                 if(this.name.match( /^Number/ )){
-			if(this.value < 1){
-				alert("There are parties with no delegates, a diagram will not be generated");
-				break;
-		       	};
-		};
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
                 }
                 if(this.name.match( /^Color/ )){
@@ -788,6 +782,7 @@ function CallDiagramScript(){
               requeststring += partylist[i]['Name'];
               requeststring += ', ';
               requeststring += partylist[i]['Num'];
+	      totalseats += partylist[i]['Num'];
               requeststring += ', ';
               requeststring += '#';
               requeststring += partylist[i]['Color'];
@@ -803,7 +798,7 @@ function CallDiagramScript(){
               }
               }
             }
-            if(arrayLength){
+            if(arrayLength && totalseats){
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
                 type: "POST",
