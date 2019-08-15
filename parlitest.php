@@ -719,8 +719,8 @@ $(document).ready(function() {
 		partydata[i-1][0]=res[i].slice(2,8);
 		seatnum = res[i].search(regex2);
 		partydata[i-1][1]=res[i].slice(9,seatnum);
-		seatsend = res[i].search(regex3);
-		partydata[i-1][2]=res[i].slice(seatnum+2,seatsend);
+//		seatsend = res[i].search(regex3);
+//		partydata[i-1][2]=res[i].slice(seatnum+2,seatsend);
 	    }
 	console.log(partydata);
 	// Delete all parties first
@@ -735,7 +735,10 @@ $(document).ready(function() {
           }
         );
 
-	//Generate parties from array: TODO
+	//Generate parties from array: 
+	partydata.forEach(function(element){
+		addParty(element[1], element[0])
+	});
 
 	  });
 	});
@@ -936,7 +939,7 @@ function updateFilename(){
 	document.getElementById("inputFilename").value = newFilename;
 }
 
-function addParty(){
+function addParty(newname="", newcolor=""){
         // Party list <div> where dynamic content will be placed
         var partylistcontainer = document.getElementById("partylistcontainer");
         //New party's number: one more than the largest party number so far:
@@ -954,11 +957,12 @@ function addParty(){
         //Party name label
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
-        partytitle.innerHTML = "Party " + i + " name";
+	if(newname==""){newname="Party " + i + " name"}
+        partytitle.innerHTML = "Party " +  i ;
         newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value= "Party ' +  i + '" >'
+        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value=' + newname + '>'
         newpartydiv.appendChild(input);
         //Party support name tag
         var partysupport=document.createElement('div');
@@ -967,7 +971,7 @@ function addParty(){
         newpartydiv.appendChild(partysupport);
         //Party support input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "' +  i + '" >';
+        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
         newpartydiv.appendChild(input);
         //Party color name tag
         var partycolor=document.createElement('div');
@@ -976,7 +980,8 @@ function addParty(){
         newpartydiv.appendChild(partycolor);
         //Party color input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  getRandomColor() + '" >'
+	if(newcolor==""){newcolor=getrandomcolor()}
+        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
         newpartydiv.appendChild(input);
         //Party border checkbox name tag
         var partycolor=document.createElement('div');
