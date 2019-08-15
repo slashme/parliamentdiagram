@@ -984,7 +984,7 @@ function addParty(newname="", newcolor=""){
         newpartydiv.appendChild(partycolor);
         //Party color input control
         var input=document.createElement('div');
-	if(newcolor==""){newcolor=getrandomcolor()}
+	if(newcolor==""){newcolor=getRandomColor()}
         input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
         newpartydiv.appendChild(input);
         //Party border checkbox name tag
