@@ -7,6 +7,7 @@ $(document).ready(function() {
 		console.log(value.stateLabel.value);
 		$('#countrylist').append($("<option></option>").attr("value",value.id.value).text(value.stateLabel.value));
 	});});
+	$('#countrylist').select2();
 
 	$('#getfile').click(function(){
 	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").val()+"&rvprop=content&rvlimit=1&callback=?";
