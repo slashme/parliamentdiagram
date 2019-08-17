@@ -46,7 +46,12 @@ Please submit bug reports and feature requests at the project's <a href="https:/
   </select>
 </div>
 <br>
-<div class=button id="getfile">Get party list</div>
+<div class=button id="wdpartylist">Query party list</div>
+<div class="left">Parties
+  <select id=partylist>
+    <option value="">Select your country first!</option>
+  </select>
+</div>
 <div id="infile">
   <div class="left">Get list of parties from:</div><input class="right" type="text" name="infile" id="inputfile" value= "File:My_Parliament.svg" ><br>
 </div>
