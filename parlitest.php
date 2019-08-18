@@ -30,7 +30,7 @@
 
   <div class="block card">
     <div class="card-body">
-      <p class="card-text">If you want to add a party manually <button class="btn btn-info">Click here</button></p>
+      <p class="card-text">If you want to add a party manually <button class="btn btn-info" id="addpartybutton">Click here</button></p>
     </div>
   </div>
 
