@@ -30,6 +30,9 @@
               </select>
             </div>
           </div>
+
+          <button class="btn btn-primary" id="wdpartylist">Query party list</button>
+
           <div class="form-group row mt-4">
             <label class="col-sm-3 col-form-label">Parties</label>
             <div class="col-sm-9">
