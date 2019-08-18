@@ -155,6 +155,7 @@ function addParty(newname="", newcolor=""){
           //Add a newline
         newpartydiv.appendChild(document.createElement("br"));
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
+        jscolor.installByClassName("jscolor");
         //jscolor.init();
 }
 
