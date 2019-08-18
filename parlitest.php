@@ -21,23 +21,37 @@
   <div class="block card">
     <div class="card-body">
       <div id="infile">
-        <div class="left">Country
-          <select id="countrylist">
-            <option value="">Select your country</option>
-          </select>
+        <div class="form">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label">Country</label>
+            <div class="col-sm-9">
+              <select id="countrylist form-control">
+                <option value="">Select your country</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row mt-4">
+            <label class="col-sm-3 col-form-label">Parties</label>
+            <div class="col-sm-9">
+              <select id="partylist" class="form-control">
+                <option value="" selected="selected">Select your country first!</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-info" id="addpartybutton">Add a party</button>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="button" id="wdpartylist">Query party list</div>
-        <div class="left">Parties
-          <select id="partylist">
-            <option value="">Select your country first!</option>
-          </select>
+  <div class="block card">
+    <div class="card-body">
+      <div id="infile" class="form-group row">
+        <label class="col-sm-3 col-form-label">Get list of parties from:</label>
+        <div class="col-sm-9">
+          <input class="right form-control" type="text" name="infile" id="inputfile" value="File:My_Parliament.svg">
         </div>
-
-        <div id="infile">
-          <div class="left">Get list of parties from:</div><input class="right" type="text" name="infile" id="inputfile" value="File:My_Parliament.svg"><br>
-        </div>
-        <div class=button id="getfile">Get party list</div>
+        <button class="btn btn-primary" id="getfile">Get party list</button>
       </div>
     </div>
   </div>
@@ -87,7 +101,6 @@
 
   <div class="card">
     <div class="card-body">
-      <button class="btn btn-info" id="addpartybutton">Add a party</button>
       <button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
     </div>
   </div>
