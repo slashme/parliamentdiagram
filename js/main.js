@@ -16,7 +16,7 @@ $('#wdpartylist').click(function(){
 })
 	.done(function(data){$.each(data.results.bindings, function(key, value){
 		console.log(value.label_en.value);
-		//$('#countrylist').append($("<option></option>").attr("value",value.id.value).text(value.stateLabel.value));
+		$('#partylist').append($("<option></option>").attr("value",value.wdPlain.value).text(value.label_en.value));
 	});});
 
 });
