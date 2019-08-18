@@ -1,42 +1,51 @@
-<div class="floatblock">
-  <a href="https://en.wikipedia.org/wiki/User_talk:Slashme">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/DavidBWpassport.JPG/190px-DavidBWpassport.JPG" width="90%" alt="David Richfield" title="David Richfield">
-  </a>
-</div>
-<div class="floatblock">
-  <a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/CumhuriyetMeclisiDagilim.svg" width="90%" alt="arch diagram tool" title="arch diagram tool">
-  </a>
-</div>
-<div class="floatblock">
-  <a href="http://tools.wmflabs.org/parliamentdiagram/USinputform.html">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Senate_diagram_2014_State_of_Utah.svg" width="90%" alt="USA diagram tool" title="USA diagram tool">
-  </a>
-</div>
-<div class="floatblock">
-  <a href="http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/New_Zealand-01.svg" width="90%" alt="Westminster-style diagram tool" title="Westminster-style diagram tool">
-  </a>
-</div>
-<div class="floatblock">
-  <a href="https://github.com/slashme/parliamentdiagram">
-    <img src="images/GitHub-Mark.png" width="90%" alt="Get the code" title="Get the code">
-  </a>
-</div>
-<br style="clear: left;" />
-<div class="floatblock">
-<a href="https://en.wikipedia.org/wiki/User_talk:Slashme">Contact me</a>
-</div>
-<div class="floatblock">
-<a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">Arch-style diagram</a>
-</div>
-<div class="floatblock">
-<a href="http://tools.wmflabs.org/parliamentdiagram/USinputform.html">US-style diagram</a>
-</div>
-<div class="floatblock">
-<a href="http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html">Westminster-style diagram</a>
-</div>
-<div class="floatblock">
-<a href="https://github.com/slashme/parliamentdiagram">Get the code!</a>
-</div>
-<br style="clear: left;" />
+<nav class="navbar navbar-dark bg-primary shadow-sm text-white">
+  <h1 class="justify-content-center container"><a class="navbar-brand">Parliament Diagrams</a></h1>
+</nav>
+
+<div class="container">
+  <div class="block card-deck">
+    <div class="card">
+      <div class="card-body">
+        <a href="https://en.wikipedia.org/wiki/User_talk:Slashme">
+          <img class="img w-100" src="images/190px-DavidBWpassport.JPG" alt="David Richfield" title="David Richfield">
+        </a>
+        <p class="card-text text-center pt-3"><a href="https://en.wikipedia.org/wiki/User_talk:Slashme">Contact me</a></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">
+          <img class="mt-5" src="images/CumhuriyetMeclisiDagilim.svg" alt="arch diagram tool" title="arch diagram tool" width="90%">
+        </a>
+        <p class="card-text text-center pt-3"><a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">Arch-style diagram</a></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <a href="http://tools.wmflabs.org/parliamentdiagram/USinputform.html">
+          <img class="mt-5" src="images/Senate_diagram_2014_State_of_Utah.svg" alt="USA diagram tool" title="USA diagram tool" width="90%">
+        </a>
+        <p class="card-text text-center pt-3"><a href="http://tools.wmflabs.org/parliamentdiagram/USinputform.html">US-style diagram</a></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <a href="http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html">
+          <img class="mt-5" src="images/New_Zealand-01.svg" alt="Westminster-style diagram tool" title="Westminster-style diagram tool" width="90%">
+        </a>
+        <p class="card-text text-center pt-3"><a href="http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html">Westminster-style diagram</a></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <a href="https://github.com/slashme/parliamentdiagram">
+          <img class="mt-3" src="images/GitHub-Mark.png" alt="Get the code" title="Get the code" width="90%">
+        </a>
+        <p class="card-text text-center"><a href="https://github.com/slashme/parliamentdiagram">Get the code!</a></p>
+      </div>
+    </div>
+  </div>
