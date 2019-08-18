@@ -30,6 +30,7 @@ $('#wdpartylist').click(function(){
 
 $('#addpartybutton').click(function(){
 	var newname=$('#partylist').text();
+	console.log(newname);
 	var newcolor="";
         // Party list <div> where dynamic content will be placed
         var partylistcontainer = document.getElementById("partylistcontainer");
