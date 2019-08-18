@@ -20,7 +20,7 @@ $('#wdpartylist').click(function(){
 				.remove()
 				.end();
 			$.each(data.results.bindings, function(key, value){
-				.append($("<option></option>").attr("value",value.wdPlain.value).text(value.label_en.value))
+			$('#partylist').append($("<option></option>").attr("value",value.wdPlain.value).text(value.label_en.value))
 	});
 			$('#partylist').select2();
 		});
