@@ -62,42 +62,6 @@
   <div class="block card">
     <div class="card-body">
       <div id="partylistcontainer">
-        <div id="party1">
-          <div class="form">
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">Party 1 name</label>
-              <div class="col-sm-10">
-                <input class="right form-control" type="text" name="Name1" value="Party 1">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">Party 1 delegates</label>
-              <div class="col-sm-10">
-                <input class="right form-control" type="number" name="Number1" value="1">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">Party 1 color</label>
-              <div class="col-sm-10">
-                <input class="right jscolor form-control" type="text" name="Color1" value="AD1FFF" autocomplete="off" style="background-image: none; background-color: rgb(173, 31, 255); color: rgb(255, 255, 255);">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">Party 1 border</label>
-              <div class="col-sm-10">
-                <input class="right form-control" type="checkbox" name="Border1">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">Party 1 border color</label>
-              <div class="col-sm-10">
-                <input class="right jscolor form-control" type="text" name="BColor1" value="000000" autocomplete="off" style="background-image: none; background-color: rgb(0, 0, 0); color: rgb(255, 255, 255);">
-              </div>
-            </div>
-
-            <input type="submit" class="btn btn-danger deletebutton" value="Delete party 1" onclick="deleteParty(1)">
-          </div>
-        </div>
       </div>
     </div>
   </div>
