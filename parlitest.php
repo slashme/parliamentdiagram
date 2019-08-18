@@ -40,7 +40,7 @@ Please submit bug reports and feature requests at the project's <a href="https:/
   </select>
 </div>
 <br>
-<div class=button onclick="addParty()">
+<div class="button" id="addpartybutton">
   Add a party
 </div>
 <br>
