@@ -321,6 +321,8 @@ function CallDiagramScript(){
 		var uploadlinkbutton=document.createElement('a');
 		uploadlinkbutton.className = 'btn btn-default';
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
+                var linkText = document.createTextNode("Generate upload link");
+                uploadlinkbutton.appendChild(linkText);
 		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
                 postcontainer.appendChild(document.createElement("br"));
