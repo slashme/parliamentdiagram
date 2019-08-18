@@ -29,7 +29,7 @@ $('#wdpartylist').click(function(){
 });
 
 $('#addpartybutton').click(function(){
-	var newname=$('#partylist').text();
+	var newname=$('#partylist :selected').text();
 	console.log(newname);
 	var newcolor="";
         // Party list <div> where dynamic content will be placed
