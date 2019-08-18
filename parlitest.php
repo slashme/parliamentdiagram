@@ -25,7 +25,7 @@
           <div class="form-group row">
             <label class="col-sm-3 col-form-label">Country</label>
             <div class="col-sm-9">
-              <select id="countrylist form-control">
+              <select id="countrylist" class="form-control">
                 <option value="">Select your country</option>
               </select>
             </div>
