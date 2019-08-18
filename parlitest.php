@@ -62,7 +62,7 @@
             <div class="form-group row">
               <label class="col-sm-2 col-form-label">Party 1 color</label>
               <div class="col-sm-10">
-                <input class="right color form-control" type="text" name="Color1" value="AD1FFF" autocomplete="off" style="background-image: none; background-color: rgb(173, 31, 255); color: rgb(255, 255, 255);">
+                <input class="right jscolor form-control" type="text" name="Color1" value="AD1FFF" autocomplete="off" style="background-image: none; background-color: rgb(173, 31, 255); color: rgb(255, 255, 255);">
               </div>
             </div>
             <div class="form-group row">
@@ -74,7 +74,7 @@
             <div class="form-group row">
               <label class="col-sm-2 col-form-label">Party 1 border color</label>
               <div class="col-sm-10">
-                <input class="right color form-control" type="text" name="BColor1" value="000000" autocomplete="off" style="background-image: none; background-color: rgb(0, 0, 0); color: rgb(255, 255, 255);">
+                <input class="right jscolor form-control" type="text" name="BColor1" value="000000" autocomplete="off" style="background-image: none; background-color: rgb(0, 0, 0); color: rgb(255, 255, 255);">
               </div>
             </div>
 
