@@ -87,7 +87,7 @@
 
   <div class="card">
     <div class="card-body">
-      <button class="btn btn-info" onclick="addParty()">Add a party</button>
+      <button class="btn btn-info" id="addpartybutton">Add a party</button>
       <button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
     </div>
   </div>
