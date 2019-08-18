@@ -34,6 +34,10 @@ $('#addpartybutton').click(function(){
 	console.log(newname);
 });
 
+$('#addpartymanual').click(function(){
+	addParty("","");
+});
+
 
 	$('#getfile').click(function(){
 	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").val()+"&rvprop=content&rvlimit=1&callback=?";
