@@ -39,6 +39,11 @@ Please submit bug reports and feature requests at the project's <a href="https:/
     <option value="">Select your country first!</option>
   </select>
 </div>
+<br>
+<div class=button onclick="addParty()">
+  Add a party
+</div>
+<br>
 <div id="infile">
   <div class="left">Get list of parties from:</div><input class="right" type="text" name="infile" id="inputfile" value= "File:My_Parliament.svg" ><br>
 </div>
@@ -56,9 +61,6 @@ Please submit bug reports and feature requests at the project's <a href="https:/
       <br>
     </div>
   </div>
-</div>
-<div class=button onclick="addParty()">
-  Add a party
 </div>
 <div class=button onclick="CallDiagramScript()">
   Make my diagram
