@@ -258,8 +258,10 @@ function CallDiagramScript(){
                 //and a horizontal line
                 postcontainer.appendChild(document.createElement("hr"));
                 //Now add the legend template text with the party names, colours and support.
-                var newtext = document.createTextNode("<h2>Legend template for use in Wikipedia:</h2>");
-                postcontainer.appendChild(newtext);
+		var legendtitle=document.createElement('h2');
+                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+                postcontainer.appendChild(legendtitle);
+		legendtitle.appendChild(newtext);
                 postcontainer.appendChild(document.createElement("br"));
                 newtext = document.createTextNode(legendstring);
                 postcontainer.appendChild(newtext);
