@@ -12,6 +12,14 @@ $(document).ready(function() {
 $('#wdpartylist').click(function(){
 		var testingvar = $('#countrylist').val();
 	console.log(testingvar);
+	  $.ajax({
+	    dataType: "json",
+	    url: "https://query.wikidata.org/sparql?query=SELECT%20%3FwdPlain%20%3Flabel_en%20%3Fshort%20%3Fdisplay%0AWHERE%0A%7B%0A%20%20%3Fparty%20wdt%3AP31%2Fwdt%3AP279*%20wd%3AQ7278.%20%3Fparty%20wdt%3AP17%20wd%3A"+testingvar+".%20%0A%20%20OPTIONAL%20%7B%20%3Fparty%20wdt%3AP1813%20%3Fshort.%20%7D%0A%20%20%3Fparty%20rdfs%3Alabel%20%3Flabel_en%20filter%20(lang(%3Flabel_en)%20%3D%20%22en%22).%0A%20%20BIND(REPLACE(STR(%3Fparty)%2C%22http%3A%2F%2Fwww.wikidata.org%2Fentity%2F%22%2C%22%22)%20AS%20%3FwdPlain)%0A%20%20BIND(COALESCE(%3Fshort%2C%20%3Flabel_en)%20AS%20%3Fdisplay)%0A%7D%20ORDER%20BY%20%3Flabel_en&format=json",
+})
+	.done(function(data){$.each(data.results.bindings, function(key, value){
+		console.log(value.label_en.value);
+		//$('#countrylist').append($("<option></option>").attr("value",value.id.value).text(value.stateLabel.value));
+	});});
 
 });
 	$('#getfile').click(function(){
