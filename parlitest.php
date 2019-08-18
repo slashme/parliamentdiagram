@@ -987,7 +987,7 @@ function addParty(newname="", newcolor=""){
         //Party color input control
         var input=document.createElement('div');
 	if(newcolor==""){newcolor=getRandomColor()}
-        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
+        input.innerHTML = '<input class="right jscolor" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
         newpartydiv.appendChild(input);
         //Party border checkbox name tag
         var partycolor=document.createElement('div');
@@ -1005,7 +1005,7 @@ function addParty(newname="", newcolor=""){
         newpartydiv.appendChild(partybcolor);
         //Party border color input control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right color" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
+        input.innerHTML = '<input class="right jscolor" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
         newpartydiv.appendChild(input);
         var delbutton=document.createElement('div');
         delbutton.className = 'button deletebutton';
@@ -1150,9 +1150,9 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
     <div id="party1">
       <div class="left">Party 1 name            </div><input class="right"       type="text"     name="Name1"    value= "Party 1" ><br>
       <div class="left">Party 1 delegates       </div><input class="right"       type="number"   name="Number1"  value = 1        ><br>
-      <div class="left">Party 1 color           </div><input class="right color" type="text"     name="Color1"   value= AD1FFF    ><br>
+      <div class="left">Party 1 color           </div><input class="right jscolor" type="text"     name="Color1"   value= AD1FFF    ><br>
       <div class="left">Party 1 border          </div><input class="right"       type="checkbox" name="Border1"                   ><br>
-      <div class="left">Party 1 border color    </div><input class="right color" type="text"     name="BColor1"  value= 000000    ><br>
+      <div class="left">Party 1 border color    </div><input class="right jscolor" type="text"     name="BColor1"  value= 000000    ><br>
       <div class="button deletebutton" onclick="deleteParty(1)">Delete party 1</div><br>
       <br>
     </div>
