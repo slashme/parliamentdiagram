@@ -319,7 +319,7 @@ function CallDiagramScript(){
 		uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
 		postcontainer.appendChild(uploadwarn);
 		var uploadlinkbutton=document.createElement('a');
-		uploadlinkbutton.className = 'btn btn-default';
+		uploadlinkbutton.className = 'btn btn-primary';
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
                 var linkText = document.createTextNode("Generate upload link");
                 uploadlinkbutton.appendChild(linkText);
