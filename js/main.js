@@ -29,6 +29,7 @@ $('#wdpartylist').click(function(){
 
 $('#addpartybutton').click(function(){
 	var newname=$('#partylist :selected').text();
+	if (newname=="Select your country first!"){ newname="" }
 	addParty(newname, "");
 	console.log(newname);
 });
