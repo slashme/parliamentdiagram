@@ -114,3 +114,16 @@ color: #D8000C;
 .card {
   box-shadow: rgba(12, 12, 13, 0.1) 0px 1px 4px 0px;
 }
+
+.footer {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  margin-top: 100px;
+  background: #f9f9f9;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #e5e5e5;
+}
+.footer ul li {
+  display: inline;
+}
