@@ -27,6 +27,82 @@ $('#wdpartylist').click(function(){
 		});
 
 });
+
+$('#addpartybutton').click(function(){
+	var newname=$('#partylist').text();
+        // Party list <div> where dynamic content will be placed
+        var partylistcontainer = document.getElementById("partylistcontainer");
+        //New party's number: one more than the largest party number so far:
+        i=0;
+        $( "div" ).each( function() { 
+            if(this.id.match( /^party[0-9]+$/ )){
+                i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
+              }
+          }
+        )
+        i++;
+        var newpartydiv=document.createElement('div');
+        newpartydiv.id="party" + i;
+        partylistcontainer.appendChild(newpartydiv);
+        //Party name label
+        var partytitle=document.createElement('div');
+        partytitle.className = 'left';
+	if(newname==""){newname="Party " + i }
+        partytitle.innerHTML = "Party " +  i ;
+        newpartydiv.appendChild(partytitle);
+        //Party name input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
+        newpartydiv.appendChild(input);
+        //Party support name tag
+        var partysupport=document.createElement('div');
+        partysupport.className = 'left';
+        partysupport.innerHTML = "Party " + i + " delegates";
+        newpartydiv.appendChild(partysupport);
+        //Party support input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
+        newpartydiv.appendChild(input);
+        //Party color name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " color";
+        newpartydiv.appendChild(partycolor);
+        //Party color input control
+        var input=document.createElement('div');
+	if(newcolor==""){newcolor=getRandomColor()}
+        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
+        newpartydiv.appendChild(input);
+        //Party border checkbox name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " border";
+        newpartydiv.appendChild(partycolor);
+        //Party border checkbox control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="checkbox" name="Border' +  i + '" >'
+        newpartydiv.appendChild(input);
+        //Party border color name tag
+        var partybcolor=document.createElement('div');
+        partybcolor.className = 'left';
+        partybcolor.innerHTML = "Party " + i + " border color";
+        newpartydiv.appendChild(partybcolor);
+        //Party border color input control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right color" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
+        newpartydiv.appendChild(input);
+        var delbutton=document.createElement('div');
+        delbutton.className = 'button deletebutton';
+        delbutton.innerHTML = "Delete party " + i;
+        delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
+        newpartydiv.appendChild(delbutton);
+          //Add a newline
+        newpartydiv.appendChild(document.createElement("br"));
+        //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
+        //jscolor.init();
+});
+
+
 	$('#getfile').click(function(){
 	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").val()+"&rvprop=content&rvlimit=1&callback=?";
 	  $.ajax({
@@ -285,78 +361,6 @@ function updateFilename(){
 	document.getElementById("inputFilename").value = newFilename;
 }
 
-function addParty(newname="", newcolor=""){
-        // Party list <div> where dynamic content will be placed
-        var partylistcontainer = document.getElementById("partylistcontainer");
-        //New party's number: one more than the largest party number so far:
-        i=0;
-        $( "div" ).each( function() { 
-            if(this.id.match( /^party[0-9]+$/ )){
-                i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
-              }
-          }
-        )
-        i++;
-        var newpartydiv=document.createElement('div');
-        newpartydiv.id="party" + i;
-        partylistcontainer.appendChild(newpartydiv);
-        //Party name label
-        var partytitle=document.createElement('div');
-        partytitle.className = 'left';
-	if(newname==""){newname="Party " + i }
-        partytitle.innerHTML = "Party " +  i ;
-        newpartydiv.appendChild(partytitle);
-        //Party name input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
-        newpartydiv.appendChild(input);
-        //Party support name tag
-        var partysupport=document.createElement('div');
-        partysupport.className = 'left';
-        partysupport.innerHTML = "Party " + i + " delegates";
-        newpartydiv.appendChild(partysupport);
-        //Party support input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
-        newpartydiv.appendChild(input);
-        //Party color name tag
-        var partycolor=document.createElement('div');
-        partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " color";
-        newpartydiv.appendChild(partycolor);
-        //Party color input control
-        var input=document.createElement('div');
-	if(newcolor==""){newcolor=getRandomColor()}
-        input.innerHTML = '<input class="right color" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
-        newpartydiv.appendChild(input);
-        //Party border checkbox name tag
-        var partycolor=document.createElement('div');
-        partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " border";
-        newpartydiv.appendChild(partycolor);
-        //Party border checkbox control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="checkbox" name="Border' +  i + '" >'
-        newpartydiv.appendChild(input);
-        //Party border color name tag
-        var partybcolor=document.createElement('div');
-        partybcolor.className = 'left';
-        partybcolor.innerHTML = "Party " + i + " border color";
-        newpartydiv.appendChild(partybcolor);
-        //Party border color input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right color" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
-        newpartydiv.appendChild(input);
-        var delbutton=document.createElement('div');
-        delbutton.className = 'button deletebutton';
-        delbutton.innerHTML = "Delete party " + i;
-        delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
-        newpartydiv.appendChild(delbutton);
-          //Add a newline
-        newpartydiv.appendChild(document.createElement("br"));
-        //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
-        //jscolor.init();
-}
 function makeUploadLink(inputname, linkdata, legendtext){
 	var a = document.createElement('a');
 	var fname="";
