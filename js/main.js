@@ -30,6 +30,7 @@ $('#wdpartylist').click(function(){
 
 $('#addpartybutton').click(function(){
 	var newname=$('#partylist').text();
+	var newcolor="";
         // Party list <div> where dynamic content will be placed
         var partylistcontainer = document.getElementById("partylistcontainer");
         //New party's number: one more than the largest party number so far:
