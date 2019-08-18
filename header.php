@@ -3,16 +3,6 @@
 </nav>
 
 <div class="container">
-  <div class="block card-deck">
-    <div class="card">
-      <div class="card-body">
-        <a href="https://en.wikipedia.org/wiki/User_talk:Slashme">
-          <img class="img w-100" src="images/190px-DavidBWpassport.JPG" alt="David Richfield" title="David Richfield">
-        </a>
-        <p class="card-text text-center pt-3"><a href="https://en.wikipedia.org/wiki/User_talk:Slashme">Contact me</a></p>
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-body">
         <a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">
@@ -37,15 +27,6 @@
           <img class="mt-5" src="images/New_Zealand-01.svg" alt="Westminster-style diagram tool" title="Westminster-style diagram tool" width="90%">
         </a>
         <p class="card-text text-center pt-3"><a href="http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html">Westminster-style diagram</a></p>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <a href="https://github.com/slashme/parliamentdiagram">
-          <img class="mt-3" src="images/GitHub-Mark.png" alt="Get the code" title="Get the code" width="90%">
-        </a>
-        <p class="card-text text-center"><a href="https://github.com/slashme/parliamentdiagram">Get the code!</a></p>
       </div>
     </div>
   </div>
