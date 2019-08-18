@@ -20,6 +20,12 @@
 
   <div class="block card">
     <div class="card-body">
+      <p class="card-text">If you want to add a party manually <button class="btn btn-info">Click here</button></p>
+    </div>
+  </div>
+
+  <div class="block card">
+    <div class="card-body">
       <div id="infile">
         <div class="form">
           <div class="form-group row">
@@ -54,8 +60,8 @@
         <div class="col-sm-9">
           <input class="right form-control" type="text" name="infile" id="inputfile" value="File:My_Parliament.svg">
         </div>
-        <button class="btn btn-primary" id="getfile">Get party list</button>
       </div>
+      <button class="btn btn-primary" id="getfile">Get party list</button>
     </div>
   </div>
 
