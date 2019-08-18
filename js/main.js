@@ -314,9 +314,12 @@ function CallDiagramScript(){
 		postcontainer.appendChild(input);
                 postcontainer.appendChild(document.createElement("br"));
                 //Button to add a link to upload the new diagram
-		var uploadlinkbutton=document.createElement('div');
-		uploadlinkbutton.className = 'button greenbutton';
-		uploadlinkbutton.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
+		var uploadwarn=document.createElement('div');
+		uploadwarn.className = 'notice';
+		uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
+		postcontainer.appendChild(uploadwarn);
+		var uploadlinkbutton=document.createElement('a');
+		uploadlinkbutton.className = 'btn btn-default';
 		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
 		postcontainer.appendChild(uploadlinkbutton);
                 //and a linebreak
