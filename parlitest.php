@@ -81,6 +81,9 @@
 	    <div id="postcontainer">
 	      <br>
 	    </div>
+	    <div id="postcontainerbutton">
+	      <br>
+	    </div>
     </div>
   </div>
 

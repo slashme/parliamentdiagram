@@ -410,10 +410,13 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	//Now build the query URL that will be used to upload the image to Commons:
 	a.href = document.URL.replace(/\?.*$/,'') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent( "== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://tools.wmflabs.org/parliamentdiagram/parliamentinputform.html Parliament diagram tool]\n|author = \n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n");
 	a.setAttribute('target', '_blank');
-	var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
-	var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
-	diagramparent.insertBefore(a, SVGdiagram.nextSibling); //Insert our new node after the diagram
-	diagramparent.insertBefore(document.createElement("br"), SVGdiagram.nextSibling); //Insert a linebreak after the diagram
+	buttonlocation=document.getElementById("postcontainerbutton");
+	buttonlocation.innerHtml="";
+	buttonlocation.append(a);
+//	var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
+//	var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
+//	diagramparent.insertBefore(a, SVGdiagram.nextSibling); //Insert our new node after the diagram
+//	diagramparent.insertBefore(document.createElement("br"), SVGdiagram.nextSibling); //Insert a linebreak after the diagram
 }
 function deleteParty(i){
   var delparty = document.getElementById("party"+i);
