@@ -1,6 +1,6 @@
 <?php require('auth.php'); ?>
 <?php require('top.php'); ?>
-<div class=block id=header>
+<div id="header">
   <?php require('header.php'); ?>
 
   <div class="block card">
