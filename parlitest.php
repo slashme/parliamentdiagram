@@ -683,7 +683,7 @@ function doTestSpecial() {
 <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
-
+jscolor.init();
 $(document).ready(function() {
 	$('#getfile').click(function(){
 	  var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles="+$("#inputfile").val()+"&rvprop=content&rvlimit=1&callback=?";
