@@ -3,6 +3,7 @@
 </nav>
 
 <div class="container">
+  <div class="block card-deck">
     <div class="card">
       <div class="card-body">
         <a href="http://tools.wmflabs.org/parliamentdiagram/parlitest.php">
