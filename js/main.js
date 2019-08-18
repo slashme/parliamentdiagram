@@ -11,6 +11,7 @@ $(document).ready(function() {
 
 $('#wdpartylist').click(function(){
 		var testingvar = $('#countrylist').val();
+	console.log(testingvar);
 
 });
 	$('#getfile').click(function(){
