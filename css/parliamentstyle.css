@@ -69,11 +69,11 @@
     position:relative;
     margin-top:15px;
     margin-bottom:15px;
-    border:1px solid #ddd;
+    /* border:1px solid #ddd; */
     border-radius:3px;
     font-family: sans-serif;
     padding: 5px;
-    max-width: 50em;
+    /* max-width: 50em; */
 }
 .greendiv {
   background: #34db34;
@@ -107,4 +107,10 @@ color: #9F6000;
 }
 .error {
 color: #D8000C;
+}
+.homebuttons {
+  color: #333;
+}
+.card {
+  box-shadow: rgba(12, 12, 13, 0.1) 0px 1px 4px 0px;
 }
