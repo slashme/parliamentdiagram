@@ -76,9 +76,11 @@
     </div>
   </div>
 
-  <div class="block">
-    <div id="postcontainer">
-      <br>
+  <div class="block card">
+    <div class="card-body">
+	    <div id="postcontainer">
+	      <br>
+	    </div>
     </div>
   </div>
 

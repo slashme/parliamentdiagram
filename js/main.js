@@ -247,23 +247,23 @@ function CallDiagramScript(){
                 //and a linebreak
                 postcontainer.appendChild(document.createElement("br"));
                 //Add a link with the new diagram
-                var a = document.createElement('a');
+                var abtn = document.createElement('a');
                 var linkText = document.createTextNode("Click to download your SVG diagram.");
-                a.appendChild(linkText);
-                a.title = "SVG diagram";
-                a.href = data;
-                a.download = data;
-                postcontainer.appendChild(a);
-                //and a linebreak
-                postcontainer.appendChild(document.createElement("br"));
+		abtn.className="btn btn-success"
+                abtn.appendChild(linkText);
+                abtn.title = "SVG diagram";
+                abtn.href = data;
+                abtn.download = data;
+                postcontainer.appendChild(abtn);
+                //and a horizontal line
+                postcontainer.appendChild(document.createElement("hr"));
                 //Now add the legend template text with the party names, colours and support.
-                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+                var newtext = document.createTextNode("<h2>Legend template for use in Wikipedia:</h2>");
                 postcontainer.appendChild(newtext);
                 postcontainer.appendChild(document.createElement("br"));
                 newtext = document.createTextNode(legendstring);
                 postcontainer.appendChild(newtext);
-                postcontainer.appendChild(document.createElement("br"));
-                postcontainer.appendChild(document.createElement("br"));
+                postcontainer.appendChild(document.createElement("hr"));
 		//File upload name label
 		var filenametitle=document.createElement('div');
 		filenametitle.className = 'left greendiv';
