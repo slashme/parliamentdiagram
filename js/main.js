@@ -380,6 +380,7 @@ function updateFilename(){
 
 function makeUploadLink(inputname, linkdata, legendtext){
 	var a = document.createElement('a');
+	a.className="btn btn-primary";
 	var fname="";
 	//This is kind of dumb: I'm iterating through all the inputs on the
 	//page to find any that match the name that's being called. FIXME
