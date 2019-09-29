@@ -8,6 +8,10 @@
 -->
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
 <script type='text/javascript'>
+$(document).ready(function() {
+	jscolor.installByClassName("jscolor");
+});
+
 //Generate random color, based on http://stackoverflow.com/questions/1484506
 function getRandomColor() {
         var letters = '0123456789ABCDEF'.split('');
