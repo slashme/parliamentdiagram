@@ -100,4 +100,4 @@ if inputlist:
     outfile.write('</svg>\n')
     outfile.close()
     #Pass the output filename to the calling page.
-    print svgfilename
+    print(svgfilename)
