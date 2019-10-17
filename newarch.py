@@ -47,11 +47,11 @@ if inputlist:
     #Figure out how many rows are needed:
     for i in range(len(Totals)):
       if Totals[i] >= sumdelegates:
-	rows=i+1
-	break
+        rows=i+1
+        break
     #Maximum radius of spot is 0.5/rows; leave a bit of space.
     radius=0.4/rows
-# Open svg file for writing:
+    # Open svg file for writing:
     outfile=open(svgfilename,'w')
     #Write svg header:
     outfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
@@ -94,7 +94,7 @@ if inputlist:
       outfile.write('  <g style="fill:'+partylist[i][2]+'; stroke:'+partylist[i][3]+'" id="'+''.join(partylist[i][0].split())+'">\n')
       for Counter in range(Counter+1, Counter+partylist[i][1]+1):
         tempstring='    <circle cx="%.2f" cy="%.2f" r="%.2f"/>' % (poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
-	outfile.write(tempstring+'\n')
+        outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('</g>\n')
     outfile.write('</svg>\n')

@@ -93,9 +93,9 @@ if inputlist:
       optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     else:
       try:
-	optionlist['centercols']=int(optionlist['centercols'])
+        optionlist['centercols']=int(optionlist['centercols'])
       except ValueError: #TODO: This is a hack - I seem to be getting a NaN here for some reason, need to fix it properly.
-	optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0))) #Do the same calculation as above if it's not a number.
+        optionlist['centercols']=int(math.ceil(math.sqrt(sumdelegates['center']/4.0))) #Do the same calculation as above if it's not a number.
     try:
       centerrows=math.ceil(float(sumdelegates['center'])/optionlist['centercols'])
     except ZeroDivisionError:
@@ -196,7 +196,7 @@ if inputlist:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['head'][counter][0], poslist['head'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
-	outfile.write(tempstring+'\n')
+        outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     #Draw the left parties; first create a group for them:
@@ -206,7 +206,7 @@ if inputlist:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
-	outfile.write(tempstring+'\n')
+        outfile.write(tempstring+'\n')
       if not optionlist['fullwidth'] and not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
         counter += -i[1] % optionlist['wingrows']['left']
       outfile.write('  </g>\n')
@@ -218,7 +218,7 @@ if inputlist:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
-	outfile.write(tempstring+'\n')
+        outfile.write(tempstring+'\n')
       if not optionlist['fullwidth'] and not optionlist['cozy']: #If we're leaving gaps between parties, skip the leftover blocks in the row
         counter += -i[1] % optionlist['wingrows']['right']
       outfile.write('  </g>\n')
@@ -230,7 +230,7 @@ if inputlist:
       outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
       for counter in range(counter+1, counter+1+i[1]):
         tempstring='    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (poslist['center'][counter][0], poslist['center'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']) )
-	outfile.write(tempstring+'\n')
+        outfile.write(tempstring+'\n')
       outfile.write('  </g>\n')
     outfile.write('  </g>\n')
     outfile.write('</g>\n')
