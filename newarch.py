@@ -90,7 +90,7 @@ if inputlist:
             else:
                 for j in range(J):
                     # The angle to a spot is n.(pi-2sin(r/Ri))/(Ni-1)+sin(r/Ri) where Ni is the number in the arc
-                    #x=R.cos(theta) + 1.75
+                    # x=R.cos(theta) + 1.75
                     # y=R.sin(theta)
                     angle = float(j)*(math.pi-2.0*math.sin(radius/R)
                                       )/(float(J)-1.0)+math.sin(radius/R)
