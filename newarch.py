@@ -81,8 +81,9 @@ if inputlist:
         poslist = []
         for i in range(1, rows):
             # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the number of rows and i is the number of the current row.
-            J = int(float(sumdelegates) /
-                    Totals[rows-1]*math.pi/(2*math.asin(2.0/(3.0*rows+4.0*i-2.0))))
+            # Fill each row proportionally to the "fullness" of the diagram, up to the second-last row.
+            J = int(float(sumdelegates) / Totals[rows-1] *
+                    math.pi/(2*math.asin(2.0/(3.0*rows+4.0*i-2.0))))
             # The radius of the ith row in an N-row diagram (Ri) is (3*N+4*i-2)/(4*N)
             R = (3.0*rows+4.0*i-2.0)/(4.0*rows)
             if J == 1:
