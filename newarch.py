@@ -8,8 +8,8 @@ import sys
 import os
 
 form = cgi.FieldStorage()
-# inputlist = form.getvalue("inputlist", "")
-inputlist = sys.argv[1]
+inputlist = form.getvalue("inputlist", "")
+# inputlist = sys.argv[1]
 # Append input list to log file:
 logfile = open('log', 'a')
 logfile.write(datetime.datetime.utcnow().strftime(
