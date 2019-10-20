@@ -8,8 +8,8 @@ import sys
 import os
 
 form = cgi.FieldStorage()
-inputlist = form.getvalue("inputlist", "")
-# inputlist = sys.argv[1]
+# inputlist = form.getvalue("inputlist", "")
+inputlist = sys.argv[1]
 # Append input list to log file:
 logfile = open('log', 'a')
 logfile.write(datetime.datetime.utcnow().strftime(
@@ -92,20 +92,20 @@ if inputlist:
                     # The angle to a spot is n.(pi-2sin(r/Ri))/(Ni-1)+sin(r/Ri) where Ni is the number in the arc
                     # x=R.cos(theta) + 1.75
                     # y=R.sin(theta)
-                    angle = float(j)*(math.pi-2.0*math.sin(radius/R)
-                                      )/(float(J)-1.0)+math.sin(radius/R)
-                    poslist.append(
-                        [angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
+                    angle = float(j) * \
+                            (math.pi-2.0*math.sin(radius/R)) / \
+                            (float(J)-1.0)+math.sin(radius/R)
+                    poslist.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
         J = sumdelegates-len(poslist)
         R = (7.0*rows-2.0)/(4.0*rows)
         if J == 1:
             poslist.append([math.pi/2.0, 1.75*R, R])
         else:
             for j in range(J):
-                angle = float(j)*(math.pi-2.0*math.sin(radius/R)) / \
-                    (float(J)-1.0)+math.sin(radius/R)
-                poslist.append(
-                    [angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
+                angle = float(j) * \
+                        (math.pi-2.0*math.sin(radius/R)) / \
+                        (float(J)-1.0)+math.sin(radius/R)
+                poslist.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
         poslist.sort(reverse=True)
         Counter = -1  # How many spots have we drawn?
         for i in range(len(partylist)):
