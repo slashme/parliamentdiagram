@@ -19,7 +19,7 @@ logfile.close()
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 # Check whether we have a file made from this exact string in the directory:
 for file in os.listdir("svgfiles"):
-    # We've done this diagram before, just serve it.
+    # If we've done this diagram before, just serve it.
     if file.count(str(requesthash)):
         print("svgfiles/"+file)
         sys.exit()
@@ -96,6 +96,7 @@ if inputlist:
                             (math.pi-2.0*math.sin(radius/R)) / \
                             (float(J)-1.0)+math.sin(radius/R)
                     poslist.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
+        # Now whatever seats are left go into the outside row:
         J = sumdelegates-len(poslist)
         R = (7.0*rows-2.0)/(4.0*rows)
         if J == 1:
