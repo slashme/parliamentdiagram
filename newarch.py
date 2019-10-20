@@ -50,7 +50,6 @@ if inputlist:
             sumdelegates += i[1]
             if sumdelegates > Totals[-1]:
                 error = 1
-    print(error)
     if sumdelegates < 1:
         error = 1
     if not error:
