@@ -160,7 +160,6 @@ function addParty(newname="", newcolor=""){
         newpartydiv.appendChild(document.createElement("br"));
         //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
         jscolor.installByClassName("jscolor");
-        //jscolor.init();
 }
 
 //Generate random color, based on http://stackoverflow.com/questions/1484506
