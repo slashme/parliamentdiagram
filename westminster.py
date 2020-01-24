@@ -52,8 +52,10 @@ if inputlist:
         elif re.search('[^0-9]', i[1]):  # Must have at least a digit in the number
             error = 1
         else:
-            # TODO: What happens if this fails? Shouldn't, because it's from an input form, though.
-            i[1] = int(i[1])
+            try:
+                i[1] = int(i[1])
+            except ValueError:
+                i[1] = 0
             # placeholder for empty seat count, for use when giving only one column per party.
             i.append(0)
         # Iterate over the list of party groups, adding the number of delegates to the correct one:
