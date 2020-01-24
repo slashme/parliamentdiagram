@@ -46,7 +46,10 @@ if inputlist:
         elif re.search('[^0-9]', i[1]):
             error = 1
         else:
-            i[1] = int(i[1])
+            try:
+                i[1] = int(i[1])
+            except ValueError:
+                i[1] = 0
             sumdelegates += i[1]
             if sumdelegates > Totals[-1]:
                 error = 1
