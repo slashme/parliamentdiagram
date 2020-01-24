@@ -71,13 +71,20 @@ if inputlist:
         #  starting one block left of the party blocks, with a half-block gap on either side.
         # Cross-bench is by default a block of shape 1x4 at the back.
         #
+        # First check whether the number of rows in the wings is defined:
+        # If it isn't in the input list or can't be cast to an integer, set it to 0:
+        if (not 'wingrows' in optionlist):
+            optionlist['wingrows'] = 0
+        try:
+            optionlist['wingrows'] = int(optionlist['wingrows'])
+        except ValueError:
+            optionlist['wingrows'] = 0
         # If the number of rows in the wings is not defined, calculate it:
-        if (not 'wingrows' in optionlist) or optionlist['wingrows'] == 0:
+        if optionlist['wingrows'] == 0:
             optionlist['wingrows'] = int(
                 math.ceil(math.sqrt(max(sumdelegates['left'], sumdelegates['right'])/20.0))*2)
         # Whether or not it's defined; now make it a dict with a value for left and right - this may later not be the same any more.
-        optionlist['wingrows'] = {'left': int(
-            optionlist['wingrows']), 'right': int(optionlist['wingrows'])}
+        optionlist['wingrows'] = {'left': optionlist['wingrows'], 'right': optionlist['wingrows']}
         if optionlist['cozy']:
             wingcols = int(math.ceil(max(
                 sumdelegates['left'], sumdelegates['right'])/float(optionlist['wingrows']['left'])))
