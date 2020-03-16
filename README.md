@@ -1,6 +1,6 @@
 # Parliament Diagram
 
-The Parliament diagram creator is made for use in Wikipedia, supported by Wikimedia Connons and Wikidata.
+The Parliament diagram creator is made for use in Wikipedia, supported by Wikimedia Commons and Wikidata.
 
 ![Sample image](https://tools.wmflabs.org/parliamentdiagram/images/CumhuriyetMeclisiDagilim.svg)
 
