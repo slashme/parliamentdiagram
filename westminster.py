@@ -261,7 +261,7 @@ if inputlist:
         tempstring = 'width="%.1f" height="%.1f">' % (svgwidth, svgheight)
         outfile.write(tempstring+'\n')
         outfile.write(
-            '<!-- Created with the Wikimedia westminster parliament diagram creator (http://tools.wmflabs.org/parliamentdiagram/westminsterinputform.html) -->\n')
+            '<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.html) -->\n')
         outfile.write('<g id="diagram">\n')
         # Draw the head parties; first create a group for them:
         outfile.write('  <g id="headbench">\n')
