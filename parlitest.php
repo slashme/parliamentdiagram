@@ -87,7 +87,7 @@
     </div>
   </div>
 
-</div> <!-- Closes div.cotnainer in header.html -->
+</div> <!-- Closes div.container in header.html -->
 </div> <!-- Closes div#header -->
 <?php require('footer.php'); ?>
 
