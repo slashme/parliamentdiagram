@@ -11,5 +11,5 @@
     <script type="text/javascript" src="js/jscolor.js"></script>
     <script src="js/select2.min.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
-</head>
+  </head>
 <body>
