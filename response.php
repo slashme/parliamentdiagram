@@ -1,6 +1,6 @@
 <?php //Print the status of the last upload
 if ( isset ($last_res )) { //if there is a "last result" from an attempted Commons upload
-	if (isset($last_res->upload) && $last_res->upload->warnings ) {
+	if (isset($last_res->upload) && isset($last_res->upload->warnings )) {
 		echo "<div class='warning'>";
 		foreach ( $last_res->upload->warnings as $k => $v ) {
 			if ( $k == 'exists' ) {
