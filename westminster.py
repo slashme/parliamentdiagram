@@ -82,7 +82,7 @@ if inputlist:
         # If the number of rows in the wings is not defined, calculate it:
         if optionlist['wingrows'] == 0:
             optionlist['wingrows'] = int(
-                math.ceil(math.sqrt(max(sumdelegates['left'], sumdelegates['right'])/20.0))*2)
+                math.ceil(math.sqrt(max(1, sumdelegates['left'], sumdelegates['right'])/20.0))*2)
         # Whether or not it's defined; now make it a dict with a value for left and right - this may later not be the same any more.
         optionlist['wingrows'] = {'left': optionlist['wingrows'], 'right': optionlist['wingrows']}
         if optionlist['cozy']:
