@@ -75,6 +75,12 @@
     padding: 5px;
     /* max-width: 50em; */
 }
+.partydiv {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap:5px;
+}
+.partydiv label { text-align:right; }
 .greendiv {
   background: #34db34;
 }

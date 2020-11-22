@@ -18,11 +18,9 @@
     <div class="card-body">
       <p class="card-text">To get the list of parties from an existing parliament diagram on commons which uses legend templates, put the name of the diagram into the text box below.</p>
 
-      <div id="infile" class="form-group row">
-        <label class="col-sm-3 col-form-label">Get list of parties from:</label>
-        <div class="col-sm-9">
-          <input class="right form-control" type="text" name="infile" id="inputfile" value="File:My_Parliament.svg">
-        </div>
+      <div id="infile" class="partydiv">
+        <label>Get list of parties from:</label>
+        <input class="form-control" type="text" name="infile" id="inputfile" value="File:My_Parliament.svg">
       </div>
       <button class="btn btn-primary" id="getfile">Get party list</button>
     </div>
@@ -38,24 +36,20 @@
     <div class="card-body">
       <div id="infile">
         <div class="form">
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Country</label>
-            <div class="col-sm-9">
-              <select id="countrylist" class="form-control">
-                <option value="">Select your country</option>
-              </select>
-            </div>
+          <div class="partydiv">
+            <label>Country</label>
+            <select id="countrylist" class="form-control">
+              <option value="">Select your country</option>
+            </select>
           </div>
 
           <button class="btn btn-primary" id="wdpartylist">Query party list</button>
 
-          <div class="form-group row mt-4">
-            <label class="col-sm-3 col-form-label">Parties</label>
-            <div class="col-sm-9">
-              <select id="partylist" class="form-control">
-                <option value="" selected="selected">Select your country first!</option>
-              </select>
-            </div>
+          <div class="partydiv">
+            <label>Parties</label>
+            <select id="partylist" class="form-control">
+              <option value="" selected="selected">Select your country first!</option>
+            </select>
           </div>
           <button class="btn btn-info" id="addpartybutton">Add a party</button>
         </div>
