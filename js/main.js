@@ -136,11 +136,11 @@ function addParty(newname="", newcolor=""){
         //Party border checkbox name tag
         var partycolor=document.createElement('div');
         partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " border";
+        partycolor.innerHTML = "Party " + i + " border thickness";
         newpartydiv.appendChild(partycolor);
         //Party border checkbox control
         var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="checkbox" name="Border' +  i + '" >'
+        input.innerHTML = '<input class="right" type="number" name="Border' +  i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
         newpartydiv.appendChild(input);
         //Party border color name tag
         var partybcolor=document.createElement('div');
@@ -191,17 +191,16 @@ function CallDiagramScript(){
                 if(this.name.match( /^Color/ )){
                   partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
                 }
-		//If we're processing a border checkbox, only add "none" if it's not checked.
+		//If we're processing a border thickness, add value if it's a number, maxing out at 1.
+		//Add 0 if it's not a number or if it's equal to 0.
                 if(this.name.match( /^Border/ )){
-		  if(!this.checked){
-		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']="none";
-		  }
+		    bwidth=parseFloat(this.value);
+		    if(isNaN(bwidth)){bwidth=0};
+		    bwidth=Math.min(Math.max(bwidth,0),1);
+		    partylist[/[0-9]+$/.exec(this.name)[0]]['Border']=bwidth;
                 }
-		//If we're processing a border color, don't overwrite a "none" value.
                 if(this.name.match( /^BColor/ )){
-                  if(partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']!="none"){
 		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']=this.value;
-		  }
                 }
         });
         var arrayLength = partylist.length;
@@ -215,7 +214,9 @@ function CallDiagramScript(){
               requeststring += '#';
               requeststring += partylist[i]['Color'];
               requeststring += ', ';
-              if(partylist[i]['BColor'] !="none"){requeststring += '#'};
+              requeststring += partylist[i]['Border'];
+              requeststring += ', ';
+              requeststring += '#';
               requeststring += partylist[i]['BColor'];
               if ( i < (arrayLength - 1)){ requeststring += '; '}
               if (partylist[i]['Num'] == 1){
