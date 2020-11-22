@@ -41,7 +41,7 @@ if inputlist:
     for i in re.split("\s*;\s*", inputlist):
         partylist.append(re.split('\s*,\s*', i))
     for i in partylist:
-        if len(i) < 4:
+        if len(i) < 5:
             error = 1
         elif re.search('[^0-9]', i[1]):
             error = 1
@@ -115,11 +115,11 @@ if inputlist:
         Counter = -1  # How many spots have we drawn?
         for i in range(len(partylist)):
             # Make each party's blocks an svg group
-            outfile.write('  <g style="fill:'+partylist[i][2]+'; stroke:' +
-                          partylist[i][3]+'" id="'+''.join(partylist[i][0].split())+'">\n')
+            tempstring = '  <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'.format(partylist[i][2], float(partylist[i][3])*radius*100, partylist[i][4], ''.join(partylist[i][0].split())) 
+            outfile.write(tempstring+'\n')
             for Counter in range(Counter+1, Counter+partylist[i][1]+1):
-                tempstring = '    <circle cx="%.2f" cy="%.2f" r="%.2f"/>' % (
-                    poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0)
+                tempstring = '    <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/>'.format(
+                    poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0*(1-float(partylist[i][3])/2.0))
                 outfile.write(tempstring+'\n')
             outfile.write('  </g>\n')
         outfile.write('</g>\n')
