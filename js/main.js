@@ -108,7 +108,7 @@ function addParty(newname="", newcolor=""){
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
 	if(newname==""){newname="Party " + i }
-        partytitle.innerHTML = "Party " +  i + "Name" ;
+        partytitle.innerHTML = "Party " +  i + " Name" ;
         newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
