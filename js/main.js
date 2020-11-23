@@ -102,66 +102,54 @@ function addParty(newname="", newcolor=""){
         )
         i++;
         var newpartydiv=document.createElement('div');
-        newpartydiv.className = 'partydiv';
         newpartydiv.id="party" + i;
         partylistcontainer.appendChild(newpartydiv);
         //Party name label
-        var partytitle=document.createElement('label');
-        partytitle.innerHTML = "Party " +  i + " name";
-        newpartydiv.appendChild(partytitle);
-        //If the party name hasn't been set by the WikiData Query, set it.
+        var partytitle=document.createElement('div');
+        partytitle.className = 'left';
 	if(newname==""){newname="Party " + i }
+        partytitle.innerHTML = "Party " +  i ;
+        newpartydiv.appendChild(partytitle);
         //Party name input control
-        var input=document.createElement('input');
-	input.setAttribute("type", "text");
-	input.setAttribute("name", 'Name' +  i);
-	input.setAttribute("value", newname);
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
         newpartydiv.appendChild(input);
         //Party support name tag
-        var partysupport=document.createElement('label');
+        var partysupport=document.createElement('div');
+        partysupport.className = 'left';
         partysupport.innerHTML = "Party " + i + " delegates";
         newpartydiv.appendChild(partysupport);
         //Party support input control
-        var input=document.createElement('input');
-	input.setAttribute("type", "number");
-	input.setAttribute("name", 'Number' +  i);
-	input.setAttribute("value", "0");
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
         newpartydiv.appendChild(input);
         //Party color name tag
-        var partycolor=document.createElement('label');
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
         partycolor.innerHTML = "Party " + i + " color";
         newpartydiv.appendChild(partycolor);
         //Party color input control
-        var input=document.createElement('input');
+        var input=document.createElement('div');
 	if(newcolor==""){newcolor=getRandomColor()}
-	input.setAttribute("class", "jscolor");
-	input.setAttribute("type", "text");
-	input.setAttribute("name", 'Color' +  i);
-	input.setAttribute("value", newcolor);
+        input.innerHTML = '<input class="right jscolor" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
         newpartydiv.appendChild(input);
-        //Party border thickness name tag
-        var partycolor=document.createElement('label');
-        partycolor.innerHTML = "Party " + i + " border thickness (0 for no border, 0.1 for a thin border, max. 1.0)";
+        //Party border checkbox name tag
+        var partycolor=document.createElement('div');
+        partycolor.className = 'left';
+        partycolor.innerHTML = "Party " + i + " border thickness";
         newpartydiv.appendChild(partycolor);
-        //Party border thickness control
-        var input=document.createElement('input');
-	input.setAttribute("type", "number");
-	input.setAttribute("name", 'Border' +  i);
-	input.setAttribute("value", "0.00");
-	input.setAttribute("step", "0.01");
-	input.setAttribute("min", "0.00");
-	input.setAttribute("max", "1.00");
+        //Party border checkbox control
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right" type="number" name="Border' +  i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
         newpartydiv.appendChild(input);
         //Party border color name tag
-        var partybcolor=document.createElement('label');
+        var partybcolor=document.createElement('div');
+        partybcolor.className = 'left';
         partybcolor.innerHTML = "Party " + i + " border color";
         newpartydiv.appendChild(partybcolor);
         //Party border color input control
-        var input=document.createElement('input');
-	input.setAttribute("class", "jscolor");
-	input.setAttribute("type", "text");
-	input.setAttribute("name", 'BColor' +  i);
-	input.setAttribute("value", "000000");
+        var input=document.createElement('div');
+        input.innerHTML = '<input class="right jscolor" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
         newpartydiv.appendChild(input);
         var delbutton=document.createElement('div');
         delbutton.className = 'button deletebutton';
