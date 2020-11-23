@@ -108,7 +108,7 @@ function addParty(newname="", newcolor=""){
         var partytitle=document.createElement('div');
         partytitle.className = 'left';
 	if(newname==""){newname="Party " + i }
-        partytitle.innerHTML = "Party " +  i ;
+        partytitle.innerHTML = "Party " +  i + "Name" ;
         newpartydiv.appendChild(partytitle);
         //Party name input control
         var input=document.createElement('div');
@@ -133,12 +133,12 @@ function addParty(newname="", newcolor=""){
 	if(newcolor==""){newcolor=getRandomColor()}
         input.innerHTML = '<input class="right jscolor" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
         newpartydiv.appendChild(input);
-        //Party border checkbox name tag
+        //Party border width name tag
         var partycolor=document.createElement('div');
         partycolor.className = 'left';
         partycolor.innerHTML = "Party " + i + " border thickness";
         newpartydiv.appendChild(partycolor);
-        //Party border checkbox control
+        //Party border width control
         var input=document.createElement('div');
         input.innerHTML = '<input class="right" type="number" name="Border' +  i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
         newpartydiv.appendChild(input);
