@@ -33,7 +33,7 @@ function CallArchScript(){
 			}
 		}
 	);
-	requeststring = "Vacant,"+Vacnum+",#6B6B6B, none;Democrats,"+Demnum+",#0000FF, none;Republicans,"+Repnum+",#FF0000, none;Independents,"+Indnum+",#C9C9C9, none";
+	requeststring = "Vacant,"+Vacnum+",#6B6B6B, 0, #000000;Democrats,"+Demnum+",#0000FF, 0, #000000;Republicans,"+Repnum+",#FF0000, 0, #000000;Independents,"+Indnum+",#C9C9C9, 0, #000000";
 	//Now post the request to the script which actually makes the diagram.
 	$.ajax({
 		type: "POST",
