@@ -66,6 +66,7 @@
   <div class="block card">
     <div class="card-body">
       <div id="partylistcontainer">
+	<p><strong>To create a border around the spots, set "border width". A width of 0.1 is a thin border, 0.5 is half the radius of the spot, and 1 means you see only border and can't see the spot's color. Leave the border width at 0 for no border.</strong></p>
       </div>
     </div>
   </div>
@@ -80,7 +81,6 @@
     <div class="card-body">
 	    <div id="postcontainer">
 	      <br>
-	      <p><strong>To create a border around the spots, set "border width". A width of 0.1 is a thin border, 0.5 is half the radius of the spot, and 1 means you see only border and can't see the spot's color. Leave the border width at 0 for no border.</strong></p>
 	    </div>
 	    <div id="postcontainerbutton">
 	      <br>
