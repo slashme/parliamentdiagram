@@ -114,7 +114,8 @@ if inputlist:
         Counter = -1  # How many spots have we drawn?
         for i in range(len(partylist)):
             # Make each party's blocks an svg group
-            tempstring = '  <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'.format(partylist[i][2], float(partylist[i][3])*radius*100, partylist[i][4], ''.join(partylist[i][0].split())) 
+            sanitizedpartyname = re.sub(r'[^a-zA-Z0-9_-]', '-', partylist[i][0])
+            tempstring = '  <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'.format(partylist[i][2], float(partylist[i][3])*radius*100, partylist[i][4], sanitizedpartyname)
             outfile.write(tempstring+'\n')
             for Counter in range(Counter+1, Counter+partylist[i][1]+1):
                 tempstring = '    <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/>'.format(
