@@ -206,7 +206,7 @@ function CallDiagramScript(){
         var arrayLength = partylist.length;
         for (var i = 1; i < arrayLength; i++) {
           if(partylist[i]) {
-              requeststring += partylist[i]['Name'];
+              requeststring += partylist[i]['Name'].replace(',','');
               requeststring += ', ';
               requeststring += partylist[i]['Num'];
 	      totalseats += partylist[i]['Num'];
