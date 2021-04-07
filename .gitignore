@@ -6,3 +6,9 @@ log
 TAGS
 tags
 /#*
+
+# These are used as thumbnails in the /parlitest.php webpage
+!images/CumhuriyetMeclisiDagilim.svg
+!images/New_Zealand-01.svg
+!images/Senate_diagram_2014_State_of_Utah.svg
+
