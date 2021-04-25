@@ -6,124 +6,354 @@ import datetime
 import sys
 import os
 
-form = cgi.FieldStorage()
-inputlist = form.getvalue("inputlist", "")
-# inputlist = sys.argv[1]
-# Append input list to log file:
-logfile = open('log', 'a')
-logfile.write(datetime.datetime.utcnow().strftime(
-    "%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
-logfile.close()
-# Create always-positive hash of the request string:
-requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
-# Check whether we have a file made from this exact string in the directory:
-for file in os.listdir("svgfiles"):
-    # If we've done this diagram before, just serve it.
-    if file.count(str(requesthash)):
-        print("svgfiles/"+file)
-        sys.exit()
-# If we get here, we didn't find a matching request, so continue.
-# Create a filename that will be unique each time.  Old files are deleted with a cron script.
-svgfilename = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + \
-    "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
-Totals = [4, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876, 997, 1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064, 3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263, 6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404,
-          9793, 10187, 10594, 11003, 11425, 11850, 12288, 12729, 13183, 13638, 14109, 14580, 15066, 15553, 16055, 16557, 17075, 17592, 18126, 18660, 19208, 19758, 20323, 20888, 21468, 22050, 22645, 23243, 23853, 24467, 25094, 25723, 26364, 27011, 27667, 28329, 29001, 29679, 30367, 31061]
-if inputlist:
-    # initialize list of parties
-    partylist = []
-    # Keep a running total of the number of delegates in the diagram, for use later.
-    sumdelegates = 0
-    # error flag: This seems ugly, but what should I do?
-    error = 0
-    for i in re.split("\s*;\s*", inputlist):
-        partylist.append(re.split('\s*,\s*', i))
-    for i in partylist:
-        if len(i) < 5:
-            error = 1
-        elif re.search('[^0-9]', i[1]):
-            error = 1
+TOTALS = [
+    4, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
+    1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064,
+    3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263,
+    6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404, 9793, 10187, 10594,
+    11003, 11425, 11850, 12288, 12729, 13183, 13638, 14109, 14580, 15066, 15553,
+    16055, 16557, 17075, 17592, 18126, 18660, 19208, 19758, 20323, 20888, 21468,
+    22050, 22645, 23243, 23853, 24467, 25094, 25723, 26364, 27011, 27667, 28329,
+    29001, 29679, 30367, 31061
+]
+
+def main():
+    """
+    Doesn't return anything, but in case of success: prints a filename, which
+    will hence be sent to the web interface.
+    """
+    start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
+    form = cgi.FieldStorage()
+    inputlist = form.getvalue("inputlist", "")
+    # inputlist = sys.argv[1]
+
+    # Append input list to log file:
+    logfile = open('log', 'a')
+    logfile.write("{} {}\n".format(start_time, inputlist))
+
+    # Create always-positive hash of the request string:
+    request_hash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+
+    cached_filename = return_file_if_already_exist(request_hash)
+    if cached_filename:
+        print(cached_filename)
+    elif inputlist:
+        print(treat_inputlist(inputlist, start_time, request_hash, logfile))
+    else:
+        logfile.write('No inputlist')
+    logfile.close()
+
+def treat_inputlist(input_list, start_time, request_hash, logfile):
+    """
+    Generate a new SVG file and return it.
+
+    Return
+    ------
+    string
+    """
+    # Create a filename that will be unique each time.
+    # Old files are deleted with a cron script.
+    svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
+
+    party_list = split(input_list)
+    sum_delegates = count_delegates(party_list)
+
+    if sum_delegates > 0:
+        nb_rows = get_number_of_rows(sum_delegates)
+        # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
+        radius = 0.4 / nb_rows
+
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
+
+        draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
+        return svg_filename
+
+
+def return_file_if_already_exist(request_hash):
+    """
+    If requested file has already been gerated, return its path/filename.
+
+    Parameters
+    ----------
+    request_hash : str
+        A unique hash representing a POST request.
+
+    Return
+    ------
+    string|bool
+        Either a path/filename, or False if such a file doesn't exist.
+    """
+    for file in os.listdir("svgfiles"):
+        if file.count(str(request_hash)):
+            return "svgfiles/{}".format(file)
+    return False  # File doesn't already exist
+
+
+def split(input_list):
+    """
+    Split input list into a list of party
+
+    Parameters
+    ----------
+    input_list : str
+
+    Return
+    ------
+    list
+    """
+    party_list = []
+    for i in re.split("\s*;\s*", input_list):
+        party_list.append(re.split('\s*,\s*', i))
+    return party_list
+
+
+def count_delegates(party_list):
+    """
+    Sums all delegates from all parties. Return 0 if something fails.
+
+    Parameters
+    ----------
+    party_list : list
+
+    Return
+    ------
+    int
+    """
+    sum = 0
+    for party in party_list:
+        if len(party) < 5 or not party[1].isdigit():  # Incorrect input format
+            return 0
         else:
-            try:
-                i[1] = int(i[1])
-            except ValueError:
-                i[1] = 0
-            sumdelegates += i[1]
-            if sumdelegates > Totals[-1]:
-                error = 1
-    if sumdelegates < 1:
-        error = 1
-    if not error:
-        # Initialize counters for use in layout
-        spotcounter = 0
-        lines = 0
-        # Figure out how many rows are needed:
-        for i in range(len(Totals)):
-            if Totals[i] >= sumdelegates:
-                rows = i+1
-                break
-        # Maximum radius of spot is 0.5/rows; leave a bit of space.
-        radius = 0.4/rows
-        # Open svg file for writing:
-        outfile = open(svgfilename, 'w')
-        # Write svg header:
-        outfile.write(
-            '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-        outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
-        outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
-        # Make 350 px wide, 175 px high diagram with a 5 px blank border
-        outfile.write('width="360" height="185">\n')
-        outfile.write(
-            '<!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n')
-        outfile.write('<g>\n')
-        # Print the number of seats in the middle at the bottom.
-        outfile.write('<text x="175" y="175" style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">'+str(sumdelegates)+'</text>\n')
-        # Create list of centre spots
-        poslist = []
-        for i in range(1, rows):
-            # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the number of rows and i is the number of the current row.
-            # Fill each row proportionally to the "fullness" of the diagram, up to the second-last row.
-            J = int(float(sumdelegates) / Totals[rows-1] *
-                    math.pi/(2*math.asin(2.0/(3.0*rows+4.0*i-2.0))))
-            # The radius of the ith row in an N-row diagram (Ri) is (3*N+4*i-2)/(4*N)
-            R = (3.0*rows+4.0*i-2.0)/(4.0*rows)
-            if J == 1:
-                poslist.append([math.pi/2.0, 1.75*R, R])
-            else:
-                for j in range(J):
-                    # The angle to a spot is n.(pi-2sin(r/Ri))/(Ni-1)+sin(r/Ri) where Ni is the number in the arc
-                    # x=R.cos(theta) + 1.75
-                    # y=R.sin(theta)
-                    angle = float(j) * \
-                            (math.pi-2.0*math.sin(radius/R)) / \
-                            (float(J)-1.0)+math.sin(radius/R)
-                    poslist.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
-        # Now whatever seats are left go into the outside row:
-        J = sumdelegates-len(poslist)
-        R = (7.0*rows-2.0)/(4.0*rows)
-        if J == 1:
-            poslist.append([math.pi/2.0, 1.75*R, R])
-        else:
-            for j in range(J):
-                angle = float(j) * \
-                        (math.pi-2.0*math.sin(radius/R)) / \
-                        (float(J)-1.0)+math.sin(radius/R)
-                poslist.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
-        poslist.sort(reverse=True)
-        Counter = -1  # How many spots have we drawn?
-        for i in range(len(partylist)):
-            # Make each party's blocks an svg group
-            sanitizedpartyname = str(i) + "_" + re.sub(r'[^a-zA-Z0-9_-]+', '-', partylist[i][0])
-            tempstring = '  <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'.format(partylist[i][2], float(partylist[i][3])*radius*100, partylist[i][4], sanitizedpartyname)
-            outfile.write(tempstring+'\n')
-            for Counter in range(Counter+1, Counter+partylist[i][1]+1):
-                tempstring = '    <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/>'.format(
-                    poslist[Counter][1]*100.0+5.0, 100.0*(1.75-poslist[Counter][2])+5.0, radius*100.0*(1-float(partylist[i][3])/2.0))
-                outfile.write(tempstring+'\n')
-            outfile.write('  </g>\n')
-        outfile.write('</g>\n')
-        outfile.write('</svg>\n')
-        outfile.close()
-        # Pass the output filename to the calling page.
-        print(svgfilename)
+            sum += int(party[1])
+        if sum > TOTALS[-1]:  # Can't handle such big number
+            return 0
+    return sum
+
+
+def get_number_of_rows(nb_delegates):
+    """
+    How many rows will be needed to reprent this much delegates.
+
+    Parameters
+    ----------
+    int
+
+    Return
+    ------
+    int
+    """
+    for i in range(len(TOTALS)):
+        if TOTALS[i] >= nb_delegates:
+            return i + 1
+
+
+def get_spots_centers(nb_delegates, nb_rows, spot_radius):
+    """
+    Parameters
+    ----------
+    nb_delegates : int
+    nb_rows : int
+    spot_radius : float
+
+    Return
+    ------
+    list<3-list<float>>
+        The position of each single spot, represented as a list [angle, x, y]
+    """
+    positions = []
+    for i in range(1, nb_rows):  # Fill the n-1 firsts rows
+        add_ith_row_spots(positions, nb_delegates, nb_rows, i, spot_radius)
+    add_last_row_spots(positions, nb_delegates, nb_rows, spot_radius)
+    positions.sort(reverse=True)
+    return positions
+
+
+def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
+    """
+    Assign spots to a row.
+
+    Parameters
+    ----------
+    spots_positions : list<3-list<float>>
+        New positions will be appened to this list.
+    nb_delegates : int
+    nb_rows : int
+    i : int
+        The number of the current row (1 being the centermost one)
+    spot_radius : float
+    """
+    diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
+
+    # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the
+    # number of rows and i is the number of the current row.
+    magic_number = 3.0 * nb_rows + 4.0 * i - 2.0
+    max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
+
+    # Fill the row proportionally to the "fullness" of the diagram
+    nb_spots_in_ith_row = int(diagram_fullness * max_spot_in_row)
+
+    # The radius of the ith row in an N-row diagram (Ri) is (3n+4*i-2)/(4n)
+    ith_row_radius = magic_number / (4.0 * nb_rows)
+    append_row_spots_positions(spots_positions, nb_spots_in_ith_row,
+                               spot_radius, ith_row_radius)
+
+
+def add_last_row_spots(spots_positions, nb_delegates, nb_rows, spot_radius):
+    """
+    All leftovers seats must be added to the last row. So this function is an
+    adapted version of `add_ith_row_spots()`.
+
+    Parameters
+    ----------
+    spots_positions : list<3-list<float>>
+        New positions will be appened to this list.
+    nb_delegates : int
+    nb_rows : int
+    spot_radius : float
+    """
+    nb_leftover_seats = nb_delegates - len(spots_positions)
+    last_row_radius = (7.0 * nb_rows - 2.0) / (4.0 * nb_rows)
+    append_row_spots_positions(spots_positions, nb_leftover_seats,
+                               spot_radius, last_row_radius)
+
+
+def append_row_spots_positions(
+        spots_positions, nb_seats_to_place, spot_radius, row_radius):
+    """
+    Will compute the positions of each spot of the current row, and add them to
+    the list. For each spot, it will compute its angle, x and y according to
+    theese formulas:
+    The angle to a spot is n.(pi-2sin(r/Ri))/(Ni-1)+sin(r/Ri) where:
+    - n is the spot's number in the row
+    - Ni is the number of spots in this row
+    - r is the radius of a spot
+    - Ri is the radius of the current row
+    x=R.cos(angle) + 1.75
+    y=R.sin(angle)
+
+    Parameters
+    ----------
+    spots_positions : list<3-list<float>>
+        New positions will be appened to this list.
+    nb_seats_to_place : int
+        Number of seats in this row.
+    spot_radius : float
+        The radius of one single spot.
+    row_radius : float
+        The radius of the current row (since a row is actually a half-circle).
+    """
+    sin_r_rr = math.sin(spot_radius / row_radius)
+    for i in range(nb_seats_to_place):
+        angle = float(i)                               \
+                    * (math.pi - 2.0 * sin_r_rr)       \
+                    / (float(nb_seats_to_place) - 1.0) \
+                + sin_r_rr
+        spots_positions.append([
+            angle,
+            row_radius * math.cos(angle) + 1.75,
+            row_radius * math.sin(angle)])
+
+
+def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
+    """
+    Draw the actual <cirle>s in the SVG
+
+    Parameters
+    ----------
+    svg_filename : str
+    nb_delegates : int
+    party_list : list<list<str, int, str float, str>>
+        A list of parties. Each party being a list as [
+            party name,
+            number of seats,
+            fill color (as hex code),
+            border width,
+            border color (as hex code)]
+    positions_list : list<3-list<float>
+        [angle (useless in this function), x, y]
+    radius : float
+        Radius of a single spot
+    """
+    out_file = open(svg_filename, 'w')
+    write_svg_header(out_file)
+    write_svg_number_of_seats(out_file, nb_delegates)
+    write_svg_seats(out_file, party_list, positions_list, radius)
+    write_svg_footer(out_file)
+    out_file.close()
+
+
+def write_svg_header(out_file):
+    # Write svg header:
+    out_file.write(
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
+        '<svg xmlns:svg="http://www.w3.org/2000/svg"\n'
+        '     xmlns="http://www.w3.org/2000/svg" version="1.1"\n'
+    # Make 350 px wide, 175 px high diagram with a 5 px blank border
+        '     width="360" height="185">\n'
+        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n'
+        '    <g>\n')
+
+
+def write_svg_number_of_seats(out_file, nb_seats):
+    # Print the number of seats in the middle at the bottom.
+    out_file.write(
+        '        <text x="175" y="175" \n'
+        '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">\n'
+        '            {}\n'
+        '        </text>\n'
+        .format(nb_seats))
+
+
+def write_svg_seats(out_file, party_list, positions_list, radius):
+    """
+    Write the main part of the SVG, each party will have its own <g>, and each
+    delegate will be a <circle> inside this <g>.
+
+    Parameters
+    ----------
+    out_file : file
+    party_list : list<list<str, int, str float, str>>
+    positions_list : list<3-list<float>
+    radius : float
+    """
+    drawn_spots = 0
+    for i in range(len(party_list)):
+        # Remove illegal characters from party's name to make an svg id
+        sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_list[i][0])
+        block_id = "{}_{}".format(i, sanitized_party_name)
+
+        party_nb_seats = int(party_list[i][1])
+        party_fill_color = party_list[i][2]
+        party_border_width = float(party_list[i][3]) * radius * 100
+        party_border_color = party_list[i][4]
+
+        out_file.write(  # <g> header
+            '        <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" \n'
+            '           id="{3}"> \n'.format(
+                party_fill_color,
+                party_border_width,
+                party_border_color,
+                block_id))
+
+        for j in range(drawn_spots, drawn_spots + party_nb_seats):
+            x = 5.0 + 100.0 * positions_list[j][1]
+            y = 5.0 + 100.0 * (1.75 - positions_list[j][2])
+            r = radius * 100.0 - party_border_width / 2.0
+            out_file.write(  # <circle> element
+                '            <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/> \n'
+                .format(x, y, r))
+
+        out_file.write('        </g>\n')  # Close <g>
+        drawn_spots += party_nb_seats
+
+
+def write_svg_footer(out_file):
+    out_file.write(
+        '    </g>\n'
+        '</svg>\n')
+
+
+if __name__ == '__main__':
+    main()
