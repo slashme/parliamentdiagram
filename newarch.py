@@ -42,7 +42,7 @@ def main():
     elif inputlist:
         print(treat_inputlist(inputlist, start_time, request_hash, logfile))
     else:
-        logfile.write('No inputlist')
+        logfile.write('No inputlist\n')
     logfile.close()
 
 def treat_inputlist(input_list, start_time, request_hash, logfile):
@@ -246,10 +246,13 @@ def append_row_spots_positions(
     """
     sin_r_rr = math.sin(spot_radius / row_radius)
     for i in range(nb_seats_to_place):
-        angle = float(i)                               \
-                    * (math.pi - 2.0 * sin_r_rr)       \
-                    / (float(nb_seats_to_place) - 1.0) \
-                + sin_r_rr
+        if nb_seats_to_place == 1:
+            angle = math.pi / 2.0
+        else:
+            angle = float(i)                               \
+                        * (math.pi - 2.0 * sin_r_rr)       \
+                        / (float(nb_seats_to_place) - 1.0) \
+                    + sin_r_rr
         spots_positions.append([
             angle,
             row_radius * math.cos(angle) + 1.75,
