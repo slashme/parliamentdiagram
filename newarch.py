@@ -161,7 +161,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
     Parameters
     ----------
     nb_delegates : int
-    nb_rows : int
+    max_nb_rows : int
     spot_radius : float
 
     Return
@@ -169,15 +169,51 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
     list<3-list<float>>
         The position of each single spot, represented as a list [angle, x, y]
     """
+    discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
     positions = []
-    for i in range(1, nb_rows):  # Fill the n-1 firsts rows
-        add_ith_row_spots(positions, nb_delegates, nb_rows, i, spot_radius)
+    for i in range(1 + discarded_rows, nb_rows):  # Fill the n-1 firsts rows
+        add_ith_row_spots(positions, nb_rows, i, spot_radius, diagram_fullness)
     add_last_row_spots(positions, nb_delegates, nb_rows, spot_radius)
     positions.sort(reverse=True)
     return positions
 
 
-def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
+def optimize_rows(nb_delegates, theoritical_nb_rows):
+    """
+    The number of seats may be small enough so we don't need to fill all the
+    possible rows, but only the outermost ones. This says how much do we
+    actually need.
+
+    Parameters
+    ----------
+    nb_delegates : int
+    theoritical_nb_rows : int
+        The maximum number of rows we can fit in this diagram
+
+    Return
+    ------
+    int
+        The number of innermost rows to discard
+    float
+        The diagram fullness
+    """
+    handled_spots = 0
+    rows_needed = 0
+    for i in range(theoritical_nb_rows, 0, -1):
+        # How many spots can we fit in each row
+        # This 2 lines formula was determined by @slashme's math
+        magic_number = 3.0 * theoritical_nb_rows + 4.0 * i - 2.0
+        max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
+        handled_spots += round(max_spot_in_row)
+        rows_needed += 1
+        if handled_spots >= nb_delegates:
+            nb_useless_rows = i - 1
+            diagram_fullness = float(nb_delegates) / handled_spots
+            return nb_useless_rows, diagram_fullness
+
+
+def add_ith_row_spots(spots_positions, nb_rows, i,
+                      spot_radius, diagram_fullness):
     """
     Assign spots to a row.
 
@@ -185,14 +221,13 @@ def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
     ----------
     spots_positions : list<3-list<float>>
         New positions will be appened to this list.
-    nb_delegates : int
     nb_rows : int
     i : int
         The number of the current row (1 being the centermost one)
     spot_radius : float
+    diagram_fullness : float
+        What proportion of the diagram is used
     """
-    diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
-
     # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the
     # number of rows and i is the number of the current row.
     magic_number = 3.0 * nb_rows + 4.0 * i - 2.0
