@@ -69,6 +69,8 @@ def treat_inputlist(input_list, start_time, request_hash, logfile):
 
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
+    else:
+        return ""
 
 
 def return_file_if_already_exist(request_hash):
