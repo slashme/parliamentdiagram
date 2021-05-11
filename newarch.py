@@ -40,7 +40,15 @@ def main():
     if cached_filename:
         print(cached_filename)
     elif inputlist:
-        print(treat_inputlist(inputlist, start_time, request_hash, logfile))
+        filename = treat_inputlist(inputlist, start_time, request_hash, logfile)
+        if filename is None :
+            logfile.write(
+                'Something wrong happened. It may be because inputlist was '
+                'badly formated, or because there was 0 delegate, or because '
+                'there was too many of them.\n'
+            )
+        else :
+            print(filename)
     else:
         logfile.write('No inputlist\n')
     logfile.close()
@@ -51,7 +59,7 @@ def treat_inputlist(input_list, start_time, request_hash, logfile):
 
     Return
     ------
-    string
+    string|None
     """
     # Create a filename that will be unique each time.
     # Old files are deleted with a cron script.
@@ -69,8 +77,6 @@ def treat_inputlist(input_list, start_time, request_hash, logfile):
 
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
-    else:
-        return ""
 
 
 def return_file_if_already_exist(request_hash):
