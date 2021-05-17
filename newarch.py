@@ -9,7 +9,7 @@ import os
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
 TOTALS = [
-    4, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
+    3, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
     1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064,
     3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263,
     6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404, 9793, 10187, 10594,
@@ -221,7 +221,7 @@ def optimize_rows(nb_delegates, theoritical_nb_rows):
         # This 2 lines formula was determined by @slashme's math
         magic_number = 3.0 * theoritical_nb_rows + 4.0 * i - 2.0
         max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
-        handled_spots += round(max_spot_in_row)
+        handled_spots += int(max_spot_in_row)
         rows_needed += 1
         if handled_spots >= nb_delegates:
             nb_useless_rows = i - 1
