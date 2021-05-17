@@ -9,7 +9,7 @@ import os
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
 TOTALS = [
-    4, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
+    3, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
     1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064,
     3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263,
     6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404, 9793, 10187, 10594,
@@ -18,6 +18,8 @@ TOTALS = [
     22050, 22645, 23243, 23853, 24467, 25094, 25723, 26364, 27011, 27667, 28329,
     29001, 29679, 30367, 31061
 ]
+
+LOGFILE = None  # A file to log everything we want
 
 def main():
     """
@@ -29,9 +31,10 @@ def main():
     inputlist = form.getvalue("inputlist", "")
     # inputlist = sys.argv[1]
 
-    # Append input list to log file:
-    logfile = open('log', 'a')
-    logfile.write("{} {}\n".format(start_time, inputlist))
+    # Open a log file and append input list to it:
+    global LOGFILE
+    LOGFILE = open('log', 'a')
+    log("{} {}".format(start_time, inputlist))
 
     # Create always-positive hash of the request string:
     request_hash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
@@ -40,7 +43,7 @@ def main():
     if cached_filename:
         print(cached_filename)
     elif inputlist:
-        filename = treat_inputlist(inputlist, start_time, request_hash, logfile)
+        filename = treat_inputlist(inputlist, start_time, request_hash)
         if filename is None :
             logfile.write(
                 'Something went wrong. Maybe the input list was badly '
@@ -49,10 +52,25 @@ def main():
         else :
             print(filename)
     else:
-        logfile.write('No inputlist\n')
-    logfile.close()
+        log('No inputlist')
+    LOGFILE.close()
 
-def treat_inputlist(input_list, start_time, request_hash, logfile):
+
+def log(message, newline=True):
+    """
+    Add message to LOGFILE.
+
+    Parameters
+    ----------
+    message : string
+        Message to append to the LOGFILE
+    newline : bool
+        Should we append a \n at the end of the message
+    """
+    LOGFILE.write("{}{}".format(message, '\n' if newline else ''))
+
+
+def treat_inputlist(input_list, start_time, request_hash):
     """
     Generate a new SVG file and return it.
 
@@ -73,7 +91,6 @@ def treat_inputlist(input_list, start_time, request_hash, logfile):
         radius = 0.4 / nb_rows
 
         pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
-
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
 
@@ -161,7 +178,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
     Parameters
     ----------
     nb_delegates : int
-    nb_rows : int
+    max_nb_rows : int
     spot_radius : float
 
     Return
@@ -169,15 +186,51 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
     list<3-list<float>>
         The position of each single spot, represented as a list [angle, x, y]
     """
+    discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
     positions = []
-    for i in range(1, nb_rows):  # Fill the n-1 firsts rows
-        add_ith_row_spots(positions, nb_delegates, nb_rows, i, spot_radius)
+    for i in range(1 + discarded_rows, nb_rows):  # Fill the n-1 firsts rows
+        add_ith_row_spots(positions, nb_rows, i, spot_radius, diagram_fullness)
     add_last_row_spots(positions, nb_delegates, nb_rows, spot_radius)
     positions.sort(reverse=True)
     return positions
 
 
-def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
+def optimize_rows(nb_delegates, theoritical_nb_rows):
+    """
+    The number of seats may be small enough so we don't need to fill all the
+    possible rows, but only the outermost ones. This says how much do we
+    actually need.
+
+    Parameters
+    ----------
+    nb_delegates : int
+    theoritical_nb_rows : int
+        The maximum number of rows we can fit in this diagram
+
+    Return
+    ------
+    int
+        The number of innermost rows to discard
+    float
+        The diagram fullness
+    """
+    handled_spots = 0
+    rows_needed = 0
+    for i in range(theoritical_nb_rows, 0, -1):
+        # How many spots can we fit in each row
+        # This 2 lines formula was determined by @slashme's math
+        magic_number = 3.0 * theoritical_nb_rows + 4.0 * i - 2.0
+        max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
+        handled_spots += int(max_spot_in_row)
+        rows_needed += 1
+        if handled_spots >= nb_delegates:
+            nb_useless_rows = i - 1
+            diagram_fullness = float(nb_delegates) / handled_spots
+            return nb_useless_rows, diagram_fullness
+
+
+def add_ith_row_spots(spots_positions, nb_rows, i,
+                      spot_radius, diagram_fullness):
     """
     Assign spots to a row.
 
@@ -185,14 +238,13 @@ def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
     ----------
     spots_positions : list<3-list<float>>
         New positions will be appened to this list.
-    nb_delegates : int
     nb_rows : int
     i : int
         The number of the current row (1 being the centermost one)
     spot_radius : float
+    diagram_fullness : float
+        What proportion of the diagram is used
     """
-    diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
-
     # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the
     # number of rows and i is the number of the current row.
     magic_number = 3.0 * nb_rows + 4.0 * i - 2.0
