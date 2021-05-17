@@ -45,9 +45,8 @@ def main():
     elif inputlist:
         filename = treat_inputlist(inputlist, start_time, request_hash)
         if filename is None :
-            log('Something wrong happened. It may be because inputlist was '
-                'badly formated, or because there was 0 delegate, or because '
-                'there was too many of them.')
+            log('Something went wrong. Maybe the input list was badly '
+                'formatted, or had 0 delegates, or had too many delegates.')
         else :
             print(filename)
     else:
