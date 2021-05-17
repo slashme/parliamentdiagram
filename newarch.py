@@ -19,6 +19,8 @@ TOTALS = [
     29001, 29679, 30367, 31061
 ]
 
+LOGFILE = None  # A file to log everything we want
+
 def main():
     """
     Doesn't return anything, but in case of success: prints a filename, which
@@ -29,9 +31,10 @@ def main():
     inputlist = form.getvalue("inputlist", "")
     # inputlist = sys.argv[1]
 
-    # Append input list to log file:
-    logfile = open('log', 'a')
-    logfile.write("{} {}\n".format(start_time, inputlist))
+    # Open a log file and append input list to it:
+    global LOGFILE
+    LOGFILE = open('log', 'a')
+    log("{} {}".format(start_time, inputlist))
 
     # Create always-positive hash of the request string:
     request_hash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
@@ -40,20 +43,33 @@ def main():
     if cached_filename:
         print(cached_filename)
     elif inputlist:
-        filename = treat_inputlist(inputlist, start_time, request_hash, logfile)
+        filename = treat_inputlist(inputlist, start_time, request_hash)
         if filename is None :
-            logfile.write(
-                'Something wrong happened. It may be because inputlist was '
+            log('Something wrong happened. It may be because inputlist was '
                 'badly formated, or because there was 0 delegate, or because '
-                'there was too many of them.\n'
-            )
+                'there was too many of them.')
         else :
             print(filename)
     else:
-        logfile.write('No inputlist\n')
-    logfile.close()
+        log('No inputlist')
+    LOGFILE.close()
 
-def treat_inputlist(input_list, start_time, request_hash, logfile):
+
+def log(message, newline=True):
+    """
+    Add message to LOGFILE.
+
+    Parameters
+    ----------
+    message : string
+        Message to append to the LOGFILE
+    newline : bool
+        Should we append a \n at the end of the message
+    """
+    LOGFILE.write("{}{}".format(message, '\n' if newline else ''))
+
+
+def treat_inputlist(input_list, start_time, request_hash):
     """
     Generate a new SVG file and return it.
 
@@ -74,7 +90,6 @@ def treat_inputlist(input_list, start_time, request_hash, logfile):
         radius = 0.4 / nb_rows
 
         pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
-
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
 
