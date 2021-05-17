@@ -96,7 +96,7 @@ def treat_inputlist(input_list, start_time, request_hash):
 
 def return_file_if_already_exist(request_hash):
     """
-    If requested file has already been gerated, return its path/filename.
+    If the requested file has been generated before, return its path/filename.
 
     Parameters
     ----------
@@ -116,7 +116,7 @@ def return_file_if_already_exist(request_hash):
 
 def split(input_list):
     """
-    Split input list into a list of party
+    Split input list into a list of parties
 
     Parameters
     ----------
@@ -157,7 +157,7 @@ def count_delegates(party_list):
 
 def get_number_of_rows(nb_delegates):
     """
-    How many rows will be needed to reprent this much delegates.
+    How many rows will be needed to represent this many delegates.
 
     Parameters
     ----------
@@ -225,13 +225,13 @@ def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
 
 def add_last_row_spots(spots_positions, nb_delegates, nb_rows, spot_radius):
     """
-    All leftovers seats must be added to the last row. So this function is an
+    All leftover seats must be added to the last row. So this function is an
     adapted version of `add_ith_row_spots()`.
 
     Parameters
     ----------
     spots_positions : list<3-list<float>>
-        New positions will be appened to this list.
+        New positions will be appended to this list.
     nb_delegates : int
     nb_rows : int
     spot_radius : float
@@ -284,14 +284,14 @@ def append_row_spots_positions(
 
 def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     """
-    Draw the actual <cirle>s in the SVG
+    Draw the actual <circle>s in the SVG
 
     Parameters
     ----------
     svg_filename : str
     nb_delegates : int
     party_list : list<list<str, int, str float, str>>
-        A list of parties. Each party being a list as [
+        A list of parties. Each party being a list with the form [
             party name,
             number of seats,
             fill color (as hex code),
