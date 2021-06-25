@@ -52,12 +52,12 @@ $('#addpartymanual').click(function(){
 	var res = wikitext.split("{{legend");
 	len=res.length;
 	if(len<2){alert("legend template not detected, cannot auto-fill party list.")};
-	
+
 	regex2=": ";
 	regex3=" seats}}";
 	//create array to hold party data
 	partydata=[];
- 
+
 	for(i=1; i<len; i++)
 	    {
 		partydata[i-1]=[];
@@ -73,14 +73,14 @@ $('#addpartymanual').click(function(){
         var partylistcontainer = document.getElementById("partylistcontainer");
         //Find out how many parties we have
         numparties=0;
-        $( "div" ).each( function() { 
+        $( "div" ).each( function() {
             if(this.id.match( /^party[0-9]+$/ )){
 		    deleteParty( parseInt(/[0-9]+$/.exec(this.id)[0] ));
               }
           }
         );
 
-	//Generate parties from array: 
+	//Generate parties from array:
 	partydata.forEach(function(element){
 		addParty(element[1], element[0])
 	});
@@ -94,7 +94,7 @@ function addParty(newname="", newcolor=""){
         var partylistcontainer = document.getElementById("partylistcontainer");
         //New party's number: one more than the largest party number so far:
         i=0;
-        $( "div" ).each( function() { 
+        $( "div" ).each( function() {
             if(this.id.match( /^party[0-9]+$/ )){
                 i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
               }
@@ -173,202 +173,204 @@ function getRandomColor() {
 }
 
 function CallDiagramScript(){
-        // Create request string: this is the request that is passed to the python script.
-        var requeststring="";
-        // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
-        var legendstring="";
-        var legendname = "";
-        var legendnum  = "";
-	var totalseats = 0; //count total seats to check for empty diagram
-        var partylist   = new Array();
-        $( "input" ).each( function() { 
-                if(this.name.match( /^Name/ )){
-                  partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
-                }
-                if(this.name.match( /^Number/ )){
-                  partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
-                }
-                if(this.name.match( /^Color/ )){
-                  partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
-                }
-		//If we're processing a border thickness, add value if it's a number, maxing out at 1.
-		//Add 0 if it's not a number or if it's equal to 0.
-                if(this.name.match( /^Border/ )){
-		    bwidth=parseFloat(this.value);
-		    if(isNaN(bwidth)){bwidth=0};
-		    bwidth=Math.min(Math.max(bwidth,0),1);
-		    partylist[/[0-9]+$/.exec(this.name)[0]]['Border']=bwidth;
-                }
-                if(this.name.match( /^BColor/ )){
-		    partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']=this.value;
-                }
-        });
-        var arrayLength = partylist.length;
-        for (var i = 1; i < arrayLength; i++) {
-          if(partylist[i]) {
-              requeststring += partylist[i]['Name'].replace(',','');
-              requeststring += ', ';
-              requeststring += partylist[i]['Num'];
-	      totalseats += partylist[i]['Num'];
-              requeststring += ', ';
-              requeststring += '#';
-              requeststring += partylist[i]['Color'];
-              requeststring += ', ';
-              requeststring += partylist[i]['Border'];
-              requeststring += ', ';
-              requeststring += '#';
-              requeststring += partylist[i]['BColor'];
-              if ( i < (arrayLength - 1)){ requeststring += '; '}
-              if (partylist[i]['Num'] == 1){
+    let requeststring="";  // This is what we send to the python script
+
+    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
+    var legendstring="";
+    var legendname = "";
+    var legendnum  = "";
+
+    var totalseats = 0; //count total seats to check for empty diagram
+    var partylist   = new Array();
+    $( "input" ).each( function() {
+        if(this.name.match( /^Name/ )){
+            partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
+        }
+        if(this.name.match( /^Number/ )){
+            partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
+        }
+        if(this.name.match( /^Color/ )){
+            partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
+        }
+
+        //If we're processing a border thickness, add value if it's a number, maxing out at 1.
+        //Add 0 if it's not a number or if it's equal to 0.
+        if(this.name.match( /^Border/ )){
+            bwidth=parseFloat(this.value);
+            if(isNaN(bwidth)){bwidth=0}; //!\\
+            bwidth=Math.min(Math.max(bwidth,0),1);
+            partylist[/[0-9]+$/.exec(this.name)[0]]['Border']=bwidth;
+        }
+        if(this.name.match( /^BColor/ )){
+            partylist[/[0-9]+$/.exec(this.name)[0]]['BColor']=this.value;
+        }
+    });
+    var arrayLength = partylist.length;
+    for (var i = 1; i < arrayLength; i++) {
+        if(partylist[i]) {
+            requeststring += partylist[i]['Name'].replace(',','');
+            requeststring += ', ';
+            requeststring += partylist[i]['Num'];
+            totalseats += partylist[i]['Num'];
+            requeststring += ', ';
+            requeststring += '#';
+            requeststring += partylist[i]['Color'];
+            requeststring += ', ';
+            requeststring += partylist[i]['Border'];
+            requeststring += ', ';
+            requeststring += '#';
+            requeststring += partylist[i]['BColor'];
+            if ( i < (arrayLength - 1)){ requeststring += '; '}
+            if (partylist[i]['Num'] == 1){
                 legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "
-              }
-              else {
-                legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "
-              }
-              }
             }
-            if(totalseats > 0){
+            else {
+                legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": "+ partylist[i]['Num']+" seats}} "
+            }
+        }
+    }
+    if(totalseats > 0){
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
-                type: "POST",
-                url: "newarch.py",
-                data: {inputlist: requeststring },
+            type: "POST",
+            url: "newarch.py",
+            data: {inputlist: requeststring },
         }).done( function(data,status){
-		data=data.trim();
-                var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-		while (postcontainer.hasChildNodes()) { //Remove old images
-		    postcontainer.removeChild(postcontainer.lastChild);
-		}
-                //Now add the svg image to the page
-                var img = document.createElement("img");
-                img.src = data;
-		img.setAttribute("id", "SVGdiagram");
-                postcontainer.appendChild(img);
-                //and a linebreak
-                postcontainer.appendChild(document.createElement("br"));
-                //Add a link with the new diagram
-                var abtn = document.createElement('a');
-                var linkText = document.createTextNode("Click to download your SVG diagram.");
-		abtn.className="btn btn-success"
-                abtn.appendChild(linkText);
-                abtn.title = "SVG diagram";
-                abtn.href = data;
-                abtn.download = data;
-                postcontainer.appendChild(abtn);
-                //and a horizontal line
-                postcontainer.appendChild(document.createElement("hr"));
-                //Now add the legend template text with the party names, colours and support.
-		var legendtitle=document.createElement('h4');
-                var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-                postcontainer.appendChild(legendtitle);
-		legendtitle.appendChild(newtext);
-                postcontainer.appendChild(document.createElement("br"));
-                newtext = document.createTextNode(legendstring);
-                postcontainer.appendChild(newtext);
-                postcontainer.appendChild(document.createElement("hr"));
-		//File upload name label
-		var filenametitle=document.createElement('div');
-		filenametitle.className = 'left greendiv';
-		filenametitle.innerHTML = "Filename to upload:";
-		postcontainer.appendChild(filenametitle);
-		//File upload name input control
-		var input=document.createElement('div');
-		inputname = data.replace(/.*\//,'').replace(/.svg\s*$/,'');
-		input.innerHTML = '<input class="right" type="text" name="' +  inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
-		postcontainer.appendChild(input);
-		//Year label
-		var yeartitle=document.createElement('div');
-		yeartitle.className = 'left greendiv';
-		yeartitle.innerHTML = "Election year:";
-		postcontainer.appendChild(yeartitle);
-		//Year input control
-		var input=document.createElement('div');
-		input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value='+(new Date()).getFullYear()+' oninput="updateFilename()" >';
-		postcontainer.appendChild(input);
-		//Country label
-		var countrytitle=document.createElement('div');
-		countrytitle.className = 'left greendiv';
-		countrytitle.innerHTML = "Country:";
-		postcontainer.appendChild(countrytitle);
-		//Country input control
-		var input=document.createElement('div');
-		input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
-		postcontainer.appendChild(input);
-		//Locality label
-		var localitytitle=document.createElement('div');
-		localitytitle.className = 'left greendiv';
-		localitytitle.innerHTML = "Locality:";
-		postcontainer.appendChild(localitytitle);
-		//Locality input control
-		var input=document.createElement('div');
-		input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
-		postcontainer.appendChild(input);
-		//Body label
-		var bodytitle=document.createElement('div');
-		bodytitle.className = 'left greendiv';
-		bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
-		postcontainer.appendChild(bodytitle);
-		//Body input control
-		var input=document.createElement('div');
-		input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
-		postcontainer.appendChild(input);
-                postcontainer.appendChild(document.createElement("br"));
-                //Button to add a link to upload the new diagram
-		var uploadwarn=document.createElement('div');
-		uploadwarn.className = 'notice';
-		uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
-		postcontainer.appendChild(uploadwarn);
-		var uploadlinkbutton=document.createElement('a');
-		uploadlinkbutton.className = 'btn btn-primary';
-		uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
-                var linkText = document.createTextNode("Generate upload link");
-                uploadlinkbutton.appendChild(linkText);
-		postcontainer.appendChild(uploadlinkbutton);
-                //and a linebreak
-                postcontainer.appendChild(document.createElement("br"));
+            data=data.trim();
+            var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+            while (postcontainer.hasChildNodes()) { //Remove old images
+                postcontainer.removeChild(postcontainer.lastChild);
+            }
+            //Now add the svg image to the page
+            var img = document.createElement("img");
+            img.src = data;
+            img.setAttribute("id", "SVGdiagram");
+            postcontainer.appendChild(img);
+            //and a linebreak
+            postcontainer.appendChild(document.createElement("br"));
+            //Add a link with the new diagram
+            var abtn = document.createElement('a');
+            var linkText = document.createTextNode("Click to download your SVG diagram.");
+            abtn.className="btn btn-success"
+            abtn.appendChild(linkText);
+            abtn.title = "SVG diagram";
+            abtn.href = data;
+            abtn.download = data;
+            postcontainer.appendChild(abtn);
+            //and a horizontal line
+            postcontainer.appendChild(document.createElement("hr"));
+            //Now add the legend template text with the party names, colours and support.
+            var legendtitle=document.createElement('h4');
+            var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+            postcontainer.appendChild(legendtitle);
+            legendtitle.appendChild(newtext);
+            postcontainer.appendChild(document.createElement("br"));
+            newtext = document.createTextNode(legendstring);
+            postcontainer.appendChild(newtext);
+            postcontainer.appendChild(document.createElement("hr"));
+            //File upload name label
+            var filenametitle=document.createElement('div');
+            filenametitle.className = 'left greendiv';
+            filenametitle.innerHTML = "Filename to upload:";
+            postcontainer.appendChild(filenametitle);
+            //File upload name input control
+            var input=document.createElement('div');
+            inputname = data.replace(/.*\//,'').replace(/.svg\s*$/,'');
+            input.innerHTML = '<input class="right" type="text" name="' +  inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
+            postcontainer.appendChild(input);
+            //Year label
+            var yeartitle=document.createElement('div');
+            yeartitle.className = 'left greendiv';
+            yeartitle.innerHTML = "Election year:";
+            postcontainer.appendChild(yeartitle);
+            //Year input control
+            var input=document.createElement('div');
+            input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="'+(new Date()).getFullYear()+'" value='+(new Date()).getFullYear()+' oninput="updateFilename()" >';
+            postcontainer.appendChild(input);
+            //Country label
+            var countrytitle=document.createElement('div');
+            countrytitle.className = 'left greendiv';
+            countrytitle.innerHTML = "Country:";
+            postcontainer.appendChild(countrytitle);
+            //Country input control
+            var input=document.createElement('div');
+            input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
+            postcontainer.appendChild(input);
+            //Locality label
+            var localitytitle=document.createElement('div');
+            localitytitle.className = 'left greendiv';
+            localitytitle.innerHTML = "Locality:";
+            postcontainer.appendChild(localitytitle);
+            //Locality input control
+            var input=document.createElement('div');
+            input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
+            postcontainer.appendChild(input);
+            //Body label
+            var bodytitle=document.createElement('div');
+            bodytitle.className = 'left greendiv';
+            bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
+            postcontainer.appendChild(bodytitle);
+            //Body input control
+            var input=document.createElement('div');
+            input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
+            postcontainer.appendChild(input);
+            postcontainer.appendChild(document.createElement("br"));
+            //Button to add a link to upload the new diagram
+            var uploadwarn=document.createElement('div');
+            uploadwarn.className = 'notice';
+            uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
+            postcontainer.appendChild(uploadwarn);
+            var uploadlinkbutton=document.createElement('a');
+            uploadlinkbutton.className = 'btn btn-primary';
+            uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("'+ inputname +'", "'+ data +'", "' + legendstring + '")');
+            var linkText = document.createTextNode("Generate upload link");
+            uploadlinkbutton.appendChild(linkText);
+            postcontainer.appendChild(uploadlinkbutton);
+            //and a linebreak
+            postcontainer.appendChild(document.createElement("br"));
         })
-	.fail( function(xhr, textStatus, errorThrown) { //data doesn't contain "svg", so post an error message instead
-		var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-		while (postcontainer.hasChildNodes()) { //Remove old images
-		    postcontainer.removeChild(postcontainer.lastChild);
-		}
-		var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
-		postcontainer.appendChild(newpost);
-		var errordiv=document.createElement('div');
-		errordiv.id="error";
-		errordiv.className = 'error';
-		errordiv.innerHTML = "Oops, your diagram wasn't successfully generated! Maybe you have more than 31061 seats. If not, please raise a bug report.";
-		newpost.appendChild(errordiv);
-		//add a linebreak
-		newpost.appendChild(document.createElement("br"));
-		//Even though we failed, still add the legend template text with the party names, colours and support.
-		var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-		newpost.appendChild(newtext);
-		newpost.appendChild(document.createElement("br"));
-		newtext = document.createTextNode(legendstring);
-		newpost.appendChild(newtext);
-		newpost.appendChild(document.createElement("br"));}
-	);
+        .fail( function(xhr, textStatus, errorThrown) { //data doesn't contain "svg", so post an error message instead
+            var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
+            while (postcontainer.hasChildNodes()) { //Remove old images
+                postcontainer.removeChild(postcontainer.lastChild);
+            }
+            var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+            postcontainer.appendChild(newpost);
+            var errordiv=document.createElement('div');
+            errordiv.id="error";
+            errordiv.className = 'error';
+            errordiv.innerHTML = "Oops, your diagram wasn't successfully generated! Maybe you have more than 31061 seats. If not, please raise a bug report.";
+            newpost.appendChild(errordiv);
+            //add a linebreak
+            newpost.appendChild(document.createElement("br"));
+            //Even though we failed, still add the legend template text with the party names, colours and support.
+            var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+            newpost.appendChild(newtext);
+            newpost.appendChild(document.createElement("br"));
+            newtext = document.createTextNode(legendstring);
+            newpost.appendChild(newtext);
+            newpost.appendChild(document.createElement("br"));
+        });
         console.log(requeststring);
         console.log(legendstring);
-      }
-	    else
-	    {
-	    alert("There are no delegates in your parliament. Cannot generate a diagram!");
-	    }
+    }
+    else
+    {
+        alert("There are no delegates in your parliament. Cannot generate a diagram!");
+    }
 }
- 
+
 function updateFilename(){
 	newFilename="";
 	if (document.getElementById("country").value) {newFilename = document.getElementById("country").value}
 	if (document.getElementById("locality").value) {
 		if (newFilename) {newFilename += "_"}
 		newFilename += document.getElementById("locality").value
-	} 
+	}
 	if (document.getElementById("body").value) {
 		if (newFilename) {newFilename += "_"}
 		newFilename += document.getElementById("body").value
-	} 
+	}
 	if (document.getElementById("year").value) {
 		if (newFilename) {newFilename += "_"}
 		newFilename += document.getElementById("year").value
@@ -384,7 +386,7 @@ function makeUploadLink(inputname, linkdata, legendtext){
 	var fname="";
 	//This is kind of dumb: I'm iterating through all the inputs on the
 	//page to find any that match the name that's being called. FIXME
-	$( "input" ).each( function() { 
+	$( "input" ).each( function() {
 			if(this.name == inputname){
 				fname = this.value
 			}
@@ -400,11 +402,11 @@ function makeUploadLink(inputname, linkdata, legendtext){
 
 	if(DD<10) {
 		DD='0'+DD
-	} 
+	}
 
 	if(MM<10) {
 		MM='0'+MM
-	} 
+	}
 
 	today = YYYY+'-'+MM+'-'+DD;
 	//Now build the query URL that will be used to upload the image to Commons:
