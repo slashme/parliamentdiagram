@@ -173,7 +173,7 @@ function getRandomColor() {
 }
 
 function CallDiagramScript(){
-    let requeststring="";  // This is what we send to the python script
+    let requestJSON={};  // This is what we send to the python script
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     var legendstring="";
@@ -206,21 +206,19 @@ function CallDiagramScript(){
         }
     });
     var arrayLength = partylist.length;
+    requestJSON.parties = []
     for (var i = 1; i < arrayLength; i++) {
         if(partylist[i]) {
-            requeststring += partylist[i]['Name'].replace(',','');
-            requeststring += ', ';
-            requeststring += partylist[i]['Num'];
+            let partyJSON = {}
+            partyJSON.name = partylist[i]['Name'].replace(',','');
+            partyJSON.nb_seats = parseInt(partylist[i]['Num']);
+            partyJSON.color = '#' + partylist[i]['Color'];
+            partyJSON.border_size = parseFloat(partylist[i]['Border']);
+            partyJSON.border_color = '#' + partylist[i]['BColor'];
+            requestJSON.parties.push(partyJSON)
+
             totalseats += partylist[i]['Num'];
-            requeststring += ', ';
-            requeststring += '#';
-            requeststring += partylist[i]['Color'];
-            requeststring += ', ';
-            requeststring += partylist[i]['Border'];
-            requeststring += ', ';
-            requeststring += '#';
-            requeststring += partylist[i]['BColor'];
-            if ( i < (arrayLength - 1)){ requeststring += '; '}
+
             if (partylist[i]['Num'] == 1){
                 legendstring += "{{legend|#" + partylist[i]['Color'] +"|" + partylist[i]['Name'] +": 1 seat}} "
             }
@@ -234,7 +232,7 @@ function CallDiagramScript(){
         $.ajax({
             type: "POST",
             url: "newarch.py",
-            data: {inputlist: requeststring },
+            data: {data: JSON.stringify(requestJSON)},
         }).done( function(data,status){
             data=data.trim();
             var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
@@ -351,7 +349,7 @@ function CallDiagramScript(){
             newpost.appendChild(newtext);
             newpost.appendChild(document.createElement("br"));
         });
-        console.log(requeststring);
+        console.log(requestJSON);
         console.log(legendstring);
     }
     else
