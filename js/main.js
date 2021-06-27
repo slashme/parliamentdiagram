@@ -196,6 +196,14 @@ function CallDiagramScript(){
     var legendname = "";
     var legendnum  = "";
 
+    // Retrieve advanced parameters
+    if ($('#advanced-body').is(':visible')) {
+        requestJSON.denser_rows = $('#row-densifier').is(':checked');
+    }
+    else {
+        requestJSON.denser_rows = false;
+    }
+
     var totalseats = 0; //count total seats to check for empty diagram
     var partylist   = new Array();
     $( "input" ).each( function() {

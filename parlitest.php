@@ -42,7 +42,7 @@
         <div class="col-12 mt-2">
           All-rows diagram
           <label class="switch">
-            <input type="checkbox">
+            <input type="checkbox" id="row-densifier">
             <span class="slider round"></span>
           </label>
           Compact-rows diagram
