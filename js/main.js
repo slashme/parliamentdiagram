@@ -87,6 +87,22 @@ $('#addpartymanual').click(function(){
 
 	  });
 	});
+
+    // Enable/disable advanced parameters
+    let enable_advanced_btn = $('#enable-advanced');
+    let disable_advanced_btn = $('#disable-advanced');
+		let advanced_body = $('#advanced-body');
+    enable_advanced_btn.click(function (){
+        enable_advanced_btn.hide();
+				disable_advanced_btn.show();
+				advanced_body.show();
+    });
+		disable_advanced_btn.click(function(){
+		    enable_advanced_btn.show();
+				disable_advanced_btn.hide();
+				advanced_body.hide();
+		})
+
 });
 
 function addParty(newname="", newcolor=""){

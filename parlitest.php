@@ -30,6 +30,32 @@
 
   <div class="block card">
     <div class="card-body">
+      <div class="row"><div class="col-12">
+        <button id="enable-advanced" class="btn btn-info">
+          Enable advanced parameters
+        </button>
+        <button id="disable-advanced" class="btn btn-outline-info" style="display: none;">
+          Disable advanced parameters
+        </button>
+      </div></div>
+      <div id="advanced-body" class="row" style="display: none;">
+        <div class="col-12 mt-2">
+          All-rows diagram
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider round"></span>
+          </label>
+          Compact-rows diagram
+          <i class="fa fa-question-circle" aria-hidden="true"
+             title="'All-rows' is the default aesthetic, it may look weird because too sparse.&#10;'Compact-rows' will generate denser diagrams, it may look weird because too thin."
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block card">
+    <div class="card-body">
       <p class="card-text">If you want to add a party manually <button class="btn btn-info" id="addpartymanual">Click here</button></p>
     </div>
   </div>
@@ -91,4 +117,3 @@
 </div> <!-- Closes div.container in header.html -->
 </div> <!-- Closes div#header -->
 <?php require('footer.php'); ?>
-

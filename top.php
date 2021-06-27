@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="css/parliamentstyle.css">
     <link rel="stylesheet" type="text/css" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/select2.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/fork-awesome.min.css"/>
     <!--
          //document.write("\<script src='jquery.min.js' type='text/javascript'>\<\/script>"); //For local debugging
     -->
