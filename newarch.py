@@ -5,6 +5,7 @@ import math
 import datetime
 import sys
 import os
+import json
 
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
@@ -28,7 +29,8 @@ def main():
     """
     start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
     form = cgi.FieldStorage()
-    inputlist = form.getvalue("inputlist", "")
+    data = form.getvalue("data", "")
+    inputlist = json.loads(data)
     # inputlist = sys.argv[1]
 
     # Open a log file and append input list to it:
@@ -37,7 +39,7 @@ def main():
     log("{} {}".format(start_time, inputlist))
 
     # Create always-positive hash of the request string:
-    request_hash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+    request_hash = str(hash(data) % ((sys.maxsize + 1) * 2))
 
     cached_filename = return_file_if_already_exist(request_hash)
     if cached_filename:
@@ -72,6 +74,25 @@ def treat_inputlist(input_list, start_time, request_hash):
     """
     Generate a new SVG file and return it.
 
+    Parameters
+    ----------
+    input_list : dict
+        The request. A dict with the following format : {
+            'parties': [
+                {
+                    'name': <str>,
+                    'nb_seats': <int>,
+                    'color': <str> (fill color, as hex code),
+                    'border_size': <float>,
+                    'border_color': <str> (as hex code)
+                },
+                ... /* other parties */
+            ],
+            'denser_rows': <bool> (should we compact rows)
+        }
+    start_time : str
+    request_hash : str
+
     Return
     ------
     string|None
@@ -80,15 +101,15 @@ def treat_inputlist(input_list, start_time, request_hash):
     # Old files are deleted with a cron script.
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
-    party_list = split(input_list)
+    party_list = input_list['parties']
+    dense_rows = input_list['denser_rows']
     sum_delegates = count_delegates(party_list)
-
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
         radius = 0.4 / nb_rows
 
-        pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
 
@@ -113,31 +134,23 @@ def return_file_if_already_exist(request_hash):
     return False  # File doesn't already exist
 
 
-def split(input_list):
-    """
-    Split input list into a list of parties
-
-    Parameters
-    ----------
-    input_list : str
-
-    Return
-    ------
-    list
-    """
-    party_list = []
-    for i in re.split("\s*;\s*", input_list):
-        party_list.append(re.split('\s*,\s*', i))
-    return party_list
-
-
 def count_delegates(party_list):
     """
     Sums all delegates from all parties. Return 0 if something fails.
 
     Parameters
     ----------
-    party_list : list
+    party_list : <lsit>
+        Data for each party, a dict with the following format : [
+            {
+                'name': <str>,
+                'nb_seats': <int>,
+                'color': <str> (fill color, as hex code),
+                'border_size': <float>,
+                'border_color': <str> (as hex code)
+            },
+            ... /* other parties */
+        ]
 
     Return
     ------
@@ -145,10 +158,7 @@ def count_delegates(party_list):
     """
     sum = 0
     for party in party_list:
-        if len(party) < 5 or not party[1].isdigit():  # Incorrect input format
-            return 0
-        else:
-            sum += int(party[1])
+        sum += party['nb_seats']
         if sum > TOTALS[-1]:  # Can't handle such big number
             return 0
     return sum
@@ -171,28 +181,70 @@ def get_number_of_rows(nb_delegates):
             return i + 1
 
 
-def get_spots_centers(nb_delegates, nb_rows, spot_radius):
+def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
     """
     Parameters
     ----------
     nb_delegates : int
     nb_rows : int
     spot_radius : float
+    dense_rows: bool
 
     Return
     ------
     list<3-list<float>>
         The position of each single spot, represented as a list [angle, x, y]
     """
+    if dense_rows:
+        discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
+    else:
+        discarded_rows = 0
+        diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
+
     positions = []
-    for i in range(1, nb_rows):  # Fill the n-1 firsts rows
-        add_ith_row_spots(positions, nb_delegates, nb_rows, i, spot_radius)
+    for i in range(1 + discarded_rows, nb_rows):  # Fill the n-1 firsts rows
+        add_ith_row_spots(positions, nb_rows, i, spot_radius, diagram_fullness)
     add_last_row_spots(positions, nb_delegates, nb_rows, spot_radius)
     positions.sort(reverse=True)
     return positions
 
 
-def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
+def optimize_rows(nb_delegates, theoritical_nb_rows):
+    """
+    The number of seats may be small enough so we don't need to fill all the
+    possible rows, but only the outermost ones. This says how much do we
+    actually need.
+
+    Parameters
+    ----------
+    nb_delegates : int
+    theoritical_nb_rows : int
+        The maximum number of rows we can fit in this diagram
+
+    Return
+    ------
+    int
+        The number of innermost rows to discard
+    float
+        The diagram fullness
+    """
+    handled_spots = 0
+    rows_needed = 0
+    for i in range(theoritical_nb_rows, 0, -1):
+        # How many spots can we fit in each row
+        # This 2 lines formula was determined by @slashme's math
+        magic_number = 3.0 * theoritical_nb_rows + 4.0 * i - 2.0
+        max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
+        handled_spots += int(max_spot_in_row)
+        rows_needed += 1
+        if handled_spots >= nb_delegates:
+            nb_useless_rows = i - 1
+            diagram_fullness = float(nb_delegates) / handled_spots
+            return nb_useless_rows, diagram_fullness
+
+
+def add_ith_row_spots(spots_positions, nb_rows, i,
+                      spot_radius, diagram_fullness):
     """
     Assign spots to a row.
 
@@ -200,14 +252,13 @@ def add_ith_row_spots(spots_positions, nb_delegates, nb_rows, i, spot_radius):
     ----------
     spots_positions : list<3-list<float>>
         New positions will be appened to this list.
-    nb_delegates : int
     nb_rows : int
     i : int
         The number of the current row (1 being the centermost one)
     spot_radius : float
+    diagram_fullness : float
+        What proportion of the diagram is used
     """
-    diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
-
     # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the
     # number of rows and i is the number of the current row.
     magic_number = 3.0 * nb_rows + 4.0 * i - 2.0
@@ -289,13 +340,13 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     ----------
     svg_filename : str
     nb_delegates : int
-    party_list : list<list<str, int, str float, str>>
-        A list of parties. Each party being a list with the form [
-            party name,
-            number of seats,
-            fill color (as hex code),
-            border width,
-            border color (as hex code)]
+    party_list : list<dict>
+        A list of parties. Each party being a dict with the form {
+            'name': <str>,
+            'nb_seats': <int>,
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
     positions_list : list<3-list<float>
         [angle (useless in this function), x, y]
     radius : float
@@ -339,20 +390,21 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     Parameters
     ----------
     out_file : file
-    party_list : list<list<str, int, str float, str>>
+    party_list : list<dict>>
     positions_list : list<3-list<float>
     radius : float
     """
     drawn_spots = 0
     for i in range(len(party_list)):
         # Remove illegal characters from party's name to make an svg id
-        sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_list[i][0])
+        party_name = party_list[i]['name']
+        sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_name)
         block_id = "{}_{}".format(i, sanitized_party_name)
 
-        party_nb_seats = int(party_list[i][1])
-        party_fill_color = party_list[i][2]
-        party_border_width = float(party_list[i][3]) * radius * 100
-        party_border_color = party_list[i][4]
+        party_nb_seats = party_list[i]['nb_seats']
+        party_fill_color = party_list[i]['color']
+        party_border_width = party_list[i]['border_size'] * radius * 100
+        party_border_color = party_list[i]['border_color']
 
         out_file.write(  # <g> header
             '        <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" \n'
@@ -361,6 +413,8 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
                 party_border_width,
                 party_border_color,
                 block_id))
+        out_file.write(  # Party name in a tooltip
+            '            <title>{}</title>'.format(party_name))
 
         for j in range(drawn_spots, drawn_spots + party_nb_seats):
             x = 5.0 + 100.0 * positions_list[j][1]
