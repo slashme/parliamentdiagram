@@ -140,7 +140,7 @@ def count_delegates(party_list):
 
     Parameters
     ----------
-    party_list : <lsit>
+    party_list : <list>
         Data for each party, a dict with the following format : [
             {
                 'name': <str>,
@@ -390,8 +390,8 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     Parameters
     ----------
     out_file : file
-    party_list : list<dict>>
-    positions_list : list<3-list<float>
+    party_list : list<dict>
+    positions_list : list<3-list<float>>
     radius : float
     """
     drawn_spots = 0
