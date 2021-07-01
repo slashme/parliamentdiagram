@@ -152,7 +152,7 @@ function addParty(newname="", newcolor=""){
         //Party border width name tag
         var partycolor=document.createElement('div');
         partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " border thickness";
+        partycolor.innerHTML = "Party " + i + " border width";
         newpartydiv.appendChild(partycolor);
         //Party border width control
         var input=document.createElement('div');
@@ -217,7 +217,7 @@ function CallDiagramScript(){
             partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
         }
 
-        //If we're processing a border thickness, add value if it's a number, maxing out at 1.
+        //If we're processing a border width, add value if it's a number, maxing out at 1.
         //Add 0 if it's not a number or if it's equal to 0.
         if(this.name.match( /^Border/ )){
             bwidth=parseFloat(this.value);
