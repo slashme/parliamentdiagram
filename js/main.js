@@ -173,7 +173,7 @@ function addRole(office_name, bureau_roles_col){
         let input_div = `
             <div class="${class_name}">
                 <input class="right" type="number" value="0"
-                       name="Number-${addRole.role_id}">
+                       name="Number-${addRole.role_id}-${party_number}">
             </div>`;
         $(input_div).insertAfter(label_div);
     });
@@ -226,8 +226,25 @@ function addParty(newname="", newcolor=""){
     // Party support input control
     var input=document.createElement('div');
     input.className = 'party-nb-delegates-div';
-    input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
+    input.innerHTML = '<input class="right" type="number" name="NumberDelegates' +  i + '"   value= "0" >';
     newpartydiv.appendChild(input);
+
+    // Party's bureau
+    let bureau_roles = $('#bureau-roles div.col-12 span.bureau-role');
+    bureau_roles.each(function(){
+        let role_id = this.id.slice(12);  // id looks like 'bureau-role-8'
+        let role_name = $('span', this).text();
+        // Party's role's label
+        let office_label = document.createElement('div');
+        office_label.className = `party-office-${role_id} left`;
+        office_label.innerHTML = `Party ${i} ${role_name}`;
+        newpartydiv.appendChild(office_label);
+        // Party's role's input control
+        let input = document.createElement('div');
+        input.className = `party-office-${role_id}`;
+        input.innerHTML = `<input class="right" type="number" name="Number-${role_id}-${i}" value="0">`;
+        newpartydiv.appendChild(input);
+    });
 
     // Party color name tag
     var partycolor=document.createElement('div');
@@ -309,7 +326,7 @@ function CallDiagramScript(){
         if(this.name.match( /^Name/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
         }
-        if(this.name.match( /^Number/ )){
+        if(this.name.match( /^NumberDelegates/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
         }
         if(this.name.match( /^Color/ )){
