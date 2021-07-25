@@ -139,22 +139,44 @@ $('#addpartymanual').click(function(){
 
 function addRole(office_name, bureau_roles_col){
     // function's static variable to have a unique id per role
-    if (typeof this.role_id == 'undefined') {
-        this.role_id = 0;
-		}
+    if (typeof addRole.role_id == 'undefined') {
+        addRole.role_id = 0;
+    }
 
     // Add a role in the list
     bureau_roles_col.append(`
-        <span class="bureau-role" id="bureau-role-${this.role_id}">
+        <span class="bureau-role" id="bureau-role-${addRole.role_id}">
             <span>${office_name}</span>
             <a>
-                <svg width="14" height="14" viewBox="0 0 14 14" onclick="deleteRole(${this.role_id})">
+                <svg width="14" height="14" viewBox="0 0 14 14"
+                     onclick="deleteRole(${addRole.role_id})">
 								    <!-- Basically, a 'x' -->
                     <path d="M12 3.41L10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7z"></path>
                 </svg>
             </a>
         </span>\n`
     );
+
+    // Add the role to already defined parties
+    let party_list = $('#partylistcontainer .party-div');
+    party_list.each(function(){
+        let party_number = this.id.slice(5);  // id looks like 'party42'
+        let party_color_div = $('.party-color-div.left', this);  // Insert b4 it
+        let class_name = `party-nb-office-${addRole.role_id}-div`;  // New divs
+
+        let label_div = `
+            <div class="${class_name} left">
+                Party ${party_number} ${office_name}
+            </div>`;
+        label_div = $(label_div).insertBefore(party_color_div);
+
+        let input_div = `
+            <div class="${class_name}">
+                <input class="right" type="number" value="0"
+                       name="Number-${addRole.role_id}">
+            </div>`;
+        $(input_div).insertAfter(label_div);
+    });
 
     // Ensure id is unique
     ++this.role_id;
