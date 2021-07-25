@@ -184,3 +184,26 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+/* Small boxes containing a deletable bureau role */
+.bureau-role {
+	display: inline-flex;
+	align-content: center;
+	justify-content: center;
+	min-width: 0;
+	padding-left: 4px;
+	padding-right: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 3px;
+	font-size: 12px;
+	line-height: 1.84615385;
+	text-decoration: none;
+	vertical-align: middle;
+	white-space: nowrap;
+	border-color: transparent;
+	background-color: lightblue;
+}
+.bureau-role a:hover {
+  background-color: red;
+}

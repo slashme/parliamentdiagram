@@ -31,14 +31,17 @@
 
   <div class="block card">
     <div class="card-body">
-      <div class="row"><div class="col-12">
-        <button id="enable-advanced" class="btn btn-info">
-          Enable advanced parameters
-        </button>
-        <button id="disable-advanced" class="btn btn-outline-info" style="display: none;">
-          Disable advanced parameters
-        </button>
-      </div></div>
+      <div class="row">
+        <div class="col-12">
+          <button id="enable-advanced" class="btn btn-info">
+            Enable advanced parameters
+          </button>
+          <button id="disable-advanced" class="btn btn-outline-info" style="display: none;">
+            Disable advanced parameters
+          </button>
+        </div>
+      </div>
+
       <div id="advanced-body" class="row" style="display: none;">
         <div class="col-12 mt-2">
           All-rows diagram
@@ -50,6 +53,39 @@
           <i class="fa fa-question-circle" aria-hidden="true"
              title="'All-rows' is the default aesthetic, it may look weird because too sparse.&#10;'Compact-rows' will generate denser diagrams, it may look weird because too thin."
           ></i>
+        </div>
+
+        <div class="col-12">
+          <button id="enable-bureau" class="btn btn-info">
+            Add a bureau
+          </button>
+        </div>
+        <div id="bureau-body" class="col-12" style="display: none;">
+          <div class="block card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12">
+                  <button id="disable-bureau" class="btn btn-outline-danger">
+                    Delete bureau
+                  </button>
+                </div>
+              </div>
+              <div id="bureau-roles" class="row mt-2">
+                <div class="col-12">
+                  <!-- JS might fill it with a list a roles-->
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-12">
+                  Add an office:
+                  <input id="new-office" type="text" placeholder="Enter role name">
+                  <button id="add-bureau-office" class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

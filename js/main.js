@@ -103,7 +103,52 @@ $('#addpartymanual').click(function(){
 				advanced_body.hide();
 		})
 
+    // Enable/Disable bureau
+    let enable_bureau_btn = $('#enable-bureau');
+    let disable_bureau_btn = $('#disable-bureau');
+    let bureau_body = $('#bureau-body');
+    enable_bureau_btn.click(function (){
+        enable_bureau_btn.hide();
+        bureau_body.show();
+    });
+    disable_bureau_btn.click(function (){
+        enable_bureau_btn.show();
+        bureau_body.hide();
+    });
+
+    // Add/Delete bureau role
+    let bureau_roles = $('#bureau-roles');
+    let add_office_btn = $('#add-bureau-office');
+    let new_office_input = $('#new-office');
+    add_office_btn.click(function (){
+        let new_office_name = new_office_input.val();
+        let bureau_roles_col = $('div.col-12', bureau_roles);
+        let role_already_exist = false;
+        $('span.bureau-role', bureau_roles_col).each(function() {
+            let text = $('span', this).text();
+            role_already_exist = role_already_exist || text === new_office_name
+        });
+        if (role_already_exist) {
+            alert ('This role already exist');
+        } else {
+            addRole(new_office_name, bureau_roles_col)
+        }
+    });
+
 });
+
+function addRole(office_name, bureau_roles_col){
+    bureau_roles_col.append(`
+        <span class="bureau-role">
+            <span>${office_name}</span>
+            <a>
+                <svg width="14" height="14" viewBox="0 0 14 14">
+                    <path d="M12 3.41L10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7z"></path>
+                </svg>
+            </a>
+        </span>\n`
+    );
+}
 
 function addParty(newname="", newcolor=""){
         // Party list <div> where dynamic content will be placed
