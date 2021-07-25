@@ -138,16 +138,24 @@ $('#addpartymanual').click(function(){
 });
 
 function addRole(office_name, bureau_roles_col){
+    if (typeof addRole.role_id == 'undefined') {
+        addRole.role_id = 0;
+		}
     bureau_roles_col.append(`
-        <span class="bureau-role">
+        <span class="bureau-role" id="bureau-role-${addRole.role_id}">
             <span>${office_name}</span>
             <a>
-                <svg width="14" height="14" viewBox="0 0 14 14">
+                <svg width="14" height="14" viewBox="0 0 14 14" onclick="deleteRole(${addRole.role_id})">
                     <path d="M12 3.41L10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7z"></path>
                 </svg>
             </a>
         </span>\n`
     );
+		++addRole.role_id;
+}
+
+function deleteRole(role_id){
+    $(`#bureau-role-${role_id}`).remove();
 }
 
 function addParty(newname="", newcolor=""){
