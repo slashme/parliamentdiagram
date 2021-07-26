@@ -342,7 +342,7 @@ function CallDiagramScript(){
     }
 
     var totalseats = 0; //count total seats to check for empty diagram
-    var partylist   = new Array();
+    var partylist  = new Array();
     $( "input" ).each( function() {
         if(this.name.match( /^Name/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
@@ -352,6 +352,14 @@ function CallDiagramScript(){
         }
         if(this.name.match( /^Color/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
+        }
+        if(this.name.match( /^Number-[0-9]+-[0-9]+$/ )){
+            let party_i = /[0-9]+$/.exec(this.name)[0];
+            let role_i  = /-[0-9]+-/.exec(this.name)[0].slice(1, -1);
+            if(!('offices' in partylist[party_i])) {
+                partylist[party_i]['offices'] = [];
+            }
+            partylist[party_i]['offices'][role_i] = this.value;
         }
 
         //If we're processing a border width, add value if it's a number, maxing out at 1.
@@ -376,6 +384,15 @@ function CallDiagramScript(){
             partyJSON.color = '#' + partylist[i]['Color'];
             partyJSON.border_size = parseFloat(partylist[i]['Border']);
             partyJSON.border_color = '#' + partylist[i]['BColor'];
+            if ($('#bureau-body').is(':visible')) {
+                partyJSON.offices = {};
+                $('.bureau-role').each(function(){
+                    let office_id = this.id.slice(12);
+                    let office_name = $('span', this).text();
+                    let nb_officers = partylist[i]['offices'][office_id];
+                    partyJSON.offices[office_name] = nb_officers;
+                });
+            }
             requestJSON.parties.push(partyJSON)
 
             totalseats += partylist[i]['Num'];
