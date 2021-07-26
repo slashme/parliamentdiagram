@@ -120,7 +120,14 @@ $('#addpartymanual').click(function(){
     let bureau_roles = $('#bureau-roles');
     let add_office_btn = $('#add-bureau-office');
     let new_office_input = $('#new-office');
-    add_office_btn.click(function (){
+    add_office_btn.click(askToAddRole);
+    new_office_input.keypress(function (e) {
+        if(e.which == 13)  // 'Enter' key has been pressed
+        {
+            askToAddRole();
+        }
+    });
+    function askToAddRole(){
         let new_office_name = new_office_input.val();
         let bureau_roles_col = $('div.col-12', bureau_roles);
         let role_already_exist = false;
@@ -131,10 +138,10 @@ $('#addpartymanual').click(function(){
         if (role_already_exist) {
             alert ('This role already exist');
         } else {
-            addRole(new_office_name, bureau_roles_col)
+            addRole(new_office_name, bureau_roles_col);
         }
-    });
-
+        new_office_input.val('');  // Clear the input for new use
+    }
 });
 
 function addRole(office_name, bureau_roles_col){
