@@ -110,10 +110,12 @@ $('#addpartymanual').click(function(){
     enable_bureau_btn.click(function (){
         enable_bureau_btn.hide();
         bureau_body.show();
+        $('.party-nb-office-div').show();  // Already defined roles
     });
     disable_bureau_btn.click(function (){
         enable_bureau_btn.show();
         bureau_body.hide();
+        $('.party-nb-office-div').hide();  // Already defined roles
     });
 
     // Add/Delete bureau role
@@ -169,7 +171,8 @@ function addRole(office_name, bureau_roles_col){
     party_list.each(function(){
         let party_number = this.id.slice(5);  // id looks like 'party42'
         let party_color_div = $('.party-color-div.left', this);  // Insert b4 it
-        let class_name = `party-nb-office-${addRole.role_id}-div`;  // New divs
+        let class_name = 'party-nb-office-div '
+                       + `party-nb-office-${addRole.role_id}-div`;  // New divs
 
         let label_div = `
             <div class="${class_name} left">
@@ -246,16 +249,20 @@ function addParty(newname="", newcolor=""){
     // Party's bureau
     let bureau_roles = $('#bureau-roles div.col-12 span.bureau-role');
     bureau_roles.each(function(){
+        let visibility = $('#bureau-body').is(':visible') ? 'block' : 'none';
         let role_id = this.id.slice(12);  // id looks like 'bureau-role-8'
         let role_name = $('span', this).text();
         // Party's role's label
         let office_label = document.createElement('div');
-        office_label.className = `party-nb-office-${role_id}-div left`;
+        office_label.className = 'party-nb-office-div left '
+                               + `party-nb-office-${role_id}-div`;
+        office_label.style.display = visibility;
         office_label.innerHTML = `Party ${i} ${role_name}`;
         newpartydiv.appendChild(office_label);
         // Party's role's input control
         let input = document.createElement('div');
-        input.className = `party-nb-office-${role_id}-div`;
+        input.className = `party-nb-office-div party-nb-office-${role_id}-div`;
+        input.style.display = visibility;
         input.innerHTML = `<input class="right" type="number" name="Number-${role_id}-${i}" value="0">`;
         newpartydiv.appendChild(input);
     });
