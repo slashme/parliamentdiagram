@@ -179,11 +179,18 @@ function addRole(office_name, bureau_roles_col){
     });
 
     // Ensure id is unique
-    ++this.role_id;
+    ++addRole.role_id;
 }
 
 function deleteRole(role_id){
+    // Remove from the list
     $(`#bureau-role-${role_id}`).remove();
+
+    // Remove from the parties forms
+    let party_list = $('#partylistcontainer .party-div');
+    party_list.each(function(){
+        $(`.party-nb-office-${role_id}-div`, this).remove();
+    });
 }
 
 function addParty(newname="", newcolor=""){
@@ -236,12 +243,12 @@ function addParty(newname="", newcolor=""){
         let role_name = $('span', this).text();
         // Party's role's label
         let office_label = document.createElement('div');
-        office_label.className = `party-office-${role_id} left`;
+        office_label.className = `party-nb-office-${role_id}-div left`;
         office_label.innerHTML = `Party ${i} ${role_name}`;
         newpartydiv.appendChild(office_label);
         // Party's role's input control
         let input = document.createElement('div');
-        input.className = `party-office-${role_id}`;
+        input.className = `party-nb-office-${role_id}-div`;
         input.innerHTML = `<input class="right" type="number" name="Number-${role_id}-${i}" value="0">`;
         newpartydiv.appendChild(input);
     });
