@@ -336,9 +336,23 @@ function CallDiagramScript(){
     // Retrieve advanced parameters
     if ($('#advanced-body').is(':visible')) {
         requestJSON.denser_rows = $('#row-densifier').is(':checked');
+
+        // Have an ordered array of bureau roles
+        if ($('#bureau-body').is(':visible')) {
+            requestJSON.bureau_roles = [];
+            $('.bureau-role').each(function() {
+                let office_name = $('span', this).text();
+                requestJSON.bureau_roles.push(office_name);
+            });
+            if (requestJSON.bureau_roles === []) {
+                // Bureau div was open, but actually, 0 role have been defined
+                requestJSON.bureau_roles = null;
+            }
+        }
     }
     else {
         requestJSON.denser_rows = false;
+        requestJSON.bureau_roles = null;
     }
 
     var totalseats = 0; //count total seats to check for empty diagram
