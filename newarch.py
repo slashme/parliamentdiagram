@@ -7,19 +7,6 @@ import sys
 import os
 import json
 
-# Initialize useful calculated fields:
-# Total number of seats per number of rows in diagram:
-TOTALS = [
-    3, 15, 33, 61, 95, 138, 189, 247, 313, 388, 469, 559, 657, 762, 876,  997,
-    1126, 1263, 1408, 1560, 1722, 1889, 2066, 2250, 2442, 2641, 2850, 3064,
-    3289, 3519, 3759, 4005, 4261, 4522, 4794, 5071, 5358, 5652, 5953, 6263,
-    6581, 6906, 7239, 7581, 7929, 8287, 8650, 9024, 9404, 9793, 10187, 10594,
-    11003, 11425, 11850, 12288, 12729, 13183, 13638, 14109, 14580, 15066, 15553,
-    16055, 16557, 17075, 17592, 18126, 18660, 19208, 19758, 20323, 20888, 21468,
-    22050, 22645, 23243, 23853, 24467, 25094, 25723, 26364, 27011, 27667, 28329,
-    29001, 29679, 30367, 31061
-]
-
 LOGFILE = None  # A file to log everything we want
 
 def main():
@@ -159,8 +146,6 @@ def count_delegates(party_list):
     sum = 0
     for party in party_list:
         sum += party['nb_seats']
-        if sum > TOTALS[-1]:  # Can't handle such big number
-            return 0
     return sum
 
 
@@ -176,9 +161,35 @@ def get_number_of_rows(nb_delegates):
     ------
     int
     """
-    for i in range(len(TOTALS)):
-        if TOTALS[i] >= nb_delegates:
-            return i + 1
+    i = 0
+    while True:
+        i += 1
+        if Totals(i) >= nb_delegates:
+            return i
+
+
+def Totals(i):
+    """
+    Total number of seats per number of rows in diagram.
+
+    Parameters
+    ----------
+    i : int
+        A number of rows of seats
+
+    Return
+    ------
+    int
+        The maximal number of seats available for that number of rows
+    """
+    if isinstance(i, int) and (i >= 0):
+        rows = i + 1
+        tot = 0
+        rad = 1/float(4*rows-2)
+        for r in range(1, rows+1):
+            R = .5 + 2*(r-1)*rad
+            tot += int(math.pi*R/(2*rad))
+        return tot
 
 
 def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
@@ -199,7 +210,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
         discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
     else:
         discarded_rows = 0
-        diagram_fullness = float(nb_delegates) / TOTALS[nb_rows - 1]
+        diagram_fullness = float(nb_delegates) / Totals(nb_rows)
 
     positions = []
     for i in range(1 + discarded_rows, nb_rows):  # Fill the n-1 firsts rows
