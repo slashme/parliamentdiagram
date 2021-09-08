@@ -89,14 +89,13 @@ def treat_inputlist(input_list, start_time, request_hash):
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
     party_list = input_list['parties']
-    dense_rows = input_list['denser_rows']
     sum_delegates = count_delegates(party_list)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
         radius = 0.4 / nb_rows
 
-        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
 
@@ -192,155 +191,42 @@ def Totals(i):
         return tot
 
 
-def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
+def get_spots_centers(nb_delegates, nb_rows, spot_radius):
     """
     Parameters
     ----------
     nb_delegates : int
     nb_rows : int
     spot_radius : float
-    dense_rows: bool
 
     Return
     ------
     list<3-list<float>>
         The position of each single spot, represented as a list [angle, x, y]
     """
-    if dense_rows:
-        discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
-    else:
-        discarded_rows = 0
-        diagram_fullness = float(nb_delegates) / Totals(nb_rows)
-
     positions = []
-    for i in range(1 + discarded_rows, nb_rows):  # Fill the n-1 firsts rows
-        add_ith_row_spots(positions, nb_rows, i, spot_radius, diagram_fullness)
-    add_last_row_spots(positions, nb_delegates, nb_rows, spot_radius)
+    for r in range(1, nb_rows+1):  # Fill the n-1 firsts rows
+        # R : row radius (radius of the circle crossing the center of each seat in the row)
+        R = .5 + 2*(r-1)*spot_radius
+        if r == nb_rows: # if it's the last row
+            # fit all the remaining seats
+            nb_seats_to_place = nb_delegates-len(positions)
+        elif nb_delegates in {3, 4}:
+            # places all seats in the last row, not necessary but prettier
+            continue
+        else:
+            # fullness of the diagram (relative to the correspondng Totals) times the maximum seats in that row
+            nb_seats_to_place = int(float(nb_delegates) / self.totals[nb_rows-1] * math.pi*R/(2*spot_radius))
+        if nb_seats_to_place == 1:
+            positions.append([math.pi/2.0, 1.0, R])
+        else:
+            for j in range(nb_seats_to_place):
+                # angle of the seat's position relative to the center of the hemicycle
+                angle = float(j) * (math.pi-2.0*math.asin(spot_radius/R)) / (float(nb_seats_to_place)-1.0) + math.asin(spot_radius/R)
+                # position relative to the center of the hemicycle
+                positions.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
     positions.sort(reverse=True)
     return positions
-
-
-def optimize_rows(nb_delegates, theoritical_nb_rows):
-    """
-    The number of seats may be small enough so we don't need to fill all the
-    possible rows, but only the outermost ones. This says how much do we
-    actually need.
-
-    Parameters
-    ----------
-    nb_delegates : int
-    theoritical_nb_rows : int
-        The maximum number of rows we can fit in this diagram
-
-    Return
-    ------
-    int
-        The number of innermost rows to discard
-    float
-        The diagram fullness
-    """
-    handled_spots = 0
-    rows_needed = 0
-    for i in range(theoritical_nb_rows, 0, -1):
-        # How many spots can we fit in each row
-        # This 2 lines formula was determined by @slashme's math
-        magic_number = 3.0 * theoritical_nb_rows + 4.0 * i - 2.0
-        max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
-        handled_spots += int(max_spot_in_row)
-        rows_needed += 1
-        if handled_spots >= nb_delegates:
-            nb_useless_rows = i - 1
-            diagram_fullness = float(nb_delegates) / handled_spots
-            return nb_useless_rows, diagram_fullness
-
-
-def add_ith_row_spots(spots_positions, nb_rows, i,
-                      spot_radius, diagram_fullness):
-    """
-    Assign spots to a row.
-
-    Parameters
-    ----------
-    spots_positions : list<3-list<float>>
-        New positions will be appened to this list.
-    nb_rows : int
-    i : int
-        The number of the current row (1 being the centermost one)
-    spot_radius : float
-    diagram_fullness : float
-        What proportion of the diagram is used
-    """
-    # Each row can contain pi/(2asin(2/(3n+4i-2))) spots, where n is the
-    # number of rows and i is the number of the current row.
-    magic_number = 3.0 * nb_rows + 4.0 * i - 2.0
-    max_spot_in_row = math.pi / (2 * math.asin(2.0 / magic_number))
-
-    # Fill the row proportionally to the "fullness" of the diagram
-    nb_spots_in_ith_row = int(diagram_fullness * max_spot_in_row)
-
-    # The radius of the ith row in an N-row diagram (Ri) is (3n+4*i-2)/(4n)
-    ith_row_radius = magic_number / (4.0 * nb_rows)
-    append_row_spots_positions(spots_positions, nb_spots_in_ith_row,
-                               spot_radius, ith_row_radius)
-
-
-def add_last_row_spots(spots_positions, nb_delegates, nb_rows, spot_radius):
-    """
-    All leftover seats must be added to the last row. So this function is an
-    adapted version of `add_ith_row_spots()`.
-
-    Parameters
-    ----------
-    spots_positions : list<3-list<float>>
-        New positions will be appended to this list.
-    nb_delegates : int
-    nb_rows : int
-    spot_radius : float
-    """
-    nb_leftover_seats = nb_delegates - len(spots_positions)
-    last_row_radius = (7.0 * nb_rows - 2.0) / (4.0 * nb_rows)
-    append_row_spots_positions(spots_positions, nb_leftover_seats,
-                               spot_radius, last_row_radius)
-
-
-def append_row_spots_positions(
-        spots_positions, nb_seats_to_place, spot_radius, row_radius):
-    """
-    Will compute the positions of each spot of the current row, and add them to
-    the list. For each spot, it will compute its angle, x and y according to
-    theese formulas:
-    The angle to a spot is n.(pi-2sin(r/Ri))/(Ni-1)+sin(r/Ri) where:
-    - n is the spot's number in the row
-    - Ni is the number of spots in this row
-    - r is the radius of a spot
-    - Ri is the radius of the current row
-    x=R.cos(angle) + 1.75
-    y=R.sin(angle)
-
-    Parameters
-    ----------
-    spots_positions : list<3-list<float>>
-        New positions will be appened to this list.
-    nb_seats_to_place : int
-        Number of seats in this row.
-    spot_radius : float
-        The radius of one single spot.
-    row_radius : float
-        The radius of the current row (since a row is actually a half-circle).
-    """
-    sin_r_rr = math.sin(spot_radius / row_radius)
-    for i in range(nb_seats_to_place):
-        if nb_seats_to_place == 1:
-            angle = math.pi / 2.0
-        else:
-            angle = float(i)                               \
-                        * (math.pi - 2.0 * sin_r_rr)       \
-                        / (float(nb_seats_to_place) - 1.0) \
-                    + sin_r_rr
-        spots_positions.append([
-            angle,
-            row_radius * math.cos(angle) + 1.75,
-            row_radius * math.sin(angle)])
 
 
 def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
