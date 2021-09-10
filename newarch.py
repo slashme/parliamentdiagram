@@ -93,7 +93,7 @@ def treat_inputlist(input_list, start_time, request_hash):
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
-        radius = 0.4 / nb_rows
+        radius = 1. / (4*nb_rows-2)
 
         pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
@@ -300,7 +300,7 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
 
         party_nb_seats = party_list[i]['nb_seats']
         party_fill_color = party_list[i]['color']
-        party_border_width = party_list[i]['border_size'] * radius * 100
+        party_border_width = party_list[i]['border_size'] * radius * 100 * .8
         party_border_color = party_list[i]['border_color']
 
         out_file.write(  # <g> header
@@ -316,7 +316,7 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
         for j in range(drawn_spots, drawn_spots + party_nb_seats):
             x = 5.0 + 100.0 * positions_list[j][1]
             y = 5.0 + 100.0 * (1.75 - positions_list[j][2])
-            r = radius * 100.0 - party_border_width / 2.0
+            r = radius * 100.0 * .8 - party_border_width / 2.0
             out_file.write(  # <circle> element
                 '            <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/> \n'
                 .format(x, y, r))
