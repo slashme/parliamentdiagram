@@ -26,7 +26,7 @@ function CallArchScript(){
 			case "Dem":
 				let demJSON = {}
 				demJSON.name = "Democrats"
-				demJSON.nb_seats = this.value;
+				demJSON.nb_seats = parseInt(this.value);
 				demJSON.color = "#0000FF";
 				demJSON.border_size = 0;
 				demJSON.border_color = "#000000";
@@ -35,7 +35,7 @@ function CallArchScript(){
 			case "Rep":
 				let repJSON = {}
 				repJSON.name = "Republicans"
-				repJSON.nb_seats = this.value;
+				repJSON.nb_seats = parseInt(this.value);
 				repJSON.color = "#FF0000";
 				repJSON.border_size = 0;
 				repJSON.border_color = "#000000";
@@ -44,7 +44,7 @@ function CallArchScript(){
 			case "Ind":
 				let indJSON = {}
 				indJSON.name = "Independents"
-				indJSON.nb_seats = this.value;
+				indJSON.nb_seats = parseInt(this.value);
 				indJSON.color = "#C9C9C9";
 				indJSON.border_size = 0;
 				indJSON.border_color = "#000000";
@@ -53,7 +53,7 @@ function CallArchScript(){
 			case "Vac":
 				let vacJSON = {}
 				vacJSON.name = "Vacant"
-				vacJSON.nb_seats = this.value;
+				vacJSON.nb_seats = parseInt(this.value);
 				vacJSON.color = "#6B6B6B";
 				vacJSON.border_size = 0;
 				vacJSON.border_color = "#000000";
