@@ -18,7 +18,10 @@ def main():
     form = cgi.FieldStorage()
     data = form.getvalue("data", "")
     inputlist = json.loads(data)
-    # inputlist = sys.argv[1]
+    #Uncomment this to load data from command line
+    #with open(sys.argv[1]) as json_file:
+    #    inputlist = json.load(json_file)
+    #    data=str(inputlist)
 
     # Open a log file and append input list to it:
     global LOGFILE
