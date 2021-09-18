@@ -219,7 +219,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
             continue
         else:
             # fullness of the diagram (relative to the correspondng Totals) times the maximum seats in that row
-            nb_seats_to_place = int(float(nb_delegates) / self.totals[nb_rows-1] * math.pi*R/(2*spot_radius))
+            nb_seats_to_place = int(float(nb_delegates) / Totals(nb_rows-1)* math.pi*R/(2*spot_radius))
         if nb_seats_to_place == 1:
             positions.append([math.pi/2.0, 1.0, R])
         else:
