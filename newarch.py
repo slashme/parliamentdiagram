@@ -164,9 +164,9 @@ def get_number_of_rows(nb_delegates):
     """
     i = 0
     while True:
-        i += 1
         if Totals(i) >= nb_delegates:
-            return i
+            return i+1
+        i += 1
 
 
 def Totals(i):
