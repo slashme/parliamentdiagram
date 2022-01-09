@@ -404,7 +404,7 @@ function CallDiagramScript(){
                     let office_id = this.id.slice(12);
                     let office_name = $('span', this).text();
                     let nb_officers = partylist[i]['offices'][office_id];
-                    partyJSON.offices[office_name] = nb_officers;
+                    partyJSON.offices[office_name] = parseInt(nb_officers);
                 });
             }
             requestJSON.parties.push(partyJSON)
