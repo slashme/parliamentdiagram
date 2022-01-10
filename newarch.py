@@ -345,14 +345,48 @@ def append_row_spots_positions(
             row_radius * math.sin(angle)])
 
 
-def get_bureau_spots_centers(a, b, c):
+def get_bureau_spots_centers(bureau_roles, party_list, radius):
     """
-    TODO
-    Currently just a test, needs 1 President and 3 Secretary to work
+    Parameters
+    ----------
+    bureau_roles : list<str>
+        An ordered list of bureau roles
+    party_list : list<dict>
+        A list of parties. Each party being a dict with the form {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (optional, number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+    radius : float
+        The radius of each spot
+
+    Returns
+    -------
+    dict<list<2-list<float>>>
+        Shaped like : {
+            'office name': [[x1, y1], [x2, y2], ...],
+            'other office' : [...],
+            ...
+        }
     """
-    return {
-        'President': [[1.75,-.2]],
-        'Secretary': [[1.25, -.7], [1.75, -.7], [2.25, -.7]] }
+    output = {}
+    role_number = 0
+    for role in bureau_roles:
+        output[role] = []
+        role_number += 1
+        y = radius - 2.5 * radius * role_number  # negative, to go under the hemicycle
+        nb_officers = 0
+        for party in party_list:
+            nb_officers += party['offices'][role]
+        for j in range(nb_officers):
+            distance_to_center = j - (nb_officers / 2.)
+            x = 1.75 + 1.25 * radius + 2.5 * radius * distance_to_center  # 1.75 is the center
+            output[role].append([x, y])
+    return output
 
 
 def draw_svg(svg_filename, nb_delegates, party_list,
@@ -495,10 +529,10 @@ def write_svg_spot(out_file, x, y, radius, border_width, indent=12):
     """
     Parameters
     ----------
-    x : <float>
-    y : <float>
-    radius : <float>
-    indent : <int>
+    x : float
+    y : float
+    radius : float
+    indent : int
         How many whitespaces should we put before opning the <circle>. This is
         to have a clean written SVG. Default is 12.
     """
