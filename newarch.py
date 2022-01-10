@@ -22,6 +22,7 @@ TOTALS = [
 ]
 
 LOGFILE = None  # A file to log everything we want
+OUTFILE = None  # An outputed SVG file
 
 def main():
     """
@@ -347,6 +348,8 @@ def append_row_spots_positions(
 
 def get_bureau_spots_centers(bureau_roles, party_list, radius):
     """
+    Compute where the office stop should be positionned.
+
     Parameters
     ----------
     bureau_roles : list<str>
@@ -418,47 +421,91 @@ def draw_svg(svg_filename, nb_delegates, party_list,
     radius : float
         Radius of a single spot
     """
-    out_file = open(svg_filename, 'w')
-    write_svg_header(out_file, len(bureau_positions_list), radius)
-    write_svg_number_of_seats(out_file, nb_delegates)
-    write_svg_seats(out_file, party_list, positions_list, radius)
-    write_svg_bureau(out_file, party_list, bureau_positions_list, radius)
-    write_svg_footer(out_file)
-    out_file.close()
+    global OUTFILE
+    OUTFILE = open(svg_filename, 'w')
+    write_svg_header(len(bureau_positions_list), radius)
+    write_svg_number_of_seats(nb_delegates)
+    write_svg_seats(party_list, positions_list, radius)
+    write_svg_bureau(party_list, bureau_positions_list, radius)
+    write_svg_footer()
+    OUTFILE.close()
 
 
-def write_svg_header(out_file, nb_office_type, radius):
-    # Write svg header:
+def append_svg(text, open_element=False, close_element=False):
+    """
+    Add some text to the SVG file. This function automatically manage indetation
+    (in order to produce a nicely human-readable file) given that the user tells
+    it when to increase or decrease the indetation level.
+    A newline caracter will be appened after the text.
+
+    Parameters
+    ----------
+    text : str
+        The payload to write in the SVG file
+    open_element : bool
+        Should we increase indentation level.
+        This function uses 4 spaces indentation.
+    close_element : bool
+        Should we decrease indentation level.
+
+    Raise
+    -----
+    ValueError
+        If too many increment_indent led to negative increment.
+    """
+    # Static variable to know how much indented we are
+    if not hasattr(append_svg, 'indent_level'):
+        append_svg.indent_level = 0
+
+    if close_element:
+        append_svg.indent_level -= 1
+        if append_svg.indent_level < 0:
+            raise ValueError('There was nothing to close duh')
+
+    nb_spaces = append_svg.indent_level * 4
+    if nb_spaces == 0:
+        indent = ''
+    else:
+        indent = ("{:" + "{}".format(nb_spaces) + "}").format('')
+
+    OUTFILE.write('{}{}\n'.format(indent, text))
+
+    if open_element:
+        append_svg.indent_level += 1
+
+
+def write_svg_header(nb_office_type, radius):
+    """
+    Write svg header
+    Creates a 350 px wide, 175 px high diagram with a 5 px blank border. Heigh
+    is increased depending on the number of office types to stack.
+    """
     height = 185 + (nb_office_type * radius * 250)  # radius*250 px per row
-    out_file.write(
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
-        '<svg xmlns:svg="http://www.w3.org/2000/svg"\n'
-        '     xmlns="http://www.w3.org/2000/svg" version="1.1"\n'
-    # Make 350 px wide, 175 px + ??? per office high diagram with a 5 px blank border
-        '     width="360" height="{:.2}">\n'
-        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n'
-        '    <g>\n'
-        .format(height))
+    append_svg('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
+    append_svg('<svg xmlns:svg="http://www.w3.org/2000/svg"')
+    append_svg('     xmlns="http://www.w3.org/2000/svg" version="1.1"')
+    append_svg('     width="360" height="{:.2}">'.format(height),
+               open_element=True)
+    append_svg('<!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->')
+    append_svg('<g>', open_element=True)
 
 
-def write_svg_number_of_seats(out_file, nb_seats):
-    # Print the number of seats in the middle at the bottom.
-    out_file.write(
-        '        <text x="175" y="175" \n'
-        '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">\n'
-        '            {}\n'
-        '        </text>\n'
-        .format(nb_seats))
+def write_svg_number_of_seats(nb_seats):
+    """ Print the number of seats in the middle at the bottom. """
+    append_svg('<text x="175" y="175"')
+    append_svg('      style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">',
+               open_element=True)
+    append_svg(nb_seats)
+    append_svg('</text>', close_element=True)
 
 
-def write_svg_seats(out_file, party_list, positions_list, radius):
+def write_svg_seats(party_list, positions_list, radius):
     """
     Write the main part of the SVG, each party will have its own <g>, and each
     delegate will be a <circle> inside this <g>.
 
     Parameters
     ----------
-    out_file : file
     party_list : list<dict>
     positions_list : list<3-list<float>>
     radius : float
@@ -475,81 +522,75 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
         party_border_width = party_list[i]['border_size'] * radius * 100
         party_border_color = party_list[i]['border_color']
 
-        out_file.write(  # <g> header
-            '        <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" \n'
-            '           id="{3}"> \n'.format(
+        append_svg(  # <g> header
+            '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'
+            .format(
                 party_fill_color,
                 party_border_width,
                 party_border_color,
-                block_id))
-        out_file.write(  # Party name in a tooltip
-            '            <title>{}</title>\n'.format(party_name))
+                block_id),
+            open_element=True)
+        append_svg('<title>{}</title>'.format(party_name)) # Party name tooltip
 
         for j in range(drawn_spots, drawn_spots + party_nb_seats):  # <circle />
             pos = positions_list[j]
-            write_svg_spot(out_file, pos[1], pos[2], radius, party_border_width)
+            write_svg_spot(pos[1], pos[2], radius, party_border_width)
 
-        out_file.write('        </g>\n')  # Close <g>
+        append_svg('</g>', close_element=True)  # Close <g>
         drawn_spots += party_nb_seats
 
 
-def write_svg_bureau(out_file, party_list, bureau_positions_list, radius):
+def write_svg_bureau(party_list, bureau_positions_list, radius):
     """
     Write the bureau spots part of the SVG
 
     Parameters
     ----------
-    out_file: file
     party_list : list<dict>
     bureau_positions_list : dict<str, <list<3-list<float>>>
     radius : float
     """
-    out_file.write('        <g id="bureau">\n')
+    append_svg('<g id="bureau">', open_element=True)
     for office_type in bureau_positions_list:
         placed_office_number = 0  # Counting, since each party has its loop
-        out_file.write('            <g>\n')
+        append_svg('<g>', open_element=True)
         for party in party_list:
             border_width = party['border_size'] * radius * 100
-            out_file.write(
-                '                <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}">\n'
-                '                    <title>{3} | {4}</title>\n'
-                .format(party['color'], border_width, party['border_color'],
-                        office_type, party['name']))
+            append_svg(
+                '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}">'
+                .format(party['color'], border_width, party['border_color']),
+                open_element=True)
+            append_svg(
+                '<title>{} | {}</title>'
+                .format(office_type, party['name']))
             for k in range(party['offices'][office_type]):
                 pos = bureau_positions_list[office_type][placed_office_number]
-                write_svg_spot(
-                    out_file, pos[0], pos[1], radius, border_width, 20)
+                write_svg_spot(pos[0], pos[1], radius, border_width)
                 placed_office_number += 1
-            out_file.write('                </g>\n')
-        out_file.write('            </g>\n')
-    out_file.write('        </g>\n')
+            append_svg('</g>', close_element=True)
+        append_svg('</g>', close_element=True)
+    append_svg('</g>', close_element=True)
 
 
-def write_svg_spot(out_file, x, y, radius, border_width, indent=12):
+def write_svg_spot(x, y, radius, border_width):
     """
     Parameters
     ----------
     x : float
     y : float
     radius : float
-    indent : int
-        How many whitespaces should we put before opning the <circle>. This is
-        to have a clean written SVG. Default is 12.
     """
-    indent = ("{:" + "{}".format(indent) + "}").format('')  # A bunch a spaces
     x = 5.0 + 100.0 * x
     y = 5.0 + 100.0 * (1.75 - y)
     r = radius * 100.0 - border_width / 2.0
+    append_svg(
+        '<circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/>'
+        .format(x, y, r))
 
-    out_file.write(
-        '{0}<circle cx="{1:.2f}" cy="{2:.2f}" r="{3:.2f}"/>\n'
-        .format(indent, x, y, r))
 
-
-def write_svg_footer(out_file):
-    out_file.write(
-        '    </g>\n'
-        '</svg>\n')
+def write_svg_footer():
+    append_svg('</g>', close_element=True)
+    append_svg('</svg>', close_element=True)
 
 
 if __name__ == '__main__':
