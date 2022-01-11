@@ -376,6 +376,9 @@ def get_bureau_spots_centers(bureau_roles, party_list, radius):
             ...
         }
     """
+    if bureau_roles is None:
+        return {}
+
     output = {}
     role_number = 0
     for role in bureau_roles:
