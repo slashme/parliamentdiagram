@@ -119,7 +119,8 @@ def treat_inputlist(input_list, start_time, request_hash):
 
         pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
         bureau_pos_list = get_bureau_spots_centers(b_roles, party_list, radius)
-        draw_svg(svg_filename, sum_delegates, party_list,
+        total_seats = get_total_seats_number(party_list)
+        draw_svg(svg_filename, total_seats, party_list,
                  pos_list, bureau_pos_list, radius)
         return svg_filename
 
@@ -395,6 +396,36 @@ def get_bureau_spots_centers(bureau_roles, party_list, radius):
     return output
 
 
+def get_total_seats_number(party_list):
+    """
+    Parameters
+    ----------
+    party_list : list<dict>
+        A list of parties. Each party being a dict with the form {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (optional, number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+
+    Returns
+    -------
+    int
+        The total number of seats, including bureau members
+    """
+    sum = 0
+    for party in party_list:
+        sum += party['nb_seats']
+        log(party)
+        if 'offices' in party:
+            for role in party['offices']:
+                sum += party['offices'][role]
+    return sum
+
+
 def draw_svg(svg_filename, nb_delegates, party_list,
              positions_list, bureau_positions_list, radius):
     """
@@ -495,7 +526,7 @@ def write_svg_header(nb_office_type, radius):
 
 def write_svg_number_of_seats(nb_seats):
     """ Print the number of seats in the middle at the bottom. """
-    append_svg('<text x="175" y="175"')
+    append_svg('<text x="180" y="175"')
     append_svg('      style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">',
                open_element=True)
     append_svg(nb_seats)
