@@ -68,6 +68,9 @@
                   <button id="disable-bureau" class="btn btn-outline-danger">
                     Delete bureau
                   </button>
+                  <i class="fa fa-question-circle" aria-hidden="true"
+                     title="When using a 'bureau', you have to declare basic delegates and officiers separatly.&#10;For example, if a party has 10 delegates -including- a president, you only have to input '9 delegates'."
+                  ></i>
                 </div>
               </div>
               <div id="bureau-roles" class="row mt-2">
