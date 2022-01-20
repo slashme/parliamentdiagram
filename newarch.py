@@ -110,7 +110,10 @@ def treat_inputlist(input_list, start_time, request_hash):
 
     party_list = input_list['parties']
     dense_rows = input_list['denser_rows']
-    b_roles = input_list['bureau_roles']
+    if 'bureau_roles' in input_list:
+        b_roles = input_list['bureau_roles']
+    else:
+        b_roles = None
     sum_delegates = count_delegates(party_list)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
@@ -584,6 +587,9 @@ def write_svg_bureau(party_list, bureau_positions_list, radius):
     bureau_positions_list : dict<str, <list<3-list<float>>>
     radius : float
     """
+    if bureau_positions_list == {}:  # No bureau to draw
+        return
+
     append_svg('<g id="bureau">', open_element=True)
     for office_type in bureau_positions_list:
         placed_office_number = 0  # Counting, since each party has its loop
