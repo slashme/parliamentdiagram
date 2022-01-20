@@ -422,11 +422,17 @@ def get_total_seats_number(party_list):
     sum = 0
     for party in party_list:
         sum += party['nb_seats']
-        log(party)
         if 'offices' in party:
             for role in party['offices']:
                 sum += party['offices'][role]
     return sum
+
+
+def sanitize_string(string):
+    """
+    Sanitize a string so it can be used in a SVG element's id
+    """
+    return re.sub(r'[^a-zA-Z0-9_-]+', '-', string)
 
 
 def draw_svg(svg_filename, nb_delegates, party_list,
@@ -551,8 +557,7 @@ def write_svg_seats(party_list, positions_list, radius):
     for i in range(len(party_list)):
         # Remove illegal characters from party's name to make an svg id
         party_name = party_list[i]['name']
-        sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_name)
-        block_id = "{}_{}".format(i, sanitized_party_name)
+        block_id = "{}_{}".format(i, sanitize_string(party_name))
 
         party_nb_seats = party_list[i]['nb_seats']
         party_fill_color = party_list[i]['color']
@@ -591,24 +596,66 @@ def write_svg_bureau(party_list, bureau_positions_list, radius):
         return
 
     append_svg('<g id="bureau">', open_element=True)
-    for office_type in bureau_positions_list:
-        placed_office_number = 0  # Counting, since each party has its loop
-        append_svg('<g>', open_element=True)
+    i = j = 0  # Just to be used in a unique element id
+    for role in bureau_positions_list:
+        role_id = "{}_{}".format(i, sanitize_string(role))
+        append_svg('<g id="{}">'.format(role_id), open_element=True)
+        already_placed = 0  # Counting, since each party has its loop
         for party in party_list:
-            border_width = party['border_size'] * radius * 100
-            append_svg(
-                '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}">'
-                .format(party['color'], border_width, party['border_color']),
-                open_element=True)
-            append_svg(
-                '<title>{} | {}</title>'
-                .format(office_type, party['name']))
-            for k in range(party['offices'][office_type]):
-                pos = bureau_positions_list[office_type][placed_office_number]
-                write_svg_spot(pos[0], pos[1], radius, border_width)
-                placed_office_number += 1
-            append_svg('</g>', close_element=True)
+            nb_seats = party['offices'][role]
+            if nb_seats > 0:
+                positions = bureau_positions_list[role][already_placed:]
+                write_svg_bureau_role_party(
+                    role, party, positions, radius, j)
+                already_placed += nb_seats
+            j += 1
+        i += 1
         append_svg('</g>', close_element=True)
+    append_svg('</g>', close_element=True)
+
+
+def write_svg_bureau_role_party(office, party, seats_positions, radius, j):
+    """
+    Write the bureau spots of a specific role and party
+
+    Parameters
+    ----------
+    office : str
+        The name of the office role
+    party : dict
+        Information about the party. Formated as: {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+        seats_positions : list<2-list<int>>
+            A list of coordinates where to write the seats in the SVG. The
+            firsts elements of the list are about the wanted party, but the
+            list is bigger than what we need. The `party` variable holds
+            information about how much elements we should consider.
+        radius : float
+            The circles radius in the SVG.
+        j : int
+            Means that this party is the jth to be treated for this bureau role.
+    """
+    border_width = party['border_size'] * radius * 100
+    party_id = sanitize_string(party['name'])
+    role_id = sanitize_string(office)
+    g_id = '{}_{}_{}'.format(j, role_id, party_id)
+    append_svg(
+        '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'
+        .format(party['color'], border_width, party['border_color'], g_id),
+        open_element=True)
+    append_svg(
+        '<title>{} | {}</title>'
+        .format(office, party['name']))
+    for i in range(party['offices'][office]):
+        pos = seats_positions[i]
+        write_svg_spot(pos[0], pos[1], radius, border_width)
     append_svg('</g>', close_element=True)
 
 
