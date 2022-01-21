@@ -523,11 +523,11 @@ def write_svg_header(nb_office_type, radius):
     Creates a 350 px wide, 175 px high diagram with a 5 px blank border. Heigh
     is increased depending on the number of office types to stack.
     """
-    height = 185 + (nb_office_type * radius * 250)  # radius*250 px per row
+    height = int(185 + (nb_office_type * radius * 250))  # radius*250 px per row
     append_svg('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
     append_svg('<svg xmlns:svg="http://www.w3.org/2000/svg"')
     append_svg('     xmlns="http://www.w3.org/2000/svg" version="1.1"')
-    append_svg('     width="360" height="{:.2}">'.format(height),
+    append_svg('     width="360" height="{}">'.format(height),
                open_element=True)
     append_svg('<!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->')
     append_svg('<g>', open_element=True)
