@@ -103,79 +103,216 @@ $('#addpartymanual').click(function(){
 				advanced_body.hide();
 		})
 
+    // Enable/Disable bureau
+    let enable_bureau_btn = $('#enable-bureau');
+    let disable_bureau_btn = $('#disable-bureau');
+    let bureau_body = $('#bureau-body');
+    enable_bureau_btn.click(function (){
+        enable_bureau_btn.hide();
+        bureau_body.show();
+        $('.party-nb-office-div').show();  // Already defined roles
+    });
+    disable_bureau_btn.click(function (){
+        enable_bureau_btn.show();
+        bureau_body.hide();
+        $('.party-nb-office-div').hide();  // Already defined roles
+    });
+
+    // Add/Delete bureau role
+    let bureau_roles = $('#bureau-roles');
+    let add_office_btn = $('#add-bureau-office');
+    let new_office_input = $('#new-office');
+    add_office_btn.click(askToAddRole);
+    new_office_input.keypress(function (e) {
+        if(e.which == 13)  // 'Enter' key has been pressed
+        {
+            askToAddRole();
+        }
+    });
+    function askToAddRole(){
+        let new_office_name = new_office_input.val();
+        let bureau_roles_col = $('div.col-12', bureau_roles);
+        let role_already_exist = false;
+        $('span.bureau-role', bureau_roles_col).each(function() {
+            let text = $('span', this).text();
+            role_already_exist = role_already_exist || text === new_office_name
+        });
+        if (role_already_exist) {
+            alert ('This role already exist');
+        } else {
+            addRole(new_office_name, bureau_roles_col);
+        }
+        new_office_input.val('');  // Clear the input for new use
+    }
 });
 
+function addRole(office_name, bureau_roles_col){
+    // function's static variable to have a unique id per role
+    if (typeof addRole.role_id == 'undefined') {
+        addRole.role_id = 0;
+    }
+
+    // Add a role in the list
+    bureau_roles_col.append(`
+        <span class="bureau-role" id="bureau-role-${addRole.role_id}">
+            <span>${office_name}</span>
+            <a>
+                <svg width="14" height="14" viewBox="0 0 14 14"
+                     onclick="deleteRole(${addRole.role_id})">
+								    <!-- Basically, a 'x' -->
+                    <path d="M12 3.41L10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7z"></path>
+                </svg>
+            </a>
+        </span>\n`
+    );
+
+    // Add the role to already defined parties
+    let party_list = $('#partylistcontainer .party-div');
+    party_list.each(function(){
+        let party_number = this.id.slice(5);  // id looks like 'party42'
+        let party_color_div = $('.party-color-div.left', this);  // Insert b4 it
+        let class_name = 'party-nb-office-div '
+                       + `party-nb-office-${addRole.role_id}-div`;  // New divs
+
+        let label_div = `
+            <div class="${class_name} left">
+                Party ${party_number} ${office_name}
+            </div>`;
+        label_div = $(label_div).insertBefore(party_color_div);
+
+        let input_div = `
+            <div class="${class_name}">
+                <input class="right" type="number" value="0"
+                       name="Number-${addRole.role_id}-${party_number}">
+            </div>`;
+        $(input_div).insertAfter(label_div);
+    });
+
+    // Ensure id is unique
+    ++addRole.role_id;
+}
+
+function deleteRole(role_id){
+    // Remove from the list
+    $(`#bureau-role-${role_id}`).remove();
+
+    // Remove from the parties forms
+    let party_list = $('#partylistcontainer .party-div');
+    party_list.each(function(){
+        $(`.party-nb-office-${role_id}-div`, this).remove();
+    });
+}
+
 function addParty(newname="", newcolor=""){
-        // Party list <div> where dynamic content will be placed
-        var partylistcontainer = document.getElementById("partylistcontainer");
-        //New party's number: one more than the largest party number so far:
-        i=0;
-        $( "div" ).each( function() {
-            if(this.id.match( /^party[0-9]+$/ )){
-                i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
-              }
-          }
-        )
-        i++;
-        var newpartydiv=document.createElement('div');
-        newpartydiv.id="party" + i;
-        partylistcontainer.appendChild(newpartydiv);
-        //Party name label
-        var partytitle=document.createElement('div');
-        partytitle.className = 'left';
-	if(newname==""){newname="Party " + i }
-        partytitle.innerHTML = "Party " +  i + " Name" ;
-        newpartydiv.appendChild(partytitle);
-        //Party name input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
+    // Party list <div> where dynamic content will be placed
+    var partylistcontainer = document.getElementById("partylistcontainer");
+    //New party's number: one more than the largest party number so far:
+    i=0;
+    $( "div" ).each( function() {
+        if(this.id.match( /^party[0-9]+$/ )){
+            i=Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0] ));
+        }
+    });
+    i++;
+
+    // Create the party div
+    var newpartydiv=document.createElement('div');
+    newpartydiv.id="party" + i;
+    newpartydiv.className="party-div";
+    partylistcontainer.appendChild(newpartydiv);
+
+    // Party name label
+    var partytitle=document.createElement('div');
+    partytitle.className = 'party-name-div left';
+    if(newname==""){
+        newname="Party " + i;
+    }
+    partytitle.innerHTML = "Party " +  i + " Name" ;
+    newpartydiv.appendChild(partytitle);
+    // Party name input control
+    var input=document.createElement('div');
+    input.className = 'party-name-div';
+    input.innerHTML = '<input class="right" type="text" name="Name' +  i + '"   value="' + newname + '">'
+    newpartydiv.appendChild(input);
+
+    // Party support name tag
+    var partysupport=document.createElement('div');
+    partysupport.className = 'party-nb-delegates-div left';
+    partysupport.innerHTML = "Party " + i + " delegates";
+    newpartydiv.appendChild(partysupport);
+    // Party support input control
+    var input=document.createElement('div');
+    input.className = 'party-nb-delegates-div';
+    input.innerHTML = '<input class="right" type="number" name="NumberDelegates' +  i + '"   value= "0" >';
+    newpartydiv.appendChild(input);
+
+    // Party's bureau
+    let bureau_roles = $('#bureau-roles div.col-12 span.bureau-role');
+    bureau_roles.each(function(){
+        let visibility = $('#bureau-body').is(':visible') ? 'block' : 'none';
+        let role_id = this.id.slice(12);  // id looks like 'bureau-role-8'
+        let role_name = $('span', this).text();
+        // Party's role's label
+        let office_label = document.createElement('div');
+        office_label.className = 'party-nb-office-div left '
+                               + `party-nb-office-${role_id}-div`;
+        office_label.style.display = visibility;
+        office_label.innerHTML = `Party ${i} ${role_name}`;
+        newpartydiv.appendChild(office_label);
+        // Party's role's input control
+        let input = document.createElement('div');
+        input.className = `party-nb-office-div party-nb-office-${role_id}-div`;
+        input.style.display = visibility;
+        input.innerHTML = `<input class="right" type="number" name="Number-${role_id}-${i}" value="0">`;
         newpartydiv.appendChild(input);
-        //Party support name tag
-        var partysupport=document.createElement('div');
-        partysupport.className = 'left';
-        partysupport.innerHTML = "Party " + i + " delegates";
-        newpartydiv.appendChild(partysupport);
-        //Party support input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="number" name="Number' +  i + '"   value= "0" >';
-        newpartydiv.appendChild(input);
-        //Party color name tag
-        var partycolor=document.createElement('div');
-        partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " color";
-        newpartydiv.appendChild(partycolor);
-        //Party color input control
-        var input=document.createElement('div');
-	if(newcolor==""){newcolor=getRandomColor()}
-        input.innerHTML = '<input class="right jscolor" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
-        newpartydiv.appendChild(input);
-        //Party border width name tag
-        var partycolor=document.createElement('div');
-        partycolor.className = 'left';
-        partycolor.innerHTML = "Party " + i + " border width";
-        newpartydiv.appendChild(partycolor);
-        //Party border width control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right" type="number" name="Border' +  i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
-        newpartydiv.appendChild(input);
-        //Party border color name tag
-        var partybcolor=document.createElement('div');
-        partybcolor.className = 'left';
-        partybcolor.innerHTML = "Party " + i + " border color";
-        newpartydiv.appendChild(partybcolor);
-        //Party border color input control
-        var input=document.createElement('div');
-        input.innerHTML = '<input class="right jscolor" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
-        newpartydiv.appendChild(input);
-        var delbutton=document.createElement('div');
-        delbutton.className = 'button deletebutton';
-        delbutton.innerHTML = "Delete party " + i;
-        delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
-        newpartydiv.appendChild(delbutton);
-          //Add a newline
-        newpartydiv.appendChild(document.createElement("br"));
-        //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
-        jscolor.installByClassName("jscolor");
+    });
+
+    // Party color name tag
+    var partycolor=document.createElement('div');
+    partycolor.className = 'party-color-div left';
+    partycolor.innerHTML = "Party " + i + " color";
+    newpartydiv.appendChild(partycolor);
+    // Party color input control
+    var input=document.createElement('div');
+    input.className = 'party-color-div';
+    if(newcolor==""){
+        newcolor=getRandomColor();
+    }
+    input.innerHTML = '<input class="right jscolor" type="text" name="Color' +  i + '" value= "' +  newcolor + '" >'
+    newpartydiv.appendChild(input);
+
+    // Party border width name tag
+    var partycolor=document.createElement('div');
+    partycolor.className = 'party-border-width-div left';
+    partycolor.innerHTML = "Party " + i + " border width";
+    newpartydiv.appendChild(partycolor);
+    // Party border width control
+    var input=document.createElement('div');
+    input.className = 'party-color-width-div';
+    input.innerHTML = '<input class="right" type="number" name="Border' +  i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
+    newpartydiv.appendChild(input);
+
+    // Party border color name tag
+    var partybcolor=document.createElement('div');
+    partybcolor.className = 'party-border-color-div left';
+    partybcolor.innerHTML = "Party " + i + " border color";
+    newpartydiv.appendChild(partybcolor);
+    // Party border color input control
+    var input=document.createElement('div');
+    input.className = 'party-border-color-div';
+    input.innerHTML = '<input class="right jscolor" type="text" name="BColor' +  i + '" value= "' +  "000000" + '" >'
+    newpartydiv.appendChild(input);
+
+    // Button to delete the party
+    var delbutton=document.createElement('div');
+    delbutton.className = 'button deletebutton';
+    delbutton.innerHTML = "Delete party " + i;
+    delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
+    newpartydiv.appendChild(delbutton);
+
+    //Add a newline
+    newpartydiv.appendChild(document.createElement("br"));
+    jscolor.installByClassName("jscolor");
 }
 
 //Generate random color, based on http://stackoverflow.com/questions/1484506
@@ -199,22 +336,44 @@ function CallDiagramScript(){
     // Retrieve advanced parameters
     if ($('#advanced-body').is(':visible')) {
         requestJSON.denser_rows = $('#row-densifier').is(':checked');
+
+        // Have an ordered array of bureau roles
+        if ($('#bureau-body').is(':visible')) {
+            requestJSON.bureau_roles = [];
+            $('.bureau-role').each(function() {
+                let office_name = $('span', this).text();
+                requestJSON.bureau_roles.push(office_name);
+            });
+            if (requestJSON.bureau_roles === []) {
+                // Bureau div was open, but actually, 0 role have been defined
+                requestJSON.bureau_roles = null;
+            }
+        }
     }
     else {
         requestJSON.denser_rows = false;
+        requestJSON.bureau_roles = null;
     }
 
     var totalseats = 0; //count total seats to check for empty diagram
-    var partylist   = new Array();
+    var partylist  = new Array();
     $( "input" ).each( function() {
         if(this.name.match( /^Name/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]={Name: this.value };
         }
-        if(this.name.match( /^Number/ )){
+        if(this.name.match( /^NumberDelegates/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]['Num']=this.value;
         }
         if(this.name.match( /^Color/ )){
             partylist[/[0-9]+$/.exec(this.name)[0]]['Color']=this.value;
+        }
+        if(this.name.match( /^Number-[0-9]+-[0-9]+$/ )){
+            let party_i = /[0-9]+$/.exec(this.name)[0];
+            let role_i  = /-[0-9]+-/.exec(this.name)[0].slice(1, -1);
+            if(!('offices' in partylist[party_i])) {
+                partylist[party_i]['offices'] = [];
+            }
+            partylist[party_i]['offices'][role_i] = this.value;
         }
 
         //If we're processing a border width, add value if it's a number, maxing out at 1.
@@ -239,6 +398,15 @@ function CallDiagramScript(){
             partyJSON.color = '#' + partylist[i]['Color'];
             partyJSON.border_size = parseFloat(partylist[i]['Border']);
             partyJSON.border_color = '#' + partylist[i]['BColor'];
+            if ($('#bureau-body').is(':visible')) {
+                partyJSON.offices = {};
+                $('.bureau-role').each(function(){
+                    let office_id = this.id.slice(12);
+                    let office_name = $('span', this).text();
+                    let nb_officers = partylist[i]['offices'][office_id];
+                    partyJSON.offices[office_name] = parseInt(nb_officers);
+                });
+            }
             requestJSON.parties.push(partyJSON)
 
             totalseats += partylist[i]['Num'];

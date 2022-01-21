@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding=utf-8
 import cgi
 import re
 import math
@@ -21,6 +22,7 @@ TOTALS = [
 ]
 
 LOGFILE = None  # A file to log everything we want
+OUTFILE = None  # An outputed SVG file
 
 def main():
     """
@@ -84,11 +86,16 @@ def treat_inputlist(input_list, start_time, request_hash):
                     'nb_seats': <int>,
                     'color': <str> (fill color, as hex code),
                     'border_size': <float>,
-                    'border_color': <str> (as hex code)
+                    'border_color': <str> (as hex code),
+                    'offices': (optional) {
+                        <str>: <int> (office name => nb of office seat),
+                        ... /* other offices for this party */
+                    }
                 },
                 ... /* other parties */
             ],
-            'denser_rows': <bool> (should we compact rows)
+            'denser_rows': <bool> (should we compact rows),
+            'bureau_roles': null|[<str>] (names of the roles)
         }
     start_time : str
     request_hash : str
@@ -103,6 +110,10 @@ def treat_inputlist(input_list, start_time, request_hash):
 
     party_list = input_list['parties']
     dense_rows = input_list['denser_rows']
+    if 'bureau_roles' in input_list:
+        b_roles = input_list['bureau_roles']
+    else:
+        b_roles = None
     sum_delegates = count_delegates(party_list)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
@@ -110,7 +121,10 @@ def treat_inputlist(input_list, start_time, request_hash):
         radius = 0.4 / nb_rows
 
         pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
-        draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
+        bureau_pos_list = get_bureau_spots_centers(b_roles, party_list, radius)
+        total_seats = get_total_seats_number(party_list)
+        draw_svg(svg_filename, total_seats, party_list,
+                 pos_list, bureau_pos_list, radius)
         return svg_filename
 
 
@@ -136,7 +150,7 @@ def return_file_if_already_exist(request_hash):
 
 def count_delegates(party_list):
     """
-    Sums all delegates from all parties. Return 0 if something fails.
+    Sums all base delegates (not including officers so) from all parties.
 
     Parameters
     ----------
@@ -147,7 +161,11 @@ def count_delegates(party_list):
                 'nb_seats': <int>,
                 'color': <str> (fill color, as hex code),
                 'border_size': <float>,
-                'border_color': <str> (as hex code)
+                'border_color': <str> (as hex code),
+                'offices': (optional) {
+                    <str>: <int> (office name => nb of office seat),
+                    ... /* other offices for this party */
+                }
             },
             ... /* other parties */
         ]
@@ -155,6 +173,7 @@ def count_delegates(party_list):
     Return
     ------
     int
+        Number of base delegates, or 0 if something failed.
     """
     sum = 0
     for party in party_list:
@@ -322,9 +341,8 @@ def append_row_spots_positions(
         if nb_seats_to_place == 1:
             angle = math.pi / 2.0
         else:
-            angle = float(i)                               \
-                        * (math.pi - 2.0 * sin_r_rr)       \
-                        / (float(nb_seats_to_place) - 1.0) \
+            angle = float(i) * (math.pi - 2.0 * sin_r_rr)       \
+                             / (float(nb_seats_to_place) - 1.0) \
                     + sin_r_rr
         spots_positions.append([
             angle,
@@ -332,7 +350,93 @@ def append_row_spots_positions(
             row_radius * math.sin(angle)])
 
 
-def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
+def get_bureau_spots_centers(bureau_roles, party_list, radius):
+    """
+    Compute where the office stop should be positionned.
+
+    Parameters
+    ----------
+    bureau_roles : list<str>
+        An ordered list of bureau roles
+    party_list : list<dict>
+        A list of parties. Each party being a dict with the form {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (optional, number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+    radius : float
+        The radius of each spot
+
+    Returns
+    -------
+    dict<list<2-list<float>>>
+        Shaped like : {
+            'office name': [[x1, y1], [x2, y2], ...],
+            'other office' : [...],
+            ...
+        }
+    """
+    if bureau_roles is None:
+        return {}
+
+    output = {}
+    role_number = 0
+    for role in bureau_roles:
+        output[role] = []
+        role_number += 1
+        y = radius - 2.5 * radius * role_number  # negative, to go under the hemicycle
+        nb_officers = 0
+        for party in party_list:
+            nb_officers += party['offices'][role]
+        for j in range(nb_officers):
+            distance_to_center = j - (nb_officers / 2.)
+            x = 1.75 + 1.25 * radius + 2.5 * radius * distance_to_center  # 1.75 is the center
+            output[role].append([x, y])
+    return output
+
+
+def get_total_seats_number(party_list):
+    """
+    Parameters
+    ----------
+    party_list : list<dict>
+        A list of parties. Each party being a dict with the form {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (optional, number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+
+    Returns
+    -------
+    int
+        The total number of seats, including bureau members
+    """
+    sum = 0
+    for party in party_list:
+        sum += party['nb_seats']
+        if 'offices' in party:
+            for role in party['offices']:
+                sum += party['offices'][role]
+    return sum
+
+
+def sanitize_string(string):
+    """
+    Sanitize a string so it can be used in a SVG element's id
+    """
+    return re.sub(r'[^a-zA-Z0-9_-]+', '-', string)
+
+
+def draw_svg(svg_filename, nb_delegates, party_list,
+             positions_list, bureau_positions_list, radius):
     """
     Draw the actual <circle>s in the SVG
 
@@ -344,52 +448,107 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
         A list of parties. Each party being a dict with the form {
             'name': <str>,
             'nb_seats': <int>,
+            'office': (optional, number of each office owned) {
+                'office name': <int>,
+                ... },
             'color': <str> (fill color, as hex code),
             'border_size': <float>,
             'border_color': <str> (as hex code)}
     positions_list : list<3-list<float>
         [angle (useless in this function), x, y]
+    bureau_positions_list : dict<str, list<2-list<float>>>
+        Where to put the bureau seats, formed as {
+            <role_name>: list of [x, y],
+            ... /* other bureau roles */
+        }
     radius : float
         Radius of a single spot
     """
-    out_file = open(svg_filename, 'w')
-    write_svg_header(out_file)
-    write_svg_number_of_seats(out_file, nb_delegates)
-    write_svg_seats(out_file, party_list, positions_list, radius)
-    write_svg_footer(out_file)
-    out_file.close()
+    global OUTFILE
+    OUTFILE = open(svg_filename, 'w')
+    write_svg_header(len(bureau_positions_list), radius)
+    write_svg_number_of_seats(nb_delegates)
+    write_svg_seats(party_list, positions_list, radius)
+    write_svg_bureau(party_list, bureau_positions_list, radius)
+    write_svg_footer()
+    OUTFILE.close()
 
 
-def write_svg_header(out_file):
-    # Write svg header:
-    out_file.write(
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
-        '<svg xmlns:svg="http://www.w3.org/2000/svg"\n'
-        '     xmlns="http://www.w3.org/2000/svg" version="1.1"\n'
-    # Make 350 px wide, 175 px high diagram with a 5 px blank border
-        '     width="360" height="185">\n'
-        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n'
-        '    <g>\n')
+def append_svg(text, open_element=False, close_element=False):
+    """
+    Add some text to the SVG file. This function automatically manage indetation
+    (in order to produce a nicely human-readable file) given that the user tells
+    it when to increase or decrease the indetation level.
+    A newline caracter will be appened after the text.
+
+    Parameters
+    ----------
+    text : str
+        The payload to write in the SVG file
+    open_element : bool
+        Should we increase indentation level.
+        This function uses 4 spaces indentation.
+    close_element : bool
+        Should we decrease indentation level.
+
+    Raise
+    -----
+    ValueError
+        If too many increment_indent led to negative increment.
+    """
+    # Static variable to know how much indented we are
+    if not hasattr(append_svg, 'indent_level'):
+        append_svg.indent_level = 0
+
+    if close_element:
+        append_svg.indent_level -= 1
+        if append_svg.indent_level < 0:
+            raise ValueError('There was nothing to close duh')
+
+    nb_spaces = append_svg.indent_level * 4
+    if nb_spaces == 0:
+        indent = ''
+    else:
+        indent = ("{:" + "{}".format(nb_spaces) + "}").format('')
+
+    OUTFILE.write('{}{}\n'.format(indent, text))
+
+    if open_element:
+        append_svg.indent_level += 1
 
 
-def write_svg_number_of_seats(out_file, nb_seats):
-    # Print the number of seats in the middle at the bottom.
-    out_file.write(
-        '        <text x="175" y="175" \n'
-        '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">\n'
-        '            {}\n'
-        '        </text>\n'
-        .format(nb_seats))
+def write_svg_header(nb_office_type, radius):
+    """
+    Write svg header
+    Creates a 350 px wide, 175 px high diagram with a 5 px blank border. Heigh
+    is increased depending on the number of office types to stack.
+    """
+    height = int(185 + (nb_office_type * radius * 250))  # radius*250 px per row
+    append_svg('<?xml version="1.0" encoding="UTF-8" standalone="no"?>')
+    append_svg('<svg xmlns:svg="http://www.w3.org/2000/svg"')
+    append_svg('     xmlns="http://www.w3.org/2000/svg" version="1.1"')
+    append_svg('     width="360" height="{}">'.format(height),
+               open_element=True)
+    append_svg('<!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->')
+    append_svg('<g>', open_element=True)
 
 
-def write_svg_seats(out_file, party_list, positions_list, radius):
+def write_svg_number_of_seats(nb_seats):
+    """ Print the number of seats in the middle at the bottom. """
+    append_svg('<text x="180" y="175"')
+    append_svg('      style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">',
+               open_element=True)
+    append_svg(nb_seats)
+    append_svg('</text>', close_element=True)
+
+
+def write_svg_seats(party_list, positions_list, radius):
     """
     Write the main part of the SVG, each party will have its own <g>, and each
     delegate will be a <circle> inside this <g>.
 
     Parameters
     ----------
-    out_file : file
     party_list : list<dict>
     positions_list : list<3-list<float>>
     radius : float
@@ -398,40 +557,127 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     for i in range(len(party_list)):
         # Remove illegal characters from party's name to make an svg id
         party_name = party_list[i]['name']
-        sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_name)
-        block_id = "{}_{}".format(i, sanitized_party_name)
+        block_id = "{}_{}".format(i, sanitize_string(party_name))
 
         party_nb_seats = party_list[i]['nb_seats']
         party_fill_color = party_list[i]['color']
         party_border_width = party_list[i]['border_size'] * radius * 100
         party_border_color = party_list[i]['border_color']
 
-        out_file.write(  # <g> header
-            '        <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" \n'
-            '           id="{3}"> \n'.format(
+        append_svg(  # <g> header
+            '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'
+            .format(
                 party_fill_color,
                 party_border_width,
                 party_border_color,
-                block_id))
-        out_file.write(  # Party name in a tooltip
-            '            <title>{}</title>'.format(party_name))
+                block_id),
+            open_element=True)
+        append_svg('<title>{}</title>'.format(party_name)) # Party name tooltip
 
-        for j in range(drawn_spots, drawn_spots + party_nb_seats):
-            x = 5.0 + 100.0 * positions_list[j][1]
-            y = 5.0 + 100.0 * (1.75 - positions_list[j][2])
-            r = radius * 100.0 - party_border_width / 2.0
-            out_file.write(  # <circle> element
-                '            <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/> \n'
-                .format(x, y, r))
+        for j in range(drawn_spots, drawn_spots + party_nb_seats):  # <circle />
+            pos = positions_list[j]
+            write_svg_spot(pos[1], pos[2], radius, party_border_width)
 
-        out_file.write('        </g>\n')  # Close <g>
+        append_svg('</g>', close_element=True)  # Close <g>
         drawn_spots += party_nb_seats
 
 
-def write_svg_footer(out_file):
-    out_file.write(
-        '    </g>\n'
-        '</svg>\n')
+def write_svg_bureau(party_list, bureau_positions_list, radius):
+    """
+    Write the bureau spots part of the SVG
+
+    Parameters
+    ----------
+    party_list : list<dict>
+    bureau_positions_list : dict<str, <list<3-list<float>>>
+    radius : float
+    """
+    if bureau_positions_list == {}:  # No bureau to draw
+        return
+
+    append_svg('<g id="bureau">', open_element=True)
+    i = j = 0  # Just to be used in a unique element id
+    for role in bureau_positions_list:
+        role_id = "{}_{}".format(i, sanitize_string(role))
+        append_svg('<g id="{}">'.format(role_id), open_element=True)
+        already_placed = 0  # Counting, since each party has its loop
+        for party in party_list:
+            nb_seats = party['offices'][role]
+            if nb_seats > 0:
+                positions = bureau_positions_list[role][already_placed:]
+                write_svg_bureau_role_party(
+                    role, party, positions, radius, j)
+                already_placed += nb_seats
+            j += 1
+        i += 1
+        append_svg('</g>', close_element=True)
+    append_svg('</g>', close_element=True)
+
+
+def write_svg_bureau_role_party(office, party, seats_positions, radius, j):
+    """
+    Write the bureau spots of a specific role and party
+
+    Parameters
+    ----------
+    office : str
+        The name of the office role
+    party : dict
+        Information about the party. Formated as: {
+            'name': <str>,
+            'nb_seats': <int>,
+            'office': (number of each office owned) {
+                'office name': <int>,
+                ... },
+            'color': <str> (fill color, as hex code),
+            'border_size': <float>,
+            'border_color': <str> (as hex code)}
+        seats_positions : list<2-list<int>>
+            A list of coordinates where to write the seats in the SVG. The
+            firsts elements of the list are about the wanted party, but the
+            list is bigger than what we need. The `party` variable holds
+            information about how much elements we should consider.
+        radius : float
+            The circles radius in the SVG.
+        j : int
+            Means that this party is the jth to be treated for this bureau role.
+    """
+    border_width = party['border_size'] * radius * 100
+    party_id = sanitize_string(party['name'])
+    role_id = sanitize_string(office)
+    g_id = '{}_{}_{}'.format(j, role_id, party_id)
+    append_svg(
+        '<g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" id="{3}">'
+        .format(party['color'], border_width, party['border_color'], g_id),
+        open_element=True)
+    append_svg(
+        '<title>{} | {}</title>'
+        .format(office, party['name']))
+    for i in range(party['offices'][office]):
+        pos = seats_positions[i]
+        write_svg_spot(pos[0], pos[1], radius, border_width)
+    append_svg('</g>', close_element=True)
+
+
+def write_svg_spot(x, y, radius, border_width):
+    """
+    Parameters
+    ----------
+    x : float
+    y : float
+    radius : float
+    """
+    x = 5.0 + 100.0 * x
+    y = 5.0 + 100.0 * (1.75 - y)
+    r = radius * 100.0 - border_width / 2.0
+    append_svg(
+        '<circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/>'
+        .format(x, y, r))
+
+
+def write_svg_footer():
+    append_svg('</g>', close_element=True)
+    append_svg('</svg>', close_element=True)
 
 
 if __name__ == '__main__':
