@@ -431,6 +431,10 @@ function CallDiagramScript(){
             while (postcontainer.hasChildNodes()) { //Remove old images
                 postcontainer.removeChild(postcontainer.lastChild);
             }
+            var postcontainerbutton = document.getElementById("postcontainerbutton"); //This will get the first node with id "postcontainerbutton"
+            while (postcontainerbutton.hasChildNodes()) { //Remove stale upload button, if any
+                postcontainerbutton.removeChild(postcontainerbutton.lastChild);
+            }
             //Now add the svg image to the page
             var img = document.createElement("img");
             img.src = data;
