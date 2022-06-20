@@ -212,7 +212,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
         if r == nb_rows: # if it's the last row
             # fit all the remaining seats
             nb_seats_to_place = nb_delegates-len(positions)
-        elif nb_delegates in {3, 4}:
+        elif nb_delegates in (3, 4):
             # places all seats in the last row, not necessary but prettier
             continue
         else:
@@ -225,7 +225,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
                 # angle of the seat's position relative to the center of the hemicycle
                 angle = float(j) * (math.pi-2.0*math.asin(spot_radius/R)) / (float(nb_seats_to_place)-1.0) + math.asin(spot_radius/R)
                 # position relative to the center of the hemicycle
-                positions.append([angle, R*math.cos(angle)+1.75, R*math.sin(angle)])
+                positions.append([angle, R*math.cos(angle)+1, R*math.sin(angle)])
     positions.sort(reverse=True)
     return positions
 
@@ -300,7 +300,7 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
 
         party_nb_seats = party_list[i]['nb_seats']
         party_fill_color = party_list[i]['color']
-        party_border_width = party_list[i]['border_size'] * radius * 100 * .8
+        party_border_width = party_list[i]['border_size'] * radius * 175 * .8
         party_border_color = party_list[i]['border_color']
 
         out_file.write(  # <g> header
@@ -314,9 +314,9 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
             '            <title>{}</title>'.format(party_name))
 
         for j in range(drawn_spots, drawn_spots + party_nb_seats):
-            x = 5.0 + 100.0 * positions_list[j][1]
-            y = 5.0 + 100.0 * (1.75 - positions_list[j][2])
-            r = radius * 100.0 * .8 - party_border_width / 2.0
+            x = 5.0 + 175 * positions_list[j][1]
+            y = 5.0 + 175 * (1 - positions_list[j][2])
+            r = radius * 175 * .8 - party_border_width / 2.0
             out_file.write(  # <circle> element
                 '            <circle cx="{0:.2f}" cy="{1:.2f}" r="{2:.2f}"/> \n'
                 .format(x, y, r))
