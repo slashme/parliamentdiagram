@@ -90,13 +90,14 @@ def treat_inputlist(input_list, start_time, request_hash):
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
     party_list = input_list['parties']
+    dense_rows = input_list['denser_rows']
     sum_delegates = count_delegates(party_list)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
         radius = 1. / (4*nb_rows-2)
 
-        pos_list = get_spots_centers(sum_delegates, nb_rows, radius)
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
         draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
         return svg_filename
 
@@ -192,21 +193,36 @@ def Totals(i):
         return tot
 
 
-def get_spots_centers(nb_delegates, nb_rows, spot_radius):
+def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
     """
     Parameters
     ----------
     nb_delegates : int
     nb_rows : int
     spot_radius : float
+    dense_rows : bool
 
     Return
     ------
     list<3-list<float>>
         The position of each single spot, represented as a list [angle, x, y]
     """
+    startnumber = 1
+    if dense_rows:
+        rows_capacity = []
+        # fit as many seats as we can in each row, starting from the outermost one
+        for i in range(nb_rows, 0, -1):
+            R = .5 + 2*(i-1)*spot_radius
+            # the max number of seats in this row
+            max_ = int(math.pi*R/(2*spot_radius))
+            rows_capacity.append(max_)
+            if sum(rows_capacity) > nb_delegates:
+                break
+        # rows_capacity' length is how many rows we need a minima to store all these delegates
+        startnumber = nb_rows-len(rows_capacity)+1
+
     positions = []
-    for r in range(1, nb_rows+1):  # Fill the n-1 firsts rows
+    for r in range(startnumber, nb_rows+1):
         # R : row radius (radius of the circle crossing the center of each seat in the row)
         R = .5 + 2*(r-1)*spot_radius
         if r == nb_rows: # if it's the last row
@@ -215,6 +231,8 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius):
         elif nb_delegates in (3, 4):
             # places all seats in the last row, not necessary but prettier
             continue
+        elif dense_rows:
+            nb_seats_to_place = round(nb_delegates * rows_capacity[nb_rows-r]/sum(rows_capacity))
         else:
             # fullness of the diagram (relative to the correspondng Totals) times the maximum seats in that row
             nb_seats_to_place = int(float(nb_delegates) / Totals(nb_rows-1)* math.pi*R/(2*spot_radius))
