@@ -9,7 +9,7 @@ import json
 
 LOGFILE = None  # A file to log everything we want
 
-def main(inputlist=None):
+def main(**inputlist):
     """
     Doesn't return anything, but in case of success: prints a filename, which
     will hence be sent to the web interface.
@@ -17,10 +17,10 @@ def main(inputlist=None):
     start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
     form = cgi.FieldStorage()
     data = form.getvalue("data", "")
-    if inputlist is None:
+    if not inputlist:
         inputlist = json.loads(data)
     else:
-        data = str(inputlist)
+        data = json.dumps(inputlist)
 
     # Open a log file and append input list to it:
     global LOGFILE
