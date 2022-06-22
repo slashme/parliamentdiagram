@@ -228,9 +228,6 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
         if r == nb_rows: # if it's the last row
             # fit all the remaining seats
             nb_seats_to_place = nb_delegates-len(positions)
-        elif nb_delegates in (3, 4):
-            # places all seats in the last row, not necessary but prettier
-            continue
         elif dense_rows:
             nb_seats_to_place = round(nb_delegates * rows_capacity[nb_rows-r]/sum(rows_capacity))
         else:
