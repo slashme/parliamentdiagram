@@ -162,14 +162,13 @@ def get_number_of_rows(nb_delegates):
     ------
     int
     """
-    i = 0
-    while True:
-        if Totals(i) >= nb_delegates:
-            return i+1
+    i = 1
+    while Totals(i) < nb_delegates:
         i += 1
+    return i
 
 
-def Totals(i):
+def Totals(rows):
     """
     Total number of seats per number of rows in diagram.
 
@@ -183,14 +182,12 @@ def Totals(i):
     int
         The maximal number of seats available for that number of rows
     """
-    if isinstance(i, int) and (i >= 0):
-        rows = i + 1
-        tot = 0
-        rad = 1/float(4*rows-2)
-        for r in range(1, rows+1):
-            R = .5 + 2*(r-1)*rad
-            tot += int(math.pi*R/(2*rad))
-        return tot
+    tot = 0
+    rad = 1/float(4*rows-2)
+    for r in range(1, rows+1):
+        R = .5 + 2*(r-1)*rad
+        tot += int(math.pi*R/(2*rad))
+    return tot
 
 
 def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
@@ -221,6 +218,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
         # rows_capacity' length is how many rows we need a minima to store all these delegates
         startnumber = nb_rows-len(rows_capacity)+1
 
+    total = Totals(nb_rows)
     positions = []
     for r in range(startnumber, nb_rows+1):
         # R : row radius (radius of the circle crossing the center of each seat in the row)
@@ -232,7 +230,7 @@ def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
             nb_seats_to_place = round(nb_delegates * rows_capacity[nb_rows-r]/sum(rows_capacity))
         else:
             # fullness of the diagram (relative to the correspondng Totals) times the maximum seats in that row
-            nb_seats_to_place = int(float(nb_delegates) / Totals(nb_rows-1)* math.pi*R/(2*spot_radius))
+            nb_seats_to_place = int(float(nb_delegates) / total * math.pi*R/(2*spot_radius))
         if nb_seats_to_place == 1:
             positions.append([math.pi/2.0, 1.0, R])
         else:
