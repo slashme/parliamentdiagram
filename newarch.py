@@ -375,7 +375,7 @@ def write_svg_header(out_file):
 def write_svg_number_of_seats(out_file, nb_seats):
     # Print the number of seats in the middle at the bottom.
     out_file.write(
-        '        <text x="175" y="175" \n'
+        '        <text x="180" y="175" \n'
         '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">{}</text>\n'
         .format(nb_seats))
 
