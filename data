@@ -1,0 +1,12 @@
+{
+  "denser_rows": false,
+  "parties": [
+    {
+      "name": "Party 1",
+      "nb_seats": 103,
+      "color": "#95C241",
+      "border_size": 0,
+      "border_color": "#000000"
+    }
+  ]
+}
