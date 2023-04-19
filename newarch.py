@@ -45,7 +45,7 @@ def main():
     if cached_filename:
         print(cached_filename)
     elif inputlist:
-        filename = treat_inputlist(inputlist, start_time, request_hash)
+        filename = treat_inputlist(start_time, request_hash, **inputlist)
         if filename is None :
             log('Something went wrong. Maybe the input list was badly '
                 'formatted, or had 0 delegates, or had too many delegates.')
@@ -70,47 +70,43 @@ def log(message, newline=True):
     LOGFILE.write("{}{}".format(message, '\n' if newline else ''))
 
 
-def treat_inputlist(input_list, start_time, request_hash):
+def treat_inputlist(start_time, request_hash, *, parties=(), denser_rows=False, **kwargs):
     """
     Generate a new SVG file and return it.
 
     Parameters
     ----------
-    input_list : dict
-        The request. A dict with the following format : {
-            'parties': [
-                {
-                    'name': <str>,
-                    'nb_seats': <int>,
-                    'color': <str> (fill color, as hex code),
-                    'border_size': <float>,
-                    'border_color': <str> (as hex code)
-                },
-                ... /* other parties */
-            ],
-            'denser_rows': <bool> (should we compact rows)
-        }
     start_time : str
     request_hash : str
+    parties : Iterable[dict]
+        A list of dicts with the following format :
+            {
+                'name': <str>,
+                'nb_seats': <int>,
+                'color': <str> (fill color, as hex code),
+                'border_size': <float>,
+                'border_color': <str> (as hex code)
+            }
+    denser_rows : bool
+    kwargs : dict
+        The rest of the request (should be empty)
 
     Return
     ------
-    string|None
+    Optional[string]
     """
     # Create a filename that will be unique each time.
     # Old files are deleted with a cron script.
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
-    party_list = input_list['parties']
-    dense_rows = input_list['denser_rows']
-    sum_delegates = count_delegates(party_list)
+    sum_delegates = count_delegates(parties)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
         radius = 0.4 / nb_rows
 
-        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
-        draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, denser_rows)
+        draw_svg(svg_filename, sum_delegates, parties, pos_list, radius)
         return svg_filename
 
 
