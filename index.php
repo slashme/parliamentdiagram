@@ -200,7 +200,7 @@ function doAuthorizationRedirect() {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
 		echo '<div class="error">';
 		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
-		echo 'Maybe everything is OK: Try <a href="http://parliamentdiagram.toolforge.org">this link.</a>';
+		echo 'Maybe everything is OK: Try <a href="index.php">this link.</a>';
 		echo '</div>';
 		exit(0);
 	}
@@ -270,7 +270,7 @@ function fetchAccessToken() {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
 		echo '<div class="error">';
 		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
-		echo 'Maybe everything is OK: Try <a href="http://parliamentdiagram.toolforge.org">this link.</a>';
+		echo 'Maybe everything is OK: Try <a href="index.php">this link.</a>';
 		echo '</div>';
 		exit(0);
 	}
