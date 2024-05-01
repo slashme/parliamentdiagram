@@ -36,25 +36,24 @@ def main(**inputlist):
 
     # Open a log file and append input list to it:
     global LOGFILE
-    LOGFILE = open('log', 'a')
-    log("{} {}".format(start_time, inputlist))
+    with open('log', 'a') as LOGFILE:
+        log("{} {}".format(start_time, inputlist))
 
-    # Create always-positive hash of the request string:
-    request_hash = str(hash(data) % ((sys.maxsize + 1) * 2))
+        # Create always-positive hash of the request string:
+        request_hash = str(hash(data) % ((sys.maxsize + 1) * 2))
 
-    cached_filename = return_file_if_already_exist(request_hash)
-    if cached_filename:
-        print(cached_filename)
-    elif inputlist:
-        filename = treat_inputlist(inputlist, start_time, request_hash)
-        if filename is None :
-            log('Something went wrong. Maybe the input list was badly '
-                'formatted, or had 0 delegates, or had too many delegates.')
-        else :
-            print(filename)
-    else:
-        log('No inputlist')
-    LOGFILE.close()
+        cached_filename = return_file_if_already_exist(request_hash)
+        if cached_filename:
+            print(cached_filename)
+        elif inputlist:
+            filename = treat_inputlist(start_time, request_hash, **inputlist)
+            if filename is None :
+                log('Something went wrong. Maybe the input list was badly '
+                    'formatted, or had 0 delegates, or had too many delegates.')
+            else:
+                print(filename)
+        else:
+            log('No inputlist')
 
 
 def log(message, newline=True):
@@ -353,12 +352,11 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     radius : float
         Radius of a single spot
     """
-    out_file = open(svg_filename, 'w')
-    write_svg_header(out_file)
-    write_svg_number_of_seats(out_file, nb_delegates)
-    write_svg_seats(out_file, party_list, positions_list, radius)
-    write_svg_footer(out_file)
-    out_file.close()
+    with open(svg_filename, 'w') as out_file:
+        write_svg_header(out_file)
+        write_svg_number_of_seats(out_file, nb_delegates)
+        write_svg_seats(out_file, party_list, positions_list, radius)
+        write_svg_footer(out_file)
 
 
 def write_svg_header(out_file):
