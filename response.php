@@ -48,11 +48,11 @@ if ( isset ($last_res )) { //if there is a "last result" from an attempted Commo
 		echo "<div class='success'>";
 		echo "Image successfully uploaded at <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
-	} 
+	}
 	if (isset($last_res->edit) && $last_res->edit->result == 'Success' ) {
 		echo "<div class='success'>";
 		echo "Image description successfully updated for <a href=https://commons.wikimedia.org/wiki/File:".str_replace ( ' ' , '_' , $_GET['filename']).">".$_GET['filename']."</a>";
 		echo "</div>\n";
-	} 
+	}
 }
 ?>
