@@ -22,16 +22,17 @@ TOTALS = [
 
 LOGFILE = None  # A file to log everything we want
 
-def main():
+def main(**inputlist):
     """
     Doesn't return anything, but in case of success: prints a filename, which
     will hence be sent to the web interface.
     """
     start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
-    form = cgi.FieldStorage()
-    data = form.getvalue("data", "")
-    inputlist = json.loads(data)
-    # inputlist = sys.argv[1]
+    if not inputlist:
+        data = cgi.FieldStorage().getvalue("data", "")
+        inputlist = json.loads(data)
+    else:
+        data = json.dumps(inputlist)
 
     # Open a log file and append input list to it:
     global LOGFILE
