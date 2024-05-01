@@ -9,7 +9,7 @@ You can use the tool at http://parliamentdiagram.toolforge.org/archinputform.php
 ## Dependencies
 
 * Requires the jscolor script, available from [jscolor.com](jscolor.com).
-* Requires python (not sure what minimum version will work).
+* Requires Python, at least 3.8 is recommended.
 
 ## License
 

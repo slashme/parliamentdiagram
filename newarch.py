@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import cgi
 import re
 import math
