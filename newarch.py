@@ -367,7 +367,7 @@ def write_svg_header(out_file):
         '     xmlns="http://www.w3.org/2000/svg" version="1.1"\n'
     # Make 350 px wide, 175 px high diagram with a 5 px blank border
         '     width="360" height="185">\n'
-        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n'
+        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/archinputform.php) -->\n'
         '    <g>\n')
 
 
