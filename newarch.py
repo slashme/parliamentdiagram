@@ -28,10 +28,12 @@ def main():
     will hence be sent to the web interface.
     """
     start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
-    form = cgi.FieldStorage()
-    data = form.getvalue("data", "")
+    # form = cgi.FieldStorage()
+    # data = form.getvalue("data", "")
+    data = sys.argv[1]
+    print(data)
     inputlist = json.loads(data)
-    # inputlist = sys.argv[1]
+    print(inputlist)
 
     # Open a log file and append input list to it:
     global LOGFILE
