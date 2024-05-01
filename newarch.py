@@ -60,8 +60,6 @@ def log(message, newline=True):
     """
     Add message to LOGFILE.
 
-    Parameters
-    ----------
     message : string
         Message to append to the LOGFILE
     newline : bool
@@ -107,16 +105,10 @@ def treat_inputlist(start_time, request_hash, parties=(), denser_rows=False, **k
 def return_file_if_already_exist(request_hash):
     """
     If the requested file has been generated before, return its path/filename.
+    Otherwise, return False
 
-    Parameters
-    ----------
     request_hash : str
         A unique hash representing a POST request.
-
-    Return
-    ------
-    string|bool
-        Either a path/filename, or False if such a file doesn't exist.
     """
     for file in os.listdir("svgfiles"):
         if file.count(str(request_hash)):
@@ -128,8 +120,6 @@ def count_delegates(party_list):
     """
     Sums all delegates from all parties. Return 0 if something fails.
 
-    Parameters
-    ----------
     party_list : <list>
         Data for each party, a dict with the following format : [
             {
@@ -142,9 +132,6 @@ def count_delegates(party_list):
             ... /* other parties */
         ]
 
-    Return
-    ------
-    int
     """
     sum = 0
     for party in party_list:
@@ -173,17 +160,12 @@ def get_number_of_rows(nb_delegates):
 
 def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
     """
-    Parameters
-    ----------
+    Returns the position of each single spot, represented as a [angle, x, y] tuple.
+
     nb_delegates : int
     nb_rows : int
     spot_radius : float
-    dense_rows: bool
-
-    Return
-    ------
-    list<3-list<float>>
-        The position of each single spot, represented as a list [angle, x, y]
+    dense_rows : bool
     """
     if dense_rows:
         discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
@@ -326,8 +308,6 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     """
     Draw the actual <circle>s in the SVG
 
-    Parameters
-    ----------
     svg_filename : str
     nb_delegates : int
     party_list : list<dict>
@@ -374,8 +354,6 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     Write the main part of the SVG, each party will have its own <g>, and each
     delegate will be a <circle> inside this <g>.
 
-    Parameters
-    ----------
     out_file : file
     party_list : list<dict>
     positions_list : list<3-list<float>>
