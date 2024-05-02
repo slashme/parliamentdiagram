@@ -248,71 +248,70 @@ def main():
                 else:  # if not fullwidth and multirow
                     poslist[wing].sort(key=lambda point: point[0])
             # Open svg file for writing:
-            outfile = open(svgfilename, 'w')
-            # Write svg header:
-            outfile.write(
-                '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-            outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
-            outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
-            # Make 350 px wide, 175 px high diagram with a 5 px blank border
-            tempstring = 'width="%.1f" height="%.1f">' % (svgwidth, svgheight)
-            outfile.write(tempstring+'\n')
-            outfile.write(
-                '<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->\n')
-            outfile.write('<g id="diagram">\n')
-            # Draw the head parties; first create a group for them:
-            outfile.write('  <g id="headbench">\n')
-            counter = -1  # How many spots have we drawn yet for this group?
-            for i in [party for party in partylist if party[2] == 'head']:
-                outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-                for counter in range(counter+1, counter+1+i[1]):
-                    tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                        poslist['head'][counter][0], poslist['head'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
-                    outfile.write(tempstring+'\n')
+            with open(svgfilename, 'w') as outfile:
+                # Write svg header:
+                outfile.write(
+                    '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+                outfile.write('<svg xmlns:svg="http://www.w3.org/2000/svg"\n')
+                outfile.write('xmlns="http://www.w3.org/2000/svg" version="1.1"\n')
+                # Make 350 px wide, 175 px high diagram with a 5 px blank border
+                tempstring = 'width="%.1f" height="%.1f">' % (svgwidth, svgheight)
+                outfile.write(tempstring+'\n')
+                outfile.write(
+                    '<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->\n')
+                outfile.write('<g id="diagram">\n')
+                # Draw the head parties; first create a group for them:
+                outfile.write('  <g id="headbench">\n')
+                counter = -1  # How many spots have we drawn yet for this group?
+                for i in [party for party in partylist if party[2] == 'head']:
+                    outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+                    for counter in range(counter+1, counter+1+i[1]):
+                        tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
+                            poslist['head'][counter][0], poslist['head'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                        outfile.write(tempstring+'\n')
+                    outfile.write('  </g>\n')
                 outfile.write('  </g>\n')
-            outfile.write('  </g>\n')
-            # Draw the left parties; first create a group for them:
-            outfile.write('  <g id="leftbench">\n')
-            counter = -1  # How many spots have we drawn yet for this group?
-            for i in [party for party in partylist if party[2] == 'left']:
-                outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-                for counter in range(counter+1, counter+1+i[1]):
-                    tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                        poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
-                    outfile.write(tempstring+'\n')
-                # If we're leaving gaps between parties, skip the leftover blocks in the row
-                if not optionlist['fullwidth'] and not optionlist['cozy']:
-                    counter += -i[1] % optionlist['wingrows']['left']
+                # Draw the left parties; first create a group for them:
+                outfile.write('  <g id="leftbench">\n')
+                counter = -1  # How many spots have we drawn yet for this group?
+                for i in [party for party in partylist if party[2] == 'left']:
+                    outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+                    for counter in range(counter+1, counter+1+i[1]):
+                        tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
+                            poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                        outfile.write(tempstring+'\n')
+                    # If we're leaving gaps between parties, skip the leftover blocks in the row
+                    if not optionlist['fullwidth'] and not optionlist['cozy']:
+                        counter += -i[1] % optionlist['wingrows']['left']
+                    outfile.write('  </g>\n')
                 outfile.write('  </g>\n')
-            outfile.write('  </g>\n')
-            # Draw the right parties; first create a group for them:
-            outfile.write('  <g id="rightbench">\n')
-            counter = -1  # How many spots have we drawn yet for this group?
-            for i in [party for party in partylist if party[2] == 'right']:
-                outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-                for counter in range(counter+1, counter+1+i[1]):
-                    tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                        poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
-                    outfile.write(tempstring+'\n')
-                # If we're leaving gaps between parties, skip the leftover blocks in the row
-                if not optionlist['fullwidth'] and not optionlist['cozy']:
-                    counter += -i[1] % optionlist['wingrows']['right']
+                # Draw the right parties; first create a group for them:
+                outfile.write('  <g id="rightbench">\n')
+                counter = -1  # How many spots have we drawn yet for this group?
+                for i in [party for party in partylist if party[2] == 'right']:
+                    outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+                    for counter in range(counter+1, counter+1+i[1]):
+                        tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
+                            poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                        outfile.write(tempstring+'\n')
+                    # If we're leaving gaps between parties, skip the leftover blocks in the row
+                    if not optionlist['fullwidth'] and not optionlist['cozy']:
+                        counter += -i[1] % optionlist['wingrows']['right']
+                    outfile.write('  </g>\n')
                 outfile.write('  </g>\n')
-            outfile.write('  </g>\n')
-            # Draw the center parties; first create a group for them:
-            outfile.write('  <g id="centerbench">\n')
-            counter = -1  # How many spots have we drawn yet for this group?
-            for i in [party for party in partylist if party[2] == 'center']:
-                outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
-                for counter in range(counter+1, counter+1+i[1]):
-                    tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                        poslist['center'][counter][0], poslist['center'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
-                    outfile.write(tempstring+'\n')
+                # Draw the center parties; first create a group for them:
+                outfile.write('  <g id="centerbench">\n')
+                counter = -1  # How many spots have we drawn yet for this group?
+                for i in [party for party in partylist if party[2] == 'center']:
+                    outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
+                    for counter in range(counter+1, counter+1+i[1]):
+                        tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
+                            poslist['center'][counter][0], poslist['center'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                        outfile.write(tempstring+'\n')
+                    outfile.write('  </g>\n')
                 outfile.write('  </g>\n')
-            outfile.write('  </g>\n')
-            outfile.write('</g>\n')
-            outfile.write('</svg>\n')
-            outfile.close()
+                outfile.write('</g>\n')
+                outfile.write('</svg>\n')
             # Pass the output filename to the calling page.
             print(svgfilename)
 
