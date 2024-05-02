@@ -49,26 +49,26 @@ def main():
             optionlist[inputitem[0][7:]] = float(inputitem[1])
         else:
             partylist.append(inputitem)
-    for i in partylist:
+    for i, pl in enumerate(partylist):
         # Must contain: party name; number; party grouping (left/right/center/head); colour.
-        if len(i) != 4:
-            error = 1
-        elif re.search('[^0-9]', i[1]):  # Must have at least a digit in the number
+        if len(pl) != 4:
+            return f"Incorrect number of columns in party n°{i}."
+        elif re.search('[^0-9]', pl[1]):  # Must have at least a digit in the number
             error = 1
         else:
             try:
-                i[1] = int(i[1])
+                pl[1] = int(pl[1])
             except ValueError:
-                i[1] = 0
+                pl[1] = 0
             # placeholder for empty seat count, for use when giving only one column per party.
-            i.append(0)
+            pl.append(0)
         # Iterate over the list of party groups, adding the number of delegates to the correct one:
         # g is the group name; n is the seat count for that group.
-        for g, n in sumdelegates.items():
-            if re.search(g, i[2]):
-                sumdelegates[g] += i[1]
+        for g in sumdelegates:
+            if re.search(g, pl[2]):
+                sumdelegates[g] += pl[1]
     if sum(sumdelegates.values()) < 1:
-        error = 1
+        return "No delegates."
     if not error:
         # Left and right are by default blocks of shape 5x1
         # Head (Speaker or whatever) is a single row of blocks down the middle,
