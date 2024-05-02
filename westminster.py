@@ -1,8 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import cgi
 import re
 import math
-import random
 import datetime
 import sys
 import os
@@ -60,10 +59,10 @@ if inputlist:
             i.append(0)
         # Iterate over the list of party groups, adding the number of delegates to the correct one:
         # g is the group name; n is the seat count for that group.
-        for g, n in sumdelegates.iteritems():
+        for g, n in sumdelegates.items():
             if re.search(g, i[2]):
                 sumdelegates[g] += i[1]
-    if sumdelegates < 1:
+    if sum(sumdelegates.values()) < 1:
         error = 1
     if not error:
         # Left and right are by default blocks of shape 5x1
