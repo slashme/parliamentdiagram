@@ -48,24 +48,28 @@ def main():
             optionlist[inputitem[0][7:]] = float(inputitem[1])
         else:
             partylist.append(inputitem)
+
     for i, pl in enumerate(partylist):
         # Must contain: party name; number; party grouping (left/right/center/head); colour.
         if len(pl) != 4:
             return f"Incorrect number of columns in party n°{i}."
         elif re.search('[^0-9]', pl[1]):  # Must have at least a digit in the number
             return f"Invalid number of delegates : {pl[1]!r}."
-        else:
-            try:
-                pl[1] = int(pl[1])
-            except ValueError:
-                pl[1] = 0
-            # placeholder for empty seat count, for use when giving only one column per party.
-            pl.append(0)
+
+        try:
+            pl[1] = int(pl[1])
+        except ValueError:
+            pl[1] = 0
+
+        # placeholder for empty seat count, for use when giving only one column per party.
+        pl.append(0)
+
         # Iterate over the list of party groups, adding the number of delegates to the correct one:
         # g is the group name; n is the seat count for that group.
         for g in sumdelegates:
-            if re.search(g, pl[2]):
+            if g in pl[2]:
                 sumdelegates[g] += pl[1]
+
     if sum(sumdelegates.values()) < 1:
         return "No delegates."
 
@@ -87,8 +91,7 @@ def main():
     wingrows = {'left': optionlist['wingrows'], 'right': optionlist['wingrows']}
 
     if optionlist['cozy']:
-        wingcols = int(math.ceil(max(
-            sumdelegates['left'], sumdelegates['right'])/float(wingrows['left'])))
+        wingcols = int(math.ceil(max(sumdelegates['left'], sumdelegates['right'])/float(wingrows['left'])))
     else:  # we will only allow one diagram column per party, so calculate how many empty seats to add to each wing's delegate count
         for wing in ['left', 'right']:
             for i in [party for party in partylist if party[2] == wing]:
@@ -96,14 +99,19 @@ def main():
                 i[4] = -i[1] % wingrows[wing]
                 # per-wing count kept separately for convenience
                 emptyseats[wing] += i[4]
+
         # Now calculate the number of columns in the diagram based on the spaced-out count; wingrows['left'] and right are still the same at this point.
-        wingcols = int(math.ceil(max(
-            sumdelegates['left']+emptyseats['left'], sumdelegates['right']+emptyseats['right'])/float(wingrows['left'])))
+        wingcols = int(math.ceil(max(sumdelegates['left']+emptyseats['left'], sumdelegates['right']+emptyseats['right'])/float(wingrows['left'])))
+
     # Now slim down the diagram on one side if required:
     if optionlist['fullwidth']:  # If we want each wing to use the full width of the diagram
         for wing in ['left', 'right']:
             # If we are reserving blank seats to space out the diagram
-            if not optionlist['cozy']:
+            if optionlist['cozy']:
+                # If we are not reserving blank seats to space out the diagram, just fit it suitably.
+                # This will do nothing to the larger wing, but will slim down the smaller one.
+                wingrows[wing] = int(math.ceil(sumdelegates[wing]/float(wingcols)))
+            else:
                 for i in range(wingrows[wing], 1, -1):
                     tempgaps = 0  # temporary variable to hold the number of empty seats with i-1 rows
                     for j in [party for party in partylist if party[2] == wing]:
@@ -119,26 +127,18 @@ def main():
                         # This is really ugly: is there a better way than just calculating again?
                         for j in [party for party in partylist if party[2] == wing]:
                             j[4] = -j[1] % (i-1)
-            else:
-                # If we are not reserving blank seats to space out the diagram, just fit it suitably.
-                # This will do nothing to the larger wing, but will slim down the smaller one.
-                wingrows[wing] = int(
-                    math.ceil(sumdelegates[wing]/float(wingcols)))
     # If the number of columns in the cross-bench is not defined, calculate it:
     if (not 'centercols' in optionlist) or optionlist['centercols'] == 0:
-        optionlist['centercols'] = int(
-            math.ceil(math.sqrt(sumdelegates['center']/4.0)))
+        optionlist['centercols'] = int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     else:
         try:
             optionlist['centercols'] = int(optionlist['centercols'])
         # TODO: This is a hack - I seem to be getting a NaN here for some reason, need to fix it properly.
         except ValueError:
             # Do the same calculation as above if it's not a number.
-            optionlist['centercols'] = int(
-                math.ceil(math.sqrt(sumdelegates['center']/4.0)))
+            optionlist['centercols'] = int(math.ceil(math.sqrt(sumdelegates['center']/4.0)))
     try:
-        centerrows = math.ceil(
-            float(sumdelegates['center'])/optionlist['centercols'])
+        centerrows = math.ceil(float(sumdelegates['center'])/optionlist['centercols'])
     except ZeroDivisionError:
         centerrows = 0
     # Calculate the total number of columns in the diagram. First see how many rows for head + wings:
@@ -152,46 +152,52 @@ def main():
     if sumdelegates['center']:
         totalcols += 1 + optionlist['centercols']
     # Calculate the total number of rows in the diagram
-    totalrows = max(wingrows['left'] +
-                    wingrows['right']+2, centerrows)
+    totalrows = max(wingrows['left'] + wingrows['right'] + 2, centerrows)
+
     # How big is a seat? SVG canvas size is 360x360, with 5px border, so 350x350 diagram.
     blocksize = 350.0/max(totalcols, totalrows)
+
     # To make the code later a bit neater, calculate the absolute radius now:
     # radius 0.5 is already a circle
     optionlist['radius'] = min(0.5, optionlist['radius'])
     radius = optionlist['radius']*blocksize*(1-optionlist['spacing'])
+
     # So the diagram size is now fixed:
     svgwidth = blocksize*totalcols+10
     svgheight = blocksize*totalrows+10
+
     # Initialise list of positions for the various diagram elements:
     poslist = {'head': [], 'left': [], 'right': [], 'center': []}
+
     # All head blocks are in a single row with same y position. Call it centertop; we'll need it again:
     # The top y-coordinate of the center block if the wings are balanced.
     centertop = svgheight/2-blocksize*(1-optionlist['spacing'])/2
     # Move it down by half the difference of the wing widths
-    centertop += (wingrows['left'] -
-                wingrows['right'])*blocksize/2
+    centertop += (wingrows['left'] - wingrows['right']) * blocksize/2
     for x in range(sumdelegates['head']):
-        poslist['head'].append(
-            [5.0+blocksize*(x+optionlist['spacing']/2), centertop])
+        poslist['head'].append([5.0+blocksize*(x+optionlist['spacing']/2), centertop])
+
     # Cross-bench parties are 5 from the edge, vertically centered:
     for x in range(optionlist['centercols']):
         # How many rows in this column of the cross-bench
         thiscol = int(min(centerrows, sumdelegates['center']-x*centerrows))
         for y in range(thiscol):
-            poslist['center'].append([svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2)
-                                    * blocksize, ((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)])
+            poslist['center'].append([
+                svgwidth-5.0-(optionlist['centercols']-x-optionlist['spacing']/2) * blocksize,
+                ((svgheight-thiscol*blocksize)/2)+blocksize*(y+optionlist['spacing']/2)
+            ])
             poslist['center'].sort(key=lambda point: point[1])
+
     # Left parties are in the top block:
     for x in range(wingcols):
         for y in range(wingrows['left']):
-            poslist['left'].append(
-                [5+(leftoffset+x+optionlist['spacing']/2)*blocksize, centertop-(1.5+y)*blocksize])
+            poslist['left'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize, centertop-(1.5+y)*blocksize])
+
     # Right parties are in the bottom block:
     for x in range(wingcols):
         for y in range(wingrows['right']):
-            poslist['right'].append(
-                [5+(leftoffset+x+optionlist['spacing']/2)*blocksize, centertop+(1.5+y)*blocksize])
+            poslist['right'].append([5+(leftoffset+x+optionlist['spacing']/2)*blocksize, centertop+(1.5+y)*blocksize])
+
     for wing in ['left', 'right']:
         # If it's only one row, just fill from the left.
         if optionlist['fullwidth'] and wingrows[wing] > 1:
@@ -215,22 +221,19 @@ def main():
                 # total filled and necessarily blank seats per wing
                 totspots = sumdelegates[wing]+emptyseats[wing]
                 # number of blank spots in this wing that need to be allocated to parties
-                extraspots = wingrows[wing] * \
-                    wingcols - totspots
+                extraspots = wingrows[wing] * wingcols - totspots
                 for j in [party for party in partylist if party[2] == wing]:
                     # total filled and necessarily blank seats per party
                     pspots = j[1]+j[4]
-                    try:
+                    if totspots:
                         # apportion the extra spots by party size
-                        addspots = int(
-                            round(float(extraspots) * pspots / totspots))
-                    except ZeroDivisionError:  # if totspots is 0, don't add spots
+                        addspots = round(extraspots * pspots / totspots)
+                    else:  # if totspots is 0, don't add spots
                         addspots = 0
                     # Fill it up to a total column - note: pspots is already the right shape, so no need to use it here.
                     addspots += -addspots % wingrows[wing]
                     # Grab the slice of seats to work on. Sorting this doesn't affect poslist, but assigning does.
-                    seatslice = poslist[wing][counter:counter +
-                                            pspots+addspots]
+                    seatslice = poslist[wing][counter:counter+pspots+addspots]
                     extraspots -= addspots  # How many extra spots left to apportion now?
                     # Into how many spots do the remaining extra spots have to go?
                     totspots -= pspots+addspots
@@ -251,6 +254,7 @@ def main():
                 poslist[wing].sort(key=lambda point: point[0])
         else:  # if not fullwidth and multirow
             poslist[wing].sort(key=lambda point: point[0])
+
     # Open svg file for writing:
     with open(svgfilename, 'w') as outfile:
         # Write svg header:
@@ -261,8 +265,7 @@ def main():
         # Make 350 px wide, 175 px high diagram with a 5 px blank border
         tempstring = 'width="%.1f" height="%.1f">' % (svgwidth, svgheight)
         outfile.write(tempstring+'\n')
-        outfile.write(
-            '<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->\n')
+        outfile.write('<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->\n')
         outfile.write('<g id="diagram">\n')
         # Draw the head parties; first create a group for them:
         outfile.write('  <g id="headbench">\n')
@@ -271,7 +274,12 @@ def main():
             outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
             for counter in range(counter+1, counter+1+i[1]):
                 tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                    poslist['head'][counter][0], poslist['head'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                    poslist['head'][counter][0],
+                    poslist['head'][counter][1],
+                    radius,
+                    radius,
+                    blocksize*(1.0-optionlist['spacing']),
+                    blocksize*(1.0-optionlist['spacing']))
                 outfile.write(tempstring+'\n')
             outfile.write('  </g>\n')
         outfile.write('  </g>\n')
@@ -282,7 +290,12 @@ def main():
             outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
             for counter in range(counter+1, counter+1+i[1]):
                 tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                    poslist['left'][counter][0], poslist['left'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                    poslist['left'][counter][0],
+                    poslist['left'][counter][1],
+                    radius,
+                    radius,
+                    blocksize*(1.0-optionlist['spacing']),
+                    blocksize*(1.0-optionlist['spacing']))
                 outfile.write(tempstring+'\n')
             # If we're leaving gaps between parties, skip the leftover blocks in the row
             if not optionlist['fullwidth'] and not optionlist['cozy']:
@@ -296,7 +309,12 @@ def main():
             outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
             for counter in range(counter+1, counter+1+i[1]):
                 tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                    poslist['right'][counter][0], poslist['right'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                    poslist['right'][counter][0],
+                    poslist['right'][counter][1],
+                    radius,
+                    radius,
+                    blocksize*(1.0-optionlist['spacing']),
+                    blocksize*(1.0-optionlist['spacing']))
                 outfile.write(tempstring+'\n')
             # If we're leaving gaps between parties, skip the leftover blocks in the row
             if not optionlist['fullwidth'] and not optionlist['cozy']:
@@ -310,7 +328,11 @@ def main():
             outfile.write('  <g style="fill:'+i[3]+'" id="'+i[0]+'">\n')
             for counter in range(counter+1, counter+1+i[1]):
                 tempstring = '    <rect x="%.4f" y="%.4f" rx="%.2f" ry="%.2f" width="%.2f" height="%.2f"/>' % (
-                    poslist['center'][counter][0], poslist['center'][counter][1], radius, radius, blocksize*(1.0-optionlist['spacing']), blocksize*(1.0-optionlist['spacing']))
+                    poslist['center'][counter][0], poslist['center'][counter][1],
+                    radius,
+                    radius,
+                    blocksize*(1.0-optionlist['spacing']),
+                    blocksize*(1.0-optionlist['spacing']))
                 outfile.write(tempstring+'\n')
             outfile.write('  </g>\n')
         outfile.write('  </g>\n')
