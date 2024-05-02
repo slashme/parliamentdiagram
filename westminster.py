@@ -6,8 +6,7 @@ import datetime
 import sys
 import os
 
-form = cgi.FieldStorage()
-inputlist = form.getvalue("inputlist", "")
+inputlist = cgi.FieldStorage().getvalue("inputlist", "")
 # inputlist = sys.argv[1] #Uncomment for commandline debugging
 nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
 # Append input list to log file:
