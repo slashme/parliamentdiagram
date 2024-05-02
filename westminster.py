@@ -9,11 +9,10 @@ import os
 form = cgi.FieldStorage()
 inputlist = form.getvalue("inputlist", "")
 # inputlist = sys.argv[1] #Uncomment for commandline debugging
+nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
 # Append input list to log file:
-logfile = open('wmlog', 'a')
-logfile.write(datetime.datetime.utcnow().strftime(
-    "%Y-%m-%d-%H-%M-%S-%f ") + inputlist + '\n')
-logfile.close()
+with open('wmlog', 'a') as logfile:
+    logfile.write(nowstrftime + " " + inputlist + '\n')
 # Create always-positive hash of the request string:
 requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
 # Check whether we have a file made from this exact string in the directory:
@@ -24,8 +23,7 @@ for file in os.listdir("svgfiles"):
         sys.exit()
 # If we get here, we didn't find a matching request, so continue.
 # Create a filename that will be unique each time.  Old files are deleted with a cron script.
-svgfilename = 'svgfiles/' + datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f") + \
-    "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
+svgfilename = 'svgfiles/' + nowstrftime + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
 if inputlist:
     # initialize dictionary of options - this will hold things like spot radius, spacing, width of blocks, etc.
     optionlist = {}
