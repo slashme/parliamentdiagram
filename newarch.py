@@ -7,8 +7,6 @@ import math
 import os
 import re
 
-LOGFILE = None  # A file to log everything we want
-
 def main(**inputlist):
     """
     Doesn't return anything, but in case of success: prints a filename, which
