@@ -35,8 +35,8 @@ if inputlist:
     emptyseats = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
     # error flag: This seems ugly, but what should I do?
     error = 0
-    for i in re.split("\s*;\s*", inputlist):
-        inputitem = re.split('\s*,\s*', i)
+    for i in re.split(r"\s*;\s*", inputlist):
+        inputitem = re.split(r'\s*,\s*', i)
         # If it's an option, handle it separately
         if re.search("option", inputitem[0]):
             optionlist[inputitem[0][7:]] = float(inputitem[1])
