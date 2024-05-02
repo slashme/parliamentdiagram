@@ -23,7 +23,7 @@ def main():
             return
     # If we get here, we didn't find a matching request, so continue.
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
-    svgfilename = 'svgfiles/' + nowstrftime + "-" + str(hash(inputlist) % ((sys.maxsize + 1) * 2))+'.svg'
+    svgfilename = 'svgfiles/' + nowstrftime + "-" + requesthash +'.svg'
     if inputlist:
         # initialize dictionary of options - this will hold things like spot radius, spacing, width of blocks, etc.
         optionlist = {}
