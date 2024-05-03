@@ -6,6 +6,8 @@ import datetime
 import sys
 import os
 
+# TODO: adapt to the changes in JS and catch JSON data
+
 def main():
     inputlist = cgi.FieldStorage().getvalue("inputlist", "")
     # inputlist = sys.argv[1] #Uncomment for commandline debugging
