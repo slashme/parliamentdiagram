@@ -42,7 +42,7 @@ def main():
     for i in re.split(r"\s*;\s*", inputlist):
         inputitem = re.split(r'\s*,\s*', i)
         # If it's an option, handle it separately
-        if re.search("option", inputitem[0]):
+        if "option" in inputitem[0]:
             optionlist[inputitem[0][7:]] = float(inputitem[1])
         else:
             partylist.append(inputitem)
