@@ -22,7 +22,7 @@
         This tool will automatically add your file to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category, but you should categorise it in more detail after uploading.
       </p>
       <p>If the layout of the seats in the diagram is strange (this sometimes happens for small parliaments) you can click on "Enable advanced parameters" and try the "compact-rows diagram" option.</p>
-      <p class="card-text">Please submit bug reports and feature requests at the project's <a href="https://github.com/Gouvernathor/parliamentdiagram/issues/new">issue tracker</a>.</p>
+      <p class="card-text">Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.</p>
       <?php require('response.php'); ?>
     </div>
   </div>
