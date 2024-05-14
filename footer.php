@@ -9,11 +9,11 @@
 <a href="https://github.com/Rade-Mathis" target="_blank">Mathis Rade</a>,
 <a href="https://en.wikipedia.org/wiki/User:Ranjithsiji" target="_blank">Ranjith Siji</a> and
 <a href="https://en.wikipedia.org/wiki/User:Ambadyanands" target="_blank">Ambady Anand S</a>.
-Code licensed under <span><a href="https://raw.githubusercontent.com/Gouvernathor/parliamentdiagram/master/LICENSE.md" target="_blank">GPL v2</a></span>.</p>
+Code licensed under <span><a href="https://raw.githubusercontent.com/slashme/parliamentdiagram/master/LICENSE.md" target="_blank">GPL v2</a></span>.</p>
     <ul class="base-footer-links muted">
-      <li><a href="https://github.com/Gouvernathor/parliamentdiagram">Source repository</a></li>
+      <li><a href="https://github.com/slashme/parliamentdiagram">Source repository</a></li>
       <li> · </li>
-      <li><a href="https://github.com/Gouvernathor/parliamentdiagram/issues">Issue tracker</a></li>
+      <li><a href="https://github.com/slashme/parliamentdiagram/issues">Issue tracker</a></li>
     </ul>
   </div>
 </footer>
