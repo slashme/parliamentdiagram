@@ -31,40 +31,29 @@ function CallDiagramScript(){
     let bigpartysize = 0;
 
     $( "input" ).each( function() {
-        switch (this.name) {
-            case "radius":
+        if (this.name.startsWith("radius")) {
                 spotradius = Math.max(0, parseFloat(this.value));
-                break;
-            case "spacing":
+        } else if (this.name.startsWith("spacing")) {
                 spotspacing = Math.max(0, Math.min(parseFloat(this.value), .99)); //don't allow spots of size 0.
-                break;
-            case "wingrows":
+        } else if (this.name.startsWith("wingrows")) {
                 wingrows = Math.max(0, parseInt(this.value));
-                break;
-            case "centercols":
+        } else if (this.name.startsWith("centercols")) {
                 centercols = Math.max(0, parseInt(this.value));
-                break;
-            case "fullwidth":
+        } else if (this.name.startsWith("fullwidth")) {
                 fullwidth = new Boolean(this.checked);
-                break;
-            case "cozy":
+        } else if (this.name.startsWith("cozy")) {
                 cozy = new Boolean(this.checked);
-                break;
-            case "autospeaker":
+        } else if (this.name.startsWith("autospeaker")) {
                 autospeaker = Math.max(0, parseInt(this.value));
-                break;
-            case "Name":
+        } else if (this.name.startsWith("Name")) {
                 partylist[parseInt(/[0-9]+$/.exec(this.name)[0])] = {Name: this.value};
-                break;
-            case "Number":
+        } else if (this.name.startsWith("Number")) {
                 // Don't allow parties without delegates: if we have a number field, make the value at least 1.
                 // It's a bit of a hack, but shouldn't be much of a limitation.
                 partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Num'] = Math.max(1, parseInt(this.value));
-                break;
-            case "Color":
+        } else if (this.name.startsWith("Color")) {
                 // If we are processing a colour string, add a # before the hex values.
                 partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Color'] = this.value;
-                break;
     }});
     $( "select" ).each( function() {
         if(this.name.match( /^Group/ )){
