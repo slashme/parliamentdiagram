@@ -1,7 +1,11 @@
+</div> <!-- Closes div class=container in header.php -->
+</div> <!-- Closes div id=header in header.php -->
+
 <footer class="footer" role="contentinfo">
   <div class="container">
-    <p>Built by 
+    <p>Built by
 <a href="https://en.wikipedia.org/wiki/User:Slashme" target="_blank">David Richfield</a>,
+<a href="https://github.com/Gouvernathor" target="_blank">Gouvernathor</a>,
 <a href="https://github.com/Rade-Mathis" target="_blank">Mathis Rade</a>,
 <a href="https://en.wikipedia.org/wiki/User:Ranjithsiji" target="_blank">Ranjith Siji</a> and
 <a href="https://en.wikipedia.org/wiki/User:Ambadyanands" target="_blank">Ambady Anand S</a>.

@@ -10,18 +10,18 @@
 /**
  * Written in 2013 by Brad Jorsch
  *
- * To the extent possible under law, the author(s) have dedicated all copyright 
- * and related and neighboring rights to this software to the public domain 
- * worldwide. This software is distributed without any warranty. 
+ * To the extent possible under law, the author(s) have dedicated all copyright
+ * and related and neighboring rights to this software to the public domain
+ * worldwide. This software is distributed without any warranty.
  *
- * See <http://creativecommons.org/publicdomain/zero/1.0/> for a copy of the 
+ * See <http://creativecommons.org/publicdomain/zero/1.0/> for a copy of the
  * CC0 Public Domain Dedication.
  */
 
 // ******************** CONFIGURATION ********************
 
 /**
- * Set this to point to a file (outside the webserver root!) containing the 
+ * Set this to point to a file (outside the webserver root!) containing the
  * following keys:
  * - agent: The HTTP User-Agent to use
  * - consumerKey: The "consumer token" given to you when registering your app
@@ -30,13 +30,13 @@
 $inifile = '/data/project/parliamentdiagram/oauth-enduser.ini';
 
 /**
- * Set this to the Special:OAuth/authorize URL. 
+ * Set this to the Special:OAuth/authorize URL.
  * To work around MobileFrontend redirection, use /wiki/ rather than /w/index.php.
  */
 $mwOAuthAuthorizeUrl = 'https://commons.wikimedia.org/wiki/Special:OAuth/authorize';
 
 /**
- * Set this to the Special:OAuth URL. 
+ * Set this to the Special:OAuth URL.
  * Note that /wiki/Special:OAuth fails when checking the signature, while
  * index.php?title=Special:OAuth works fine.
  */
@@ -105,12 +105,12 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == 'authorize') { doAuthorizati
 /**
  * Utility function to sign a request
  *
- * Note this doesn't properly handle the case where a parameter is set both in 
+ * Note this doesn't properly handle the case where a parameter is set both in
  * the query string in $url and in $params, or non-scalar values in $params.
  *
  * @param string $method Generally "GET" or "POST"
  * @param string $url URL string
- * @param array $params Extra parameters for the Authorization header or post 
+ * @param array $params Extra parameters for the Authorization header or post
  * 	data (if application/x-www-form-urlencoded).
  * @return string Signature
  */
@@ -124,7 +124,7 @@ function sign_request( $method, $url, $params = array() ) {
 	$port = isset( $parts['port'] ) ? $parts['port'] : ( $scheme == 'https' ? '443' : '80' );
 	$path = isset( $parts['path'] ) ? $parts['path'] : '';
 	if ( ( $scheme == 'https' && $port != '443' ) ||
-		( $scheme == 'http' && $port != '80' ) 
+		( $scheme == 'http' && $port != '80' )
 	) {
 		// Only include the port if it's not the default
 		$host = "$host:$port";
@@ -169,7 +169,7 @@ function doAuthorizationRedirect() {
 	$url .= strpos( $url, '?' ) ? '&' : '?';
 	$url .= http_build_query( array(
 		'format' => 'json',
-		
+
 		// OAuth information
 		'oauth_callback' => 'oob', // Must be "oob" for MWOAuth
 		'oauth_consumer_key' => $gConsumerKey,
@@ -200,7 +200,7 @@ function doAuthorizationRedirect() {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
 		echo '<div class="error">';
 		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
-		echo 'Maybe everything is OK: Try <a href="http://parliamentdiagram.toolforge.org">this link.</a>';
+		echo 'Maybe everything is OK: Try <a href="index.php">this link.</a>';
 		echo '</div>';
 		exit(0);
 	}
@@ -270,7 +270,7 @@ function fetchAccessToken() {
 		header( "HTTP/1.1 $errorCode Internal Server Error" );
 		echo '<div class="error">';
 		echo 'Error retrieving token: ' . htmlspecialchars( $token->error ).'</br>';
-		echo 'Maybe everything is OK: Try <a href="http://parliamentdiagram.toolforge.org">this link.</a>';
+		echo 'Maybe everything is OK: Try <a href="index.php">this link.</a>';
 		echo '</div>';
 		exit(0);
 	}
@@ -297,7 +297,7 @@ function fetchAccessToken() {
  */
 function doApiQuery( $post, &$ch = null , $mode = '' ) {
 	global $mwOAuthUrl, $gUserAgent, $gConsumerKey, $gTokenKey, $gConsumerSecret, $apiUrl ;
-        
+
 	$headerArr = array(
 		// OAuth information
 		'oauth_consumer_key' => $gConsumerKey,
@@ -329,16 +329,16 @@ function doApiQuery( $post, &$ch = null , $mode = '' ) {
 
 	if ( !$ch ) {
 		$ch = curl_init();
-		
+
 	}
-	
+
 	$post_fields = '' ;
 	if ( $mode == 'upload' ) {
 		$post_fields = $post ;
 	} else {
 		$post_fields = http_build_query( $post ) ;
 	}
-	
+
 	curl_setopt( $ch, CURLOPT_POST, true );
 	curl_setopt( $ch, CURLOPT_URL, $url );
 	curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields );
@@ -431,7 +431,7 @@ function doIdentify() {
 	$err = json_decode( $data );
 	if ( is_object( $err ) && isset( $err->error ) && $err->error === 'mwoauthdatastore-access-token-not-found' ) {
 		// We're not authorized!
-		echo 'To start using the parliament diagram tool, go <a href="https://parliamentdiagram.toolforge.org/parlitest.php">here</a>.';
+		echo 'To start using the parliament diagram tool, go <a href="archinputform.php">here</a>.';
                 echo '<hr>';
 		echo 'You haven\'t authorized this application yet! Go <a href="' . htmlspecialchars( $_SERVER['SCRIPT_NAME'] ) . '?action=authorize">here</a> to do that.';
 		echo '<hr>';
@@ -481,7 +481,7 @@ function doIdentify() {
 	echo "<div class='success'>";
 	echo 'You have authorized the parliament diagram tool to post on behalf of ' . htmlspecialchars(  $payload->username ) . '. You can now close this window and click the upload link again.';
         echo '<hr>';
-        echo 'To start using the parliament diagram tool, go <a href="https://parliamentdiagram.toolforge.org/parlitest.php">here</a>.';
+        echo 'To start using the parliament diagram tool, go <a href="archinputform.php">here</a>.';
 	echo "</div>\n";
 }
 
