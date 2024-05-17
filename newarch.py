@@ -219,16 +219,16 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     radius : float
     """
     drawn_spots = 0
-    for i in range(len(party_list)):
+    for i, party in enumerate(party_list):
         # Remove illegal characters from party's name to make an svg id
-        party_name = party_list[i]['name']
+        party_name = party['name']
         sanitized_party_name = re.sub(r'[^a-zA-Z0-9_-]+', '-', party_name)
         block_id = "{}_{}".format(i, sanitized_party_name)
 
-        party_nb_seats = party_list[i]['nb_seats']
-        party_fill_color = party_list[i]['color']
-        party_border_width = party_list[i]['border_size'] * radius * 175 * .8
-        party_border_color = party_list[i]['border_color']
+        party_nb_seats = party['nb_seats']
+        party_fill_color = party['color']
+        party_border_width = party['border_size'] * radius * 175 * .8
+        party_border_color = party['border_color']
 
         out_file.write(  # <g> header
             '        <g style="fill:{0}; stroke-width:{1:.2f}; stroke:{2}" \n'
