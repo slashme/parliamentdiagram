@@ -120,7 +120,7 @@ function CallDiagramScript() {
         $.ajax({
             type: "POST",
             url: "westminster.py",
-            data: requeststring,
+            data: {data: requeststring},
         }).done(function(data, status) {
             data = data.trim();
 
