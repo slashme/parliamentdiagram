@@ -7,6 +7,7 @@ import sys
 import os
 
 # TODO: adapt to the changes in JS and catch JSON data
+# the object (dict) now contains an "options" dict and a "parties" list
 
 def main():
     inputlist = cgi.FieldStorage().getvalue("inputlist", "")
@@ -91,7 +92,7 @@ def main():
     # Pass the output filename to the calling page.
     print(svgfilename)
 
-def seats(*, partylist, sumdelegates, option_wingrows: int|None, cozy, fullwidth, centercols_raw=None, option_radius, option_spacing):
+def seats(*, partylist, sumdelegates, option_wingrows: "int|None", cozy, fullwidth, centercols_raw=None, option_radius, option_spacing):
     # Left and right are by default blocks of shape 5x1
     # Head (Speaker or whatever) is a single row of blocks down the middle,
     #  starting one block left of the party blocks, with a half-block gap on either side.
