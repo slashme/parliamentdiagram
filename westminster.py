@@ -54,7 +54,6 @@ def treat_inputlist(inputlist, nowstrftime, requesthash) -> "int|str|None":
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
-    partydictlist = inputlist.get("parties", []) # type: list[dict]
     option_wingrows = inputlist.get("wingrows", None) # type: int|None
     cozy = inputlist["cozy"] # type: bool
     fullwidth = inputlist["fullwidth"] # type: bool
@@ -67,7 +66,7 @@ def treat_inputlist(inputlist, nowstrftime, requesthash) -> "int|str|None":
     # Keep a running total of the number of delegates in each part of the diagram, for use later.
     sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
 
-    for pl in partydictlist:
+    for pl in inputlist.get("parties", ()):
         p = Party(**pl)
         parties[p] = 0
         for g in sumdelegates:
