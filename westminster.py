@@ -53,8 +53,13 @@ def treat_inputlist(inputlist, nowstrftime, requesthash):
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
-    options = inputlist.get("options", {}) # type: dict
     partydictlist = inputlist.get("parties", []) # type: list[dict]
+    option_wingrows = inputlist.get("wingrows", None) # type: int|None
+    cozy = inputlist["cozy"] # type: bool
+    fullwidth = inputlist["fullwidth"] # type: bool
+    centercols = inputlist["centercols"] # type: int
+    radius = inputlist["radius"] # type: float
+    spacing = inputlist["spacing"] # type: float
 
     # initialize the list of parties
     parties = collections.Counter() # type: dict[Party, int]
@@ -74,12 +79,12 @@ def treat_inputlist(inputlist, nowstrftime, requesthash):
     poslist, wingrows, radius, blocksize, svgwidth, svgheight = seats(
         parties=parties,
         sumdelegates=sumdelegates,
-        option_wingrows=options.get('wingrows', None),
-        cozy=options['cozy'],
-        fullwidth=options['fullwidth'],
-        centercols_raw=options['centercols'],
-        option_radius=options['radius'],
-        option_spacing=options['spacing']
+        option_wingrows=option_wingrows,
+        cozy=cozy,
+        fullwidth=fullwidth,
+        centercols_raw=centercols,
+        option_radius=radius,
+        option_spacing=spacing
     )
 
     # Open svg file for writing:
@@ -88,9 +93,9 @@ def treat_inputlist(inputlist, nowstrftime, requesthash):
         print(build_svg(
                 parties=parties,
                 poslist=poslist,
-                blockside=blocksize*(1-options['spacing']),
+                blockside=blocksize*(1-spacing),
                 wingrows=wingrows,
-                fullwidth_or_cozy=options['fullwidth'] or options['cozy'],
+                fullwidth_or_cozy=fullwidth or cozy,
                 radius=radius,
                 svgwidth=svgwidth,
                 svgheight=svgheight,
@@ -119,7 +124,8 @@ def seats(*,
 
     # compute the number of ranks
     wingrows = dict.fromkeys(('left', 'right'),
-        option_wingrows or math.ceil(math.sqrt(max(1, sumdelegates['left'], sumdelegates['right'])/20))*2) # type: dict[str, int]
+        option_wingrows or math.ceil(math.sqrt(max(1, sumdelegates['left'], sumdelegates['right'])/20))*2
+    ) # type: dict[str, int]
 
     # compute the number of columns
     if cozy:

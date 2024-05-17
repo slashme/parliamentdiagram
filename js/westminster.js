@@ -61,13 +61,12 @@ function CallDiagramScript() {
         }
     });
 
-    let options = payload.options = {};
-    options.radius = spotradius;
-    options.spacing = spotspacing;
-    options.wingrows = wingrows;
-    options.centercols = centercols;
-    options.fullwidth = fullwidth;
-    options.cozy = cozy;
+    payload.radius = spotradius;
+    payload.spacing = spotspacing;
+    payload.wingrows = wingrows;
+    payload.centercols = centercols;
+    payload.fullwidth = fullwidth;
+    payload.cozy = cozy;
 
     let parties = payload.parties = [];
 
