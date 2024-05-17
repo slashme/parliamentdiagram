@@ -1,17 +1,26 @@
 #!/usr/bin/python3
 import cgi
-import re
-import math
+import dataclasses
 import datetime
-import sys
+import json
+import math
 import os
+import sys
 
 # TODO: adapt to the changes in JS and catch JSON data
 # the object (dict) now contains an "options" dict and a "parties" list
 
+@dataclasses.dataclass
+class PartyEntry:
+    name: str
+    num: int
+    group: str
+    color: str
+    given_seats: int = 0
+
 def main():
-    inputlist = cgi.FieldStorage().getvalue("inputlist", "")
-    # inputlist = sys.argv[1] #Uncomment for commandline debugging
+    data = cgi.FieldStorage().getvalue("data", "")
+    inputlist = json.loads(data)
 
     if not inputlist:
         return "No input."
@@ -20,56 +29,34 @@ def main():
 
     # Append input list to log file:
     with open('wmlog', 'a') as logfile:
-        logfile.write(nowstrftime + " " + inputlist + '\n')
+        print(nowstrftime, inputlist, file=logfile)
 
     # Create always-positive hash of the request string:
-    requesthash = str(hash(inputlist) % ((sys.maxsize + 1) * 2))
+    requesthash = str(hash(data) % ((sys.maxsize + 1) * 2))
     # Check whether we have a file made from this exact string in the directory:
-    for file in os.listdir("svgfiles"):
-        # We've done this diagram before, just serve it.
-        if file.count(str(requesthash)):
-            print("svgfiles/"+file)
-            return
+    if print_file_if_already_exists(requesthash):
+        return
 
     # If we get here, we didn't find a matching request, so continue.
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
-    svgfilename = 'svgfiles/' + nowstrftime + "-" + requesthash +'.svg'
+    svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
-    # initialize dictionary of options - this will hold things like spot radius, spacing, width of blocks, etc.
-    optionlist = {}
-    # initialize list of parties
-    partylist = []
+    options = data.get("options", {}) # type: dict
+    partydictlist = data.get("parties", []) # type: list[dict]
+
+    # initialize the list of parties
+    parties = [] # type: list[PartyEntry]
     # Keep a running total of the number of delegates in each part of the diagram, for use later.
     sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
 
-    for i in re.split(r"\s*;\s*", inputlist):
-        inputitem = re.split(r'\s*,\s*', i)
-        # If it's an option, handle it separately
-        if "option" in inputitem[0]:
-            optionlist[inputitem[0][7:]] = float(inputitem[1])
-        else:
-            partylist.append(inputitem)
-
-    for i, pl in enumerate(partylist):
-        # Must contain: party name; number; party grouping (left/right/center/head); colour.
-        if len(pl) != 4:
-            return f"Incorrect number of columns in party n°{i}."
-        elif re.search('[^0-9]', pl[1]):  # Must have at least a digit in the number
-            return f"Invalid number of delegates : {pl[1]!r}."
-
-        try:
-            pl[1] = int(pl[1])
-        except ValueError:
-            pl[1] = 0
-
-        # placeholder for empty seat count, for use when giving only one column per party.
-        pl.append(0)
-
-        # Iterate over the list of party groups, adding the number of delegates to the correct one:
-        # g is the group name; n is the seat count for that group.
+    # TODO: obsolete, this is now name/num/group/color dicts instead of tuples
+    # TODO: rewrite what needs to be so that it uses a dict instead of a list
+    for i, pl in enumerate(partydictlist):
+        p = PartyEntry(**pl)
+        parties.append(p)
         for g in sumdelegates:
-            if g in pl[2]:
-                sumdelegates[g] += pl[1]
+            if g in p.group:
+                sumdelegates[g] += p.num
 
     if sum(sumdelegates.values()) < 1:
         return "No delegates."
@@ -77,20 +64,30 @@ def main():
     poslist, wingrows, radius, blocksize, svgwidth, svgheight = seats(
         partylist=partylist,
         sumdelegates=sumdelegates,
-        option_wingrows=optionlist.get('wingrows', None),
-        cozy=optionlist['cozy'],
-        fullwidth=optionlist['fullwidth'],
-        centercols_raw=optionlist['centercols'],
-        option_radius=optionlist['radius'],
-        option_spacing=optionlist['spacing']
+        option_wingrows=options.get('wingrows', None),
+        cozy=options['cozy'],
+        fullwidth=options['fullwidth'],
+        centercols_raw=options['centercols'],
+        option_radius=options['radius'],
+        option_spacing=options['spacing']
     )
 
     # Open svg file for writing:
     with open(svgfilename, 'w') as outfile:
         # Write svg header:
-        outfile.write(build_svg(partylist=partylist, poslist=poslist, blockside=blocksize*(1-optionlist['spacing']), wingrows=wingrows, fullwidth_or_cozy=optionlist['fullwidth'] or optionlist['cozy'], radius=radius, svgwidth=svgwidth, svgheight=svgheight))
+        outfile.write(build_svg(partylist=partylist, poslist=poslist, blockside=blocksize*(1-options['spacing']), wingrows=wingrows, fullwidth_or_cozy=options['fullwidth'] or options['cozy'], radius=radius, svgwidth=svgwidth, svgheight=svgheight))
     # Pass the output filename to the calling page.
     print(svgfilename)
+
+def print_file_if_already_exists(requesthash):
+    """
+    Returns whether the file has been found (and its path printed) or not.
+    """
+    for file in os.listdir("svgfiles"):
+        if file.count(str(requesthash)):
+            print(f"svgfiles/{file}")
+            return True
+    return False
 
 def seats(*, partylist, sumdelegates, option_wingrows: "int|None", cozy, fullwidth, centercols_raw=None, option_radius, option_spacing):
     # Left and right are by default blocks of shape 5x1
