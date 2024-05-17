@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import cgi
+import hashlib
 import re
 import math
 import datetime
@@ -27,20 +28,20 @@ def main(**inputlist):
     Doesn't return anything, but in case of success: prints a filename, which
     will hence be sent to the web interface.
     """
-    start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
-    if not inputlist:
-        data = cgi.FieldStorage().getvalue("data", "")
-        inputlist = json.loads(data)
-    else:
+    start_time = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
+    if inputlist:
         data = json.dumps(inputlist)
+    else:
+        data = cgi.FieldStorage().getvalue("data", "") # type: str
+        inputlist = json.loads(data)
 
     # Open a log file and append input list to it:
     global LOGFILE
     with open('log', 'a') as LOGFILE:
         log("{} {}".format(start_time, inputlist))
 
-        # Create always-positive hash of the request string:
-        request_hash = str(hash(data) % ((sys.maxsize + 1) * 2))
+        # Create consistent hash of the request string:
+        request_hash = hashlib.sha256(data.encode()).hexdigest()
 
         cached_filename = return_file_if_already_exist(request_hash)
         if cached_filename:
