@@ -14,7 +14,7 @@ class Party(typing.NamedTuple):
     group: str
     color: str
 
-def main(**inputlist):
+def main(**inputlist) -> "int|str|None":
     if inputlist:
         data = json.dumps(inputlist)
     else:
@@ -49,7 +49,7 @@ def print_file_if_already_exists(requesthash):
             return True
     return False
 
-def treat_inputlist(inputlist, nowstrftime, requesthash):
+def treat_inputlist(inputlist, nowstrftime, requesthash) -> "int|str|None":
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
@@ -254,20 +254,21 @@ def seats(*,
             ])
 
     for wing in ('left', 'right'):
+        wingposlist = poslist[wing]
         if fullwidth and wingrows[wing] > 1:
             # first sort the spots - will need this whether or not it's cozy
             if wing == 'right':
                 # sort by y coordinate if it's right wing
-                poslist[wing].sort(key=lambda point: point[1])
+                wingposlist.sort(key=lambda point: point[1])
             else:
                 # sort by negative y coordinate if it's left wing
-                poslist[wing].sort(key=lambda point: -point[1])
+                wingposlist.sort(key=lambda point: -point[1])
 
             # if we are smooshing them together without gaps, just fill from the bottom up
             if cozy:
                 # trim the block to the exact number of delegates
                 # so that filling from the left will fill the whole horizontal space
-                poslist[wing] = poslist[wing][:sumdelegates[wing]]
+                poslist[wing] = wingposlist[:sumdelegates[wing]]
 
             else:
                 # grab a block for each party
@@ -275,7 +276,7 @@ def seats(*,
                 # so that when it's sorted by x coordinate, they are not allocated
 
                 # sort by x coordinate again
-                poslist[wing].sort(key=lambda point: point[0])
+                wingposlist.sort(key=lambda point: point[0])
 
                 # number of seats in the parties we've done already
                 counter = 0
@@ -303,7 +304,7 @@ def seats(*,
 
                         # grab the slice of seats to work on
                         # sorting this doesn't affect poslist, but assigning does
-                        seatslice = poslist[wing][counter:counter+pspots+addspots]
+                        seatslice = wingposlist[counter:counter+pspots+addspots]
                         extraspots -= addspots
 
                         # into how many spots do the remaining extra spots have to go?
@@ -321,15 +322,11 @@ def seats(*,
                             # sort by negative y coordinate if it's left wing
                             seatslice.sort(key=lambda point: -point[1])
 
-                        for i in seatslice[party.num:]:
-                            # set the x coordinate really big
-                            # canvas size is 360, so 999 is big enough
-                            # this changes the values in poslist, remember
-                            i[0] = 999
+                        del seatslice[party.num:]
 
                         counter += pspots+addspots
 
-        poslist[wing].sort(key=lambda point: point[0])
+        wingposlist.sort(key=lambda point: point[0])
 
     return poslist, wingrows, radius, blocksize, svgwidth, svgheight
 
