@@ -40,8 +40,8 @@ def main(**inputlist):
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
-    options = data.get("options", {}) # type: dict
-    partydictlist = data.get("parties", []) # type: list[dict]
+    options = inputlist.get("options", {}) # type: dict
+    partydictlist = inputlist.get("parties", []) # type: list[dict]
 
     # initialize the list of parties
     parties = collections.Counter() # type: dict[Party, int]
