@@ -20,8 +20,6 @@ TOTALS = [
     29001, 29679, 30367, 31061
 ]
 
-LOGFILE = None  # A file to log everything we want
-
 def main(**inputlist):
     """
     Doesn't return anything, but in case of success: prints a filename, which
@@ -35,9 +33,8 @@ def main(**inputlist):
         inputlist = json.loads(data)
 
     # Open a log file and append input list to it:
-    global LOGFILE
     with open('log', 'a') as LOGFILE:
-        log("{} {}".format(start_time, inputlist))
+        print(start_time, inputlist, file=LOGFILE)
 
         # Create consistent hash of the request string:
         request_hash = hashlib.sha256(data.encode()).hexdigest()
@@ -48,25 +45,12 @@ def main(**inputlist):
         elif inputlist:
             filename = treat_inputlist(start_time, request_hash, **inputlist)
             if filename is None :
-                log('Something went wrong. Maybe the input list was badly '
-                    'formatted, or had 0 delegates, or had too many delegates.')
+                print('Something went wrong. Maybe the input list was badly '
+                    'formatted, or had 0 delegates, or had too many delegates.', file=LOGFILE)
             else:
                 print(filename)
         else:
-            log('No inputlist')
-
-
-def log(message, newline=True):
-    """
-    Add message to LOGFILE.
-
-    message : string
-        Message to append to the LOGFILE
-    newline : bool
-        Should we append a \n at the end of the message
-    """
-    LOGFILE.write("{}{}".format(message, '\n' if newline else ''))
-
+            print('No inputlist', file=LOGFILE)
 
 def treat_inputlist(start_time, request_hash, parties=(), denser_rows=False, **kwargs):
     """
