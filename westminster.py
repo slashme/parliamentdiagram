@@ -2,6 +2,7 @@
 import cgi
 import collections
 import datetime
+import hashlib
 import json
 import math
 import os
@@ -18,7 +19,7 @@ def main(**inputlist) -> "int|str|None":
     if inputlist:
         data = json.dumps(inputlist)
     else:
-        data = cgi.FieldStorage().getvalue("data", "")
+        data = cgi.FieldStorage().getvalue("data", "") # type: str
         inputlist = json.loads(data)
 
     if not inputlist:
@@ -30,8 +31,8 @@ def main(**inputlist) -> "int|str|None":
     with open('wmlog', 'a') as logfile:
         print(nowstrftime, inputlist, file=logfile)
 
-    # Create always-positive hash of the request string:
-    requesthash = str(hash(data) % ((sys.maxsize + 1) * 2))
+    # Create consistent hash of the request string:
+    requesthash = hashlib.sha256(data.encode()).hexdigest()
     # Check whether we have a file made from this exact string in the directory:
     if print_file_if_already_exists(requesthash):
         return
