@@ -62,7 +62,7 @@ def treat_inputlist(start_time, request_hash, parties=(), denser_rows=False, **k
     # Old files are deleted with a cron script.
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
-    sum_delegates = count_delegates(parties)
+    sum_delegates = sum(party['nb_seats'] for party in parties)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
@@ -85,29 +85,6 @@ def return_file_if_already_exist(request_hash):
         if file.count(str(request_hash)):
             return "svgfiles/{}".format(file)
     return False  # File doesn't already exist
-
-
-def count_delegates(party_list):
-    """
-    Sums all delegates from all parties. Return 0 if something fails.
-
-    party_list : <list>
-        Data for each party, a dict with the following format : [
-            {
-                'name': <str>,
-                'nb_seats': <int>,
-                'color': <str> (fill color, as hex code),
-                'border_size': <float>,
-                'border_color': <str> (as hex code)
-            },
-            ... /* other parties */
-        ]
-
-    """
-    sum = 0
-    for party in party_list:
-        sum += party['nb_seats']
-    return sum
 
 
 def get_number_of_rows(nb_delegates):
