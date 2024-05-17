@@ -37,6 +37,19 @@ def main(**inputlist):
         return
 
     # If we get here, we didn't find a matching request, so continue.
+    return treat_inputlist(inputlist, nowstrftime, requesthash)
+
+def print_file_if_already_exists(requesthash):
+    """
+    Returns whether the file has been found (and its path printed) or not.
+    """
+    for file in os.listdir("svgfiles"):
+        if file.count(str(requesthash)):
+            print(f"svgfiles/{file}")
+            return True
+    return False
+
+def treat_inputlist(inputlist, nowstrftime, requesthash):
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
@@ -71,20 +84,20 @@ def main(**inputlist):
 
     # Open svg file for writing:
     with open(svgfilename, 'w') as outfile:
-        # Write svg header:
-        outfile.write(build_svg(parties=parties, poslist=poslist, blockside=blocksize*(1-options['spacing']), wingrows=wingrows, fullwidth_or_cozy=options['fullwidth'] or options['cozy'], radius=radius, svgwidth=svgwidth, svgheight=svgheight))
+        # Write svg:
+        print(build_svg(
+                parties=parties,
+                poslist=poslist,
+                blockside=blocksize*(1-options['spacing']),
+                wingrows=wingrows,
+                fullwidth_or_cozy=options['fullwidth'] or options['cozy'],
+                radius=radius,
+                svgwidth=svgwidth,
+                svgheight=svgheight,
+            ), file=outfile)
+
     # Pass the output filename to the calling page.
     print(svgfilename)
-
-def print_file_if_already_exists(requesthash):
-    """
-    Returns whether the file has been found (and its path printed) or not.
-    """
-    for file in os.listdir("svgfiles"):
-        if file.count(str(requesthash)):
-            print(f"svgfiles/{file}")
-            return True
-    return False
 
 def seats(*,
         parties: "collections.Counter[Party]",
