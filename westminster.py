@@ -105,15 +105,15 @@ def treat_inputlist(inputlist, nowstrftime, requesthash) -> "int|str|None":
     print(svgfilename)
 
 def seats(*,
-        parties: "collections.Counter[Party]",
-        sumdelegates,
+        parties: collections.Counter[Party],
+        sumdelegates: dict[str, int],
         option_wingrows: "int|None",
-        cozy,
-        fullwidth,
-        centercols_raw=None,
-        option_radius,
-        option_spacing,
-        ) -> tuple[dict[str, list], dict[str, int], float, float, float, float]:
+        cozy: bool,
+        fullwidth: bool,
+        centercols_raw: "int|None" = None,
+        option_radius: float,
+        option_spacing: float,
+        ) -> tuple[dict[str, list[tuple[float, float]]], dict[str, int], float, float, float, float]:
     # Left and right are by default blocks of shape 5x1
     # Head (Speaker or whatever) is a single row of blocks down the middle,
     #  starting one block left of the party blocks, with a half-block gap on either side.
@@ -217,7 +217,7 @@ def seats(*,
     svgheight = blocksize*totalrows+10
 
     # initialise list of positions for the various diagram elements
-    poslist = {'head': [], 'left': [], 'right': [], 'center': []}
+    poslist = {'head': [], 'left': [], 'right': [], 'center': []} # type: dict[str, list[tuple[float, float]]]
 
     # all head blocks are in a single row with same y position
     # the top y-coordinate of the center block if the wings are balanced
@@ -226,32 +226,35 @@ def seats(*,
 
     # the head
     for x in range(sumdelegates['head']):
-        poslist['head'].append([5+blocksize*(x+option_spacing/2), centertop])
+        poslist['head'].append((
+            5+blocksize*(x+option_spacing/2),
+            centertop,
+        ))
 
     # the cross-bench
     # 5 from the edge, vertically centered
     for x in range(centercols):
         thiscol = min(centerrows, sumdelegates['center']-x*centerrows)
-        poslist['center'].append([
+        poslist['center'].append((
             svgwidth-5-(centercols-x-option_spacing/2) * blocksize,
-            (svgheight-thiscol*blocksize)/2+blocksize*(option_spacing/2)
-        ])
+            (svgheight-thiscol*blocksize)/2+blocksize*(option_spacing/2),
+        ))
     poslist['center'].sort(key=lambda point: point[1])
 
     for x in range(wingcols):
         # left parties are in the top block
         for y in range(wingrows['left']):
-            poslist['left'].append([
+            poslist['left'].append((
                 5+(leftoffset+x+option_spacing/2)*blocksize,
-                centertop-(1.5+y)*blocksize
-            ])
+                centertop-(1.5+y)*blocksize,
+            ))
 
         # right parties are in the bottom block
         for y in range(wingrows['right']):
-            poslist['right'].append([
+            poslist['right'].append((
                 5+(leftoffset+x+option_spacing/2)*blocksize,
-                centertop+(1.5+y)*blocksize
-            ])
+                centertop+(1.5+y)*blocksize,
+            ))
 
     for wing in ('left', 'right'):
         wingposlist = poslist[wing]
