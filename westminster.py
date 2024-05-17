@@ -39,12 +39,12 @@ def main(**inputlist) -> "int|str|None":
     # If we get here, we didn't find a matching request, so continue.
     return treat_inputlist(inputlist, nowstrftime, requesthash)
 
-def print_file_if_already_exists(requesthash):
+def print_file_if_already_exists(requesthash: str):
     """
     Returns whether the file has been found (and its path printed) or not.
     """
     for file in os.listdir("svgfiles"):
-        if file.count(str(requesthash)):
+        if requesthash in file:
             print(f"svgfiles/{file}")
             return True
     return False
@@ -62,7 +62,7 @@ def treat_inputlist(inputlist, nowstrftime, requesthash) -> "int|str|None":
     spacing = inputlist["spacing"] # type: float
 
     # initialize the list of parties
-    parties = collections.Counter() # type: dict[Party, int]
+    parties = collections.Counter()
     # Keep a running total of the number of delegates in each part of the diagram, for use later.
     sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
 
