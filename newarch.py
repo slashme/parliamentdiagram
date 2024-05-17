@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 import cgi
-import hashlib
-import re
-import math
 import datetime
-import sys
-import os
+import hashlib
 import json
+import math
+import os
+import re
 
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
