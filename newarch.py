@@ -27,7 +27,7 @@ def main(**inputlist):
     Doesn't return anything, but in case of success: prints a filename, which
     will hence be sent to the web interface.
     """
-    start_time = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
+    start_time = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
     if inputlist:
         data = json.dumps(inputlist)
     else:
