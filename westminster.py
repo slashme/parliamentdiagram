@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import cgi
-import collections
 import datetime
 import hashlib
 import json
@@ -66,7 +65,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
     # initialize the list of parties
-    parties = collections.Counter()
+    parties = {} # type: dict[Party, int]
     # Keep a running total of the number of delegates in each part of the diagram, for use later.
     sumdelegates = {'left': 0, 'right': 0, 'center': 0, 'head': 0}
 
@@ -109,7 +108,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
     print(svgfilename)
 
 def seats(*,
-        parties: collections.Counter[Party],
+        parties: dict[Party, int],
         sumdelegates: dict[str, int],
         option_wingrows: "int|None",
         cozy: bool,
@@ -338,7 +337,7 @@ def seats(*,
     return poslist, wingrows, radius, blocksize, svgwidth, svgheight
 
 def build_svg(*,
-        parties: "collections.Counter[Party]",
+        parties: dict[Party, int],
         poslist,
         blockside,
         wingrows,
