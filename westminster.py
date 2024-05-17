@@ -24,7 +24,7 @@ def main(**inputlist) -> "int|str|None":
     if not inputlist:
         return "No input."
 
-    nowstrftime = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
+    nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
 
     # Append input list to log file:
     with open('wmlog', 'a') as logfile:
