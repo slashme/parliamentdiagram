@@ -14,9 +14,12 @@ class Party(typing.NamedTuple):
     group: str
     color: str
 
-def main():
-    data = cgi.FieldStorage().getvalue("data", "")
-    inputlist = json.loads(data)
+def main(**inputlist):
+    if inputlist:
+        data = json.dumps(inputlist)
+    else:
+        data = cgi.FieldStorage().getvalue("data", "")
+        inputlist = json.loads(data)
 
     if not inputlist:
         return "No input."
