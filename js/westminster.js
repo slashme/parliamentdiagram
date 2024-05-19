@@ -77,13 +77,10 @@ function CallDiagramScript() {
             // This is such a cheap operation that I'm not going to bother
             // to check each time whether "autospeaker" is checked.
 
-            // If bigparty is pointing to a non-null member of the party list,
-            // check whether the current member has larger support,
-            // and if so point to it instead.
-            if (partylist[bigparty]) {
-                if (party.Num > bigpartysize) {
-                    bigparty = i;
-                }
+            // Update bigparty as the index of the biggest party
+            if (party.Num > bigpartysize) {
+                bigparty = i;
+                bigpartysize = party.Num;
             }
 
             parties.push({
