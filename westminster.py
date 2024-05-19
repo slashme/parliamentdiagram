@@ -309,7 +309,7 @@ def seats(*,
                         addspots += -addspots % wingrows[wing]
 
                         # grab the slice of seats to work on
-                        # sorting this doesn't affect poslist, but assigning does
+                        # sorting this doesn't affect poslist
                         seatslice = wingposlist[counter:counter+pspots+addspots]
                         extraspots -= addspots
 
@@ -328,7 +328,8 @@ def seats(*,
                             # sort by negative y coordinate if it's left wing
                             seatslice.sort(key=lambda point: -point[1])
 
-                        del seatslice[party.num:]
+                        for point in seatslice[party.num:]:
+                            wingposlist.remove(point)
 
                         counter += pspots+addspots
 
