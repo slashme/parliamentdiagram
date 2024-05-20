@@ -54,7 +54,8 @@ function CallDiagramScript() {
         } else if (this.name.startsWith("Color")) {
             // If we are processing a colour string, add a # before the hex values.
             partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Color'] = this.value;
-    }});
+        }
+    });
     $("select").each(function() {
         if (this.name.startsWith("Group")) {
             partylist[/[0-9]+$/.exec(this.name)[0]]['Group'] = this.value;
