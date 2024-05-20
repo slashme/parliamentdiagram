@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, render_template, url_for
 
 app = Flask(__name__)
 
@@ -32,15 +32,15 @@ def westminsterinputform_redirect():
 # main pages
 @app.route("/archinputform")
 def archinputform():
-    return ("Not yet implemented", 503)
+    return render_template("archinputform.html")
 
 @app.route("/USinputform")
 def usinputform():
-    return ("Not yet implemented", 503)
+    return render_template("usinputform.html")
 
 @app.route("/westminsterinputform")
 def westminsterinputform():
-    return ("Not yet implemented", 503)
+    return render_template("westminsterinputform.html")
 
 
 # direct requests
