@@ -64,12 +64,13 @@ def newarch_generation():
 
     request_hash = hashlib.sha256(data.encode()).hexdigest()
 
+    if not inputdata:
+        app.logger.error("No inputlist")
+        return ("No data provided", 400)
+
     cached_filename = already_existing_file(request_hash)
     if cached_filename is not None:
         return cached_filename
-    elif not inputdata:
-        app.logger.error("No inputlist")
-        return ("No data provided", 400)
 
     parties = inputdata.pop("parties", None)
     if parties is None:
