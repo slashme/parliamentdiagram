@@ -71,6 +71,8 @@ def newarch_generation():
 
     cached_filename = already_existing_file(request_hash)
     if cached_filename is not None:
+        app.logger.info("File already exists")
+        os.utime("static/"+cached_filename)
         return app.url_for("static", filename=cached_filename)
 
     parties = inputdata.pop("parties", None)
