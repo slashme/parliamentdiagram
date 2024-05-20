@@ -4,7 +4,8 @@ import os
 from typing import Any
 
 from flask import Flask, render_template, request
-import parliamentarch
+from parliamentarch import SeatData, write_svg_from_attribution
+from parliamentarch.geometry import FillingStrategy
 
 app = Flask(__name__)
 
@@ -75,24 +76,24 @@ def newarch_generation():
         app.logger.error("No list of parties")
         return ("No list of parties provided", 400)
 
-    attrib: dict[parliamentarch.SeatData, int] = {}
+    attrib: dict[SeatData, int] = {}
     for d in parties:
         n = d.pop("nb_seats", 1)
         data = d.pop("name")
-        attrib[parliamentarch.SeatData(data, **d)] = n
+        attrib[SeatData(data, **d)] = n
     if inputdata.pop("denser_rows", False):
-        filling_strategy = parliamentarch.geometry.FillingStrategy.EMPTY_INNER
+        filling_strategy = FillingStrategy.EMPTY_INNER
     else:
-        filling_strategy = parliamentarch.geometry.FillingStrategy.DEFAULT
+        filling_strategy = FillingStrategy.DEFAULT
     seat_radius_factor = inputdata.pop("seat_radius_factor", .8)
 
     filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
-    parliamentarch.write_svg_from_attribution("static/"+filename, # TODO: check that the path is correct
+    write_svg_from_attribution("static/"+filename, # TODO: check that the path is correct
         attrib,
         filling_strategy=filling_strategy,
         seat_radius_factor=seat_radius_factor,
         **inputdata)
-    # format taken by parliamentarch.get_svg_from_attribution:
+    # format taken by get_svg_from_attribution:
         # attrib: dict[SeatData, int]
         # **kwargs:
             # min_nrows: int
