@@ -55,6 +55,7 @@ def westminsterinputform():
 @app.post("/newarch")
 @app.post("/newarch.py")
 def newarch_generation():
+    # TODO: maybe wrap the simple URL in some kind of response wrapper
     nowstrftime = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
 
     data = request.form["data"]
@@ -70,7 +71,7 @@ def newarch_generation():
 
     cached_filename = already_existing_file(request_hash)
     if cached_filename is not None:
-        return cached_filename
+        return app.url_for("static", filename=cached_filename)
 
     parties = inputdata.pop("parties", None)
     if parties is None:
