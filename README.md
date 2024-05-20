@@ -4,12 +4,18 @@ The Parliament diagram creator is made for use in Wikipedia, supported by Wikime
 
 ![Sample image](images/AssNat_16_groupes_2022.svg)
 
-You can use the tool at http://parliamentdiagram.toolforge.org/archinputform.php
+You can use the tool at http://parliamentdiagram.toolforge.org/archinputform
 
 ## Dependencies
 
-* Requires the jscolor script, available from [jscolor.com](jscolor.com).
-* Requires python (not sure what minimum version will work).
+* Requires the parliamentarch and flask Python modules. Install them with `pip install parliamentarch flask`.
+* Python version 3.12 or later is required (due to the parliamentarch module).
+
+## Usage
+
+From within the src directory, run `python -m flask run` to start the server locally.
+Other ways to run the server are possible, see the Flask documentation.
+It is advised to clear the src/static/svgfiles directory regularly.
 
 ## License
 
