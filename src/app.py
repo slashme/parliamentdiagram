@@ -23,17 +23,17 @@ def root():
 @app.route("/parlitest.php")
 @app.route("/archinputform.php")
 def archinputform_redirect():
-    return app.redirect(app.url_for("archinputform"))
+    return app.redirect(app.url_for("archinputform"), 301)
 
 @app.route("/USinputform.html")
 @app.route("/USinputform.php")
 def usinputform_redirect():
-    return app.redirect(app.url_for("usinputform"))
+    return app.redirect(app.url_for("usinputform"), 301)
 
 @app.route("/westminsterinputform.html")
 @app.route("/westminsterinputform.php")
 def westminsterinputform_redirect():
-    return app.redirect(app.url_for("westminsterinputform"))
+    return app.redirect(app.url_for("westminsterinputform"), 301)
 
 
 # main pages
