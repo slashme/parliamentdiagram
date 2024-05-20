@@ -358,7 +358,7 @@ def build_svg(*,
 
     for areaname, possublist in poslist.items():
         # Draw the parties of that area; first create a group for them:
-        svglines.append(f'  <g id="{areaname}bench">\n')
+        svglines.append(f'  <g id="{areaname}bench">')
         counter = 0 # How many spots have we drawn yet for this group?
         for party in parties:
             if party.group == areaname:
