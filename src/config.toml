@@ -1,0 +1,4 @@
+SECRET_KEY = "" # import secrets; print(secrets.token_urlsafe(48))
+OAUTH_MWURI = "https://meta.wikimedia.org/w/index.php"
+CONSUMER_KEY = "" # the 'consumer token' value from the OAuth consumer registration
+CONSUMER_SECRET = "" # the 'secret token' value from the OAuth consumer registration

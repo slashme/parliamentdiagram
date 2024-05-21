@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import os
+import tomllib
 from typing import Any
 
 from flask import Flask, abort, render_template, request
@@ -10,6 +11,9 @@ from parliamentarch.geometry import FillingStrategy
 from westminster import treat_inputlist as westminster_treat_inputlist
 
 app = Flask(__name__)
+
+with open(os.path.join(os.path.dirname(__file__), "config.toml"), "rb") as f:
+    app.config.update(tomllib.load(f))
 
 # redirects
 @app.route("/")
