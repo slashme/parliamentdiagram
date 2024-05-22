@@ -13,12 +13,12 @@ from westminster import treat_inputlist as westminster_treat_inputlist
 app = Flask(__name__)
 
 _oauthconfigfilepath = os.path.join(os.path.dirname(__file__), "oauth_config.toml")
-oauth_enabled = os.path.exists(_oauthconfigfilepath)
-if oauth_enabled:
+if os.path.exists(_oauthconfigfilepath):
     with open(_oauthconfigfilepath, "rb") as _f:
-        app.config.update(tomllib.load(_f))
-    oauth_enabled = True
+        app.config.update(tomllib.load(_f), oauth_enabled=True)
     del _f
+else:
+    app.config.update(oauth_enabled=False)
 del _oauthconfigfilepath
 
 # redirects
