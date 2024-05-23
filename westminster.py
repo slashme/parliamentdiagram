@@ -352,35 +352,35 @@ def build_svg(*,
         '<svg xmlns:svg="http://www.w3.org/2000/svg"',
         '     xmlns="http://www.w3.org/2000/svg" version="1.1"',
        f'     width="{svgwidth:.1f}" height="{svgheight:.1f}">',
-        '<!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->',
-        '<g id="diagram">',
+        '  <!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->',
+        '  <g id="diagram">',
     ]
 
     for areaname, possublist in poslist.items():
         # Draw the parties of that area; first create a group for them:
-        svglines.append(f'  <g id="{areaname}bench">')
+        svglines.append(f'    <g id="{areaname}bench">')
         counter = 0 # How many spots have we drawn yet for this group?
         for party in parties:
             if party.group == areaname:
-                svglines.append(f'    <g style="fill:{party.color}" id="{party.name}">')
+                svglines.append(f'      <g style="fill:{party.color}" id="{party.name}">')
                 for subcounter in range(counter, counter+party.num):
                     svglines.append(
-                        '      <rect x="{0:.4f}" y="{1:.4f}" rx="{2:.2f}" ry="{2:.2f}" width="{3:.2f}" height="{3:.2f}"/>'.format(
+                        '        <rect x="{0:.4f}" y="{1:.4f}" rx="{2:.2f}" ry="{2:.2f}" width="{3:.2f}" height="{3:.2f}"/>'.format(
                             possublist[subcounter][0],
                             possublist[subcounter][1],
                             radius,
                             blockside
                         ))
                 counter = subcounter + 1
-                svglines.append('    </g>')
+                svglines.append('      </g>')
 
                 # If we're leaving gaps between parties, skip the leftover blocks in the row
                 if areaname in ('left', 'right') and not fullwidth_or_cozy:
                     counter += -party.num % wingrows[areaname]
 
-        svglines.append('  </g>')
+        svglines.append('    </g>')
 
-    svglines.append('</g>')
+    svglines.append('  </g>')
     svglines.append('</svg>')
 
     return "\n".join(svglines)
