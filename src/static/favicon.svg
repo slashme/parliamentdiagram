@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:svg="http://www.w3.org/2000/svg"
+     xmlns="http://www.w3.org/2000/svg" version="1.1"
+     viewBox="0 0 350 175">
+    <!-- Created with parliamentarch (https://github.com/Gouvernathor/parliamentarch/) -->
+    <g style="fill:#e20000">
+        <circle cx="31.05" cy="151.67" r="23.33"/>
+        <circle cx="90.67" cy="151.67" r="23.33"/>
+        <circle cx="57.23" cy="89.00" r="23.33"/>
+        <circle cx="108.95" cy="44.98" r="23.33"/>
+        <circle cx="138.24" cy="95.60" r="23.33"/>
+    </g>
+    <g style="fill:#fffb00">
+        <circle cx="175.00" cy="29.17" r="23.33"/>
+        <circle cx="211.76" cy="95.60" r="23.33"/>
+        <circle cx="241.05" cy="44.98" r="23.33"/>
+    </g>
+    <g style="fill:#4865bc">
+        <circle cx="292.77" cy="89.00" r="23.33"/>
+        <circle cx="259.33" cy="151.67" r="23.33"/>
+        <circle cx="318.95" cy="151.67" r="23.33"/>
+    </g>
+</svg>
