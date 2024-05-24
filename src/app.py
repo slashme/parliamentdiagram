@@ -7,6 +7,8 @@ from flask import Flask, render_template, request
 from parliamentarch import SeatData, write_svg_from_attribution
 from parliamentarch.geometry import FillingStrategy
 
+from westminster import get_westminster_filename
+
 app = Flask(__name__)
 
 # redirects
@@ -55,7 +57,6 @@ def westminsterinputform():
 @app.post("/newarch")
 @app.post("/newarch.py")
 def newarch_generation():
-    # TODO: maybe wrap the simple URL in some kind of response wrapper
     nowstrftime = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
 
     data = request.form["data"]
@@ -108,6 +109,8 @@ def newarch_generation():
             # margins: float|tuple[float, float]|tuple[float, float, float, float]
             # write_number_of_seats: bool
             # font_size_factor: float
+
+    # TODO: maybe wrap the simple URL in some kind of response wrapper
     return app.url_for("static", filename=filename)
 
 def already_existing_file(request_hash: str) -> str|None:
@@ -119,4 +122,8 @@ def already_existing_file(request_hash: str) -> str|None:
 @app.post("/westminster")
 @app.post("/westminster.py")
 def westminster_generation():
-    return ("Not yet implemented", 503)
+    data = request.form["data"]
+    inputdata: dict[str, Any] = app.json.loads(data)
+
+    filename = get_westminster_filename(data, **inputdata)
+    return app.url_for("static", filename=filename)

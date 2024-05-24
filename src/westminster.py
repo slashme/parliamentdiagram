@@ -1,11 +1,9 @@
 #!/usr/bin/python3
-import cgi
 import datetime
 import hashlib
 import json
 import math
 import os
-import sys
 import typing
 
 class Party(typing.NamedTuple):
@@ -14,15 +12,15 @@ class Party(typing.NamedTuple):
     group: str
     color: str
 
-def main_print(**inputlist) -> "int|str|None":
-    if inputlist:
+def get_westminster_filename(data: str|None = None, /, **inputlist) -> str:
+    if data is None:
+        if not inputlist:
+            raise TypeError("No input.")
         data = json.dumps(inputlist)
-    else:
-        data = cgi.FieldStorage().getvalue("data", "") # type: str
+    elif not inputlist:
         inputlist = json.loads(data)
-
-    if not inputlist:
-        return "No input."
+        if not inputlist:
+            raise ValueError("No input.")
 
     nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
 
@@ -35,18 +33,17 @@ def main_print(**inputlist) -> "int|str|None":
     # Check whether we have a file made from this exact string in the directory:
     filename = return_file_if_already_exists(requesthash)
     if filename is not None:
-        print(filename)
-        return
+        return filename
 
     # If we get here, we didn't find a matching request, so continue.
     filename = treat_inputlist(nowstrftime, requesthash,
         option_wingrows=inputlist.pop("wingrows", None),
         partylist=inputlist.pop("parties", ()),
         **inputlist)
-    print(filename)
+    return filename
 
 def return_file_if_already_exists(requesthash: str) -> str|None:
-    for file in os.listdir("svgfiles"):
+    for file in os.listdir("static/svgfiles"):
         if requesthash in file:
             return f"svgfiles/{file}"
 
@@ -89,7 +86,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
     )
 
     # Open svg file for writing:
-    with open(svgfilename, 'w') as outfile:
+    with open(os.path.join("static", svgfilename), 'w') as outfile:
         # Write svg:
         print(build_svg(
                 parties=parties,
@@ -382,6 +379,3 @@ def build_svg(*,
     svglines.append('</svg>')
 
     return "\n".join(svglines)
-
-if __name__ == "__main__":
-    sys.exit(main_print())
