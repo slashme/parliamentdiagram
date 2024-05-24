@@ -59,45 +59,44 @@ def westminsterinputform():
 def newarch_generation():
     nowstrftime, request_hash, inputdata = common_handling("archlog")
 
-    cached_filename = already_existing_file(request_hash)
-    if cached_filename is not None:
+    filename = already_existing_file(request_hash)
+    if filename is not None:
         app.logger.info("File already exists")
-        os.utime("static/"+cached_filename)
-        return app.url_for("static", filename=cached_filename)
-
-    parties = inputdata.pop("parties", None)
-    if parties is None:
-        app.logger.error("No list of parties")
-        return ("No list of parties provided", 400)
-
-    attrib: dict[SeatData, int] = {}
-    for d in parties:
-        n = d.pop("nb_seats", 1)
-        data = d.pop("name")
-        attrib[SeatData(data, **d)] = n
-    if inputdata.pop("denser_rows", False):
-        filling_strategy = FillingStrategy.EMPTY_INNER
+        os.utime("static/"+filename)
     else:
-        filling_strategy = FillingStrategy.DEFAULT
-    seat_radius_factor = inputdata.pop("seat_radius_factor", .8)
+        parties = inputdata.pop("parties", None)
+        if parties is None:
+            app.logger.error("No list of parties")
+            abort(400, "No list of parties provided")
 
-    filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
-    write_svg_from_attribution("static/"+filename, # TODO: check that the path is correct
-        attrib,
-        filling_strategy=filling_strategy,
-        seat_radius_factor=seat_radius_factor,
-        **inputdata)
-    # format taken by get_svg_from_attribution:
-        # attrib: dict[SeatData, int]
-        # **kwargs:
-            # min_nrows: int
-            # span_angle: float
-            # seat_radius_factor: float
-            # filling_strategy: FillingStrategy|str
-            # canvas_size: float
-            # margins: float|tuple[float, float]|tuple[float, float, float, float]
-            # write_number_of_seats: bool
-            # font_size_factor: float
+        attrib: dict[SeatData, int] = {}
+        for d in parties:
+            n = d.pop("nb_seats", 1)
+            data = d.pop("name")
+            attrib[SeatData(data, **d)] = n
+        if inputdata.pop("denser_rows", False):
+            filling_strategy = FillingStrategy.EMPTY_INNER
+        else:
+            filling_strategy = FillingStrategy.DEFAULT
+        seat_radius_factor = inputdata.pop("seat_radius_factor", .8)
+
+        filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
+        write_svg_from_attribution("static/"+filename, # TODO: check that the path is correct
+            attrib,
+            filling_strategy=filling_strategy,
+            seat_radius_factor=seat_radius_factor,
+            **inputdata)
+        # format taken by get_svg_from_attribution:
+            # attrib: dict[SeatData, int]
+            # **kwargs:
+                # min_nrows: int
+                # span_angle: float
+                # seat_radius_factor: float
+                # filling_strategy: FillingStrategy|str
+                # canvas_size: float
+                # margins: float|tuple[float, float]|tuple[float, float, float, float]
+                # write_number_of_seats: bool
+                # font_size_factor: float
 
     # TODO: maybe wrap the simple URL in some kind of response wrapper
     return app.url_for("static", filename=filename)
