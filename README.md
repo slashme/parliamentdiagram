@@ -9,7 +9,7 @@ You can use the tool at http://parliamentdiagram.toolforge.org/archinputform
 ## Dependencies
 
 * Requires the parliamentarch and flask Python modules. Install them with `pip install parliamentarch flask`.
-* Python version 3.12 or later is required (due to the parliamentarch module).
+* Python version 3.11 or later is required.
 
 ## Usage
 
