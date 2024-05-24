@@ -167,63 +167,53 @@ function getRandomColor() {
 }
 
 function CallDiagramScript() {
-    let requestJSON = {};  // This is what we send to the python script
-
-    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
-    var legendstring = "";
-    var legendname = "";
-    var legendnum = "";
+    const requestJSON = {};  // This is what we send to the python script
 
     // Retrieve advanced parameters
-    if ($('#advanced-body').is(':visible')) {
-        requestJSON.denser_rows = $('#row-densifier').is(':checked');
-    } else {
-        requestJSON.denser_rows = false;
-    }
+    requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
 
-    var totalseats = 0; //count total seats to check for empty diagram
-    var partylist = new Array();
+    const partylist = new Array();
     $("input").each(function () {
-        if (this.name.match(/^Name/)) {
-            partylist[/[0-9]+$/.exec(this.name)[0]] = { Name: this.value };
-        }
-        if (this.name.match(/^Number/)) {
-            partylist[/[0-9]+$/.exec(this.name)[0]]['Num'] = this.value;
-        }
-        if (this.name.match(/^Color/)) {
-            partylist[/[0-9]+$/.exec(this.name)[0]]['Color'] = this.value;
-        }
-
-        //If we're processing a border width, add value if it's a number, maxing out at 1.
-        //Add 0 if it's not a number or if it's equal to 0.
-        if (this.name.match(/^Border/)) {
-            bwidth = parseFloat(this.value);
+        const thisname = this.name;
+        if (thisname.startsWith("Name")) {
+            partylist[/[0-9]+$/.exec(thisname)[0]] = { Name: this.value };
+        } else if (thisname.startsWith("Number")) {
+            partylist[/[0-9]+$/.exec(thisname)[0]]['Num'] = this.value;
+        } else if (thisname.startsWith("Color")) {
+            partylist[/[0-9]+$/.exec(thisname)[0]]['Color'] = this.value;
+        } else if (thisname.startsWith("Border")) {
+            //If we're processing a border width, add value if it's a number, maxing out at 1.
+            //Add 0 if it's not a number or if it's equal to 0.
+            let bwidth = parseFloat(this.value);
             if (isNaN(bwidth)) { bwidth = 0 }; //!\\
             bwidth = Math.min(Math.max(bwidth, 0), 1);
-            partylist[/[0-9]+$/.exec(this.name)[0]]['Border'] = bwidth;
-        }
-        if (this.name.match(/^BColor/)) {
-            partylist[/[0-9]+$/.exec(this.name)[0]]['BColor'] = this.value;
+            partylist[/[0-9]+$/.exec(thisname)[0]]['Border'] = bwidth;
+        } else if (thisname.startsWith("BColor")) {
+            partylist[/[0-9]+$/.exec(thisname)[0]]['BColor'] = this.value;
         }
     });
-    var arrayLength = partylist.length;
-    requestJSON.parties = []
-    for (var i = 1; i < arrayLength; i++) {
-        if (partylist[i]) {
+
+    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
+    let legendstring = "";
+    let totalseats = 0; //count total seats to check for empty diagram
+    requestJSON.parties = [];
+    for (let party of partylist) {
+        if (party) {
             let partyJSON = {}
-            partyJSON.name = partylist[i]['Name'].replace(',', '');
-            partyJSON.nb_seats = parseInt(partylist[i]['Num']);
-            partyJSON.color = '#' + partylist[i]['Color'];
-            partyJSON.border_size = parseFloat(partylist[i]['Border']);
-            partyJSON.border_color = '#' + partylist[i]['BColor'];
-            requestJSON.parties.push(partyJSON)
+            const num = parseInt(party['Num']);
+            partyJSON.name = party['Name'].replace(',', '');
+            partyJSON.nb_seats = parseInt(num);
+            partyJSON.color = '#' + party['Color'];
+            partyJSON.border_size = parseFloat(party['Border']);
+            partyJSON.border_color = '#' + party['BColor'];
+            requestJSON.parties.push(partyJSON);
 
-            totalseats += partylist[i]['Num'];
+            totalseats += num;
 
-            if (partylist[i]['Num'] == 1) {
-                legendstring += "{{legend|#" + partylist[i]['Color'] + "|" + partylist[i]['Name'] + ": 1 seat}} "
+            if (num == 1) {
+                legendstring += "{{legend|#" + party['Color'] + "|" + party['Name'] + ": 1 seat}} ";
             } else {
-                legendstring += "{{legend|#" + partylist[i]['Color'] + "|" + partylist[i]['Name'] + ": " + partylist[i]['Num'] + " seats}} "
+                legendstring += "{{legend|#" + party['Color'] + "|" + party['Name'] + ": " + num + " seats}} ";
             }
         }
     }
