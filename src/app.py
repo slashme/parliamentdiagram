@@ -3,11 +3,11 @@ import hashlib
 import os
 from typing import Any
 
-from flask import Flask, render_template, request
+from flask import Flask, abort, render_template, request
 from parliamentarch import SeatData, write_svg_from_attribution
 from parliamentarch.geometry import FillingStrategy
 
-from westminster import get_westminster_filename
+from westminster import treat_inputlist as westminster_treat_inputlist
 
 app = Flask(__name__)
 
@@ -57,18 +57,7 @@ def westminsterinputform():
 @app.post("/newarch")
 @app.post("/newarch.py")
 def newarch_generation():
-    nowstrftime = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
-
-    data = request.form["data"]
-    inputdata: dict[str, Any] = app.json.loads(data)
-
-    app.logger.info("%s %s", nowstrftime, inputdata)
-
-    request_hash = hashlib.sha256(data.encode()).hexdigest()
-
-    if not inputdata:
-        app.logger.error("No inputlist")
-        return ("No data provided", 400)
+    nowstrftime, request_hash, inputdata = common_handling("archlog")
 
     cached_filename = already_existing_file(request_hash)
     if cached_filename is not None:
@@ -113,17 +102,50 @@ def newarch_generation():
     # TODO: maybe wrap the simple URL in some kind of response wrapper
     return app.url_for("static", filename=filename)
 
+@app.post("/westminster")
+@app.post("/westminster.py")
+def westminster_generation():
+    nowstrftime, request_hash, inputdata = common_handling("wlog")
+
+    filename = already_existing_file(request_hash)
+    if filename is not None:
+        app.logger.info("File already exists")
+        os.utime("static/"+filename)
+    else:
+        filename = westminster_treat_inputlist(nowstrftime, request_hash,
+            option_wingrows=inputdata.pop("wingrows", None),
+            partylist=inputdata.pop("parties", ()),
+            **inputdata)
+
+    return app.url_for("static", filename=filename)
+
+def common_handling(logfn: str):
+    # data
+    data = request.form["data"]
+
+    # inputdata
+    inputdata: dict[str, Any] = app.json.loads(data)
+
+    # no input: out
+    if not inputdata:
+        app.logger.error("No inputlist")
+        abort(400, "No data provided")
+
+    # nowstrftime
+    nowstrftime = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+    # log the nowstrftime and inputlist on local file logfn *and* on the app logger
+    app.logger.info("%s %s", nowstrftime, inputdata)
+    # with open(logfn, "a") as logfile:
+    #     print(nowstrftime, inputdata, file=logfile)
+
+    # requesthash
+    request_hash = hashlib.sha256(data.encode()).hexdigest()
+
+    return nowstrftime, request_hash, inputdata
+
 def already_existing_file(request_hash: str) -> str|None:
     for file in os.listdir("static/svgfiles"): # TODO: check that the path is correct
         if request_hash in file:
             return f"svgfiles/{file}"
     return None
-
-@app.post("/westminster")
-@app.post("/westminster.py")
-def westminster_generation():
-    data = request.form["data"]
-    inputdata: dict[str, Any] = app.json.loads(data)
-
-    filename = get_westminster_filename(data, **inputdata)
-    return app.url_for("static", filename=filename)

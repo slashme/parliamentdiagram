@@ -1,7 +1,4 @@
 #!/usr/bin/python3
-import datetime
-import hashlib
-import json
 import math
 import os
 import typing
@@ -11,41 +8,6 @@ class Party(typing.NamedTuple):
     num: int
     group: str
     color: str
-
-def get_westminster_filename(data: str|None = None, /, **inputlist) -> str:
-    if data is None:
-        if not inputlist:
-            raise TypeError("No input.")
-        data = json.dumps(inputlist)
-    elif not inputlist:
-        inputlist = json.loads(data)
-        if not inputlist:
-            raise ValueError("No input.")
-
-    nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
-
-    # Append input list to log file:
-    with open('wmlog', 'a') as logfile:
-        print(nowstrftime, inputlist, file=logfile)
-
-    # Create consistent hash of the request string:
-    requesthash = hashlib.sha256(data.encode()).hexdigest()
-    # Check whether we have a file made from this exact string in the directory:
-    filename = return_file_if_already_exists(requesthash)
-    if filename is not None:
-        return filename
-
-    # If we get here, we didn't find a matching request, so continue.
-    filename = treat_inputlist(nowstrftime, requesthash,
-        option_wingrows=inputlist.pop("wingrows", None),
-        partylist=inputlist.pop("parties", ()),
-        **inputlist)
-    return filename
-
-def return_file_if_already_exists(requesthash: str) -> str|None:
-    for file in os.listdir("static/svgfiles"):
-        if requesthash in file:
-            return f"svgfiles/{file}"
 
 def treat_inputlist(nowstrftime, requesthash, *,
         option_wingrows: "int|None" = None,
