@@ -29,12 +29,12 @@ $(document).ready(function () {
     $('#addpartybutton').click(function () {
         var newname = $('#partylist :selected').text();
         if (newname == "Select your country first!") { newname = "" }
-        addParty(newname, "");
+        addParty(newname);
         console.log(newname);
     });
 
     $('#addpartymanual').click(function () {
-        addParty("", "");
+        addParty();
     });
 
     // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
