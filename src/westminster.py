@@ -14,7 +14,7 @@ class Party(typing.NamedTuple):
     group: str
     color: str
 
-def main(**inputlist) -> "int|str|None":
+def main_print(**inputlist) -> "int|str|None":
     if inputlist:
         data = json.dumps(inputlist)
     else:
@@ -33,24 +33,22 @@ def main(**inputlist) -> "int|str|None":
     # Create consistent hash of the request string:
     requesthash = hashlib.sha256(data.encode()).hexdigest()
     # Check whether we have a file made from this exact string in the directory:
-    if print_file_if_already_exists(requesthash):
+    filename = return_file_if_already_exists(requesthash)
+    if filename is not None:
+        print(filename)
         return
 
     # If we get here, we didn't find a matching request, so continue.
-    return treat_inputlist(nowstrftime, requesthash,
+    filename = treat_inputlist(nowstrftime, requesthash,
         option_wingrows=inputlist.pop("wingrows", None),
         partylist=inputlist.pop("parties", ()),
         **inputlist)
+    print(filename)
 
-def print_file_if_already_exists(requesthash: str):
-    """
-    Returns whether the file has been found (and its path printed) or not.
-    """
+def return_file_if_already_exists(requesthash: str) -> str|None:
     for file in os.listdir("svgfiles"):
         if requesthash in file:
-            print(f"svgfiles/{file}")
-            return True
-    return False
+            return f"svgfiles/{file}"
 
 def treat_inputlist(nowstrftime, requesthash, *,
         option_wingrows: "int|None" = None,
@@ -60,7 +58,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
         centercols: int,
         radius: float,
         spacing: float,
-        **kwargs) -> "int|str|None":
+        **kwargs) -> str:
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
@@ -77,7 +75,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
                 sumdelegates[g] += p.num
 
     if sum(sumdelegates.values()) < 1:
-        return "No delegates."
+        raise ValueError("No delegates.")
 
     poslist, wingrows, radius, blocksize, svgwidth, svgheight = seats(
         parties=parties,
@@ -105,7 +103,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
             ), file=outfile)
 
     # Pass the output filename to the calling page.
-    print(svgfilename)
+    return svgfilename
 
 def seats(*,
         parties: dict[Party, int],
@@ -386,4 +384,4 @@ def build_svg(*,
     return "\n".join(svglines)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main_print())
