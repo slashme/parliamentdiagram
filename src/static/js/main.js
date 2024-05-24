@@ -37,48 +37,33 @@ $(document).ready(function () {
         addParty("", "");
     });
 
-
+    // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
+    const wikitextregexp = /{{\s*legend\s*\|\s*([^|]*)\|\s*([^:]*)(?::\s*(\d+))?/g;
     $('#getfile').click(function () {
-        var wikiurl = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=" + $("#inputfile").val() + "&rvprop=content&rvlimit=1&callback=?";
         $.ajax({
             dataType: "json",
-            url: wikiurl,
+            url: "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=" + $("#inputfile").val() + "&rvprop=content&rvlimit=1&callback=?",
         }).done(function (data) {
+            let wikitext;
             $.each(data.query.pages, function (i, item) {
                 wikitext = item.revisions[0]['*'];
             });
-            var res = wikitext.split("{{legend");
-            len = res.length;
-            if (len < 2) { alert("legend template not detected, cannot auto-fill party list.") };
 
-            regex2 = ": ";
-            regex3 = " seats}}";
-            //create array to hold party data
-            partydata = [];
-
-            for (i = 1; i < len; i++) {
-                partydata[i - 1] = [];
-                partydata[i - 1][0] = res[i].slice(2, 8);
-                seatnum = res[i].search(regex2);
-                if (seatnum == -1) { alert("Can't find number of seats, this is probably an old diagram.") };
-                partydata[i - 1][1] = res[i].slice(9, seatnum);
-                //        seatsend = res[i].search(regex3);
-                //        partydata[i-1][2]=res[i].slice(seatnum+2,seatsend);
+            const partiesdata = [];
+            for (let [, color, partyname, nseats] of wikitext.matchAll(wikitextregexp)) {
+                partiesdata.push([partyname, color, nseats]);
             }
+
             // Delete all parties first
-            // Select party list <div>
-            var partylistcontainer = document.getElementById("partylistcontainer");
-            //Find out how many parties we have
-            numparties = 0;
             $("div").each(function () {
-                if (this.id.match(/^party[0-9]+$/)) {
-                    deleteParty(parseInt(/[0-9]+$/.exec(this.id)[0]));
+                const thisid = this.id;
+                if (thisid.match(/^party[0-9]+$/)) {
+                    deleteParty(parseInt(/[0-9]+$/.exec(thisid)[0]));
                 }
             });
 
-            //Generate parties from array:
-            partydata.forEach(function (element) {
-                addParty(element[1], element[0])
+            partiesdata.forEach(function (triplet) {
+                addParty(...triplet);
             });
         });
     });
@@ -99,7 +84,7 @@ $(document).ready(function () {
     });
 });
 
-function addParty(newname = "", newcolor = "") {
+function addParty(newname = "", newcolor = "", newnseats = 0) {
     // Party list <div> where dynamic content will be placed
     var partylistcontainer = document.getElementById("partylistcontainer");
     //New party's number: one more than the largest party number so far:
@@ -121,7 +106,7 @@ function addParty(newname = "", newcolor = "") {
     newpartydiv.appendChild(partytitle);
     //Party name input control
     var input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="text" name="Name' + i + '"   value="' + newname + '">'
+    input.innerHTML = '<input class="right" type="text" name="Name' + i + '" value="' + newname + '">'
     newpartydiv.appendChild(input);
     //Party support name tag
     var partysupport = document.createElement('div');
@@ -130,7 +115,7 @@ function addParty(newname = "", newcolor = "") {
     newpartydiv.appendChild(partysupport);
     //Party support input control
     var input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="number" name="Number' + i + '"   value= "0" >';
+    input.innerHTML = '<input class="right" type="number" name="Number' + i + '" value= "' + newnseats + '" >';
     newpartydiv.appendChild(input);
     //Party color name tag
     var partycolor = document.createElement('div');
@@ -158,7 +143,7 @@ function addParty(newname = "", newcolor = "") {
     newpartydiv.appendChild(partybcolor);
     //Party border color input control
     var input = document.createElement('div');
-    input.innerHTML = '<input class="right jscolor" type="text" name="BColor' + i + '" value= "' + "000000" + '" >'
+    input.innerHTML = '<input class="right jscolor" type="text" name="BColor' + i + '" value= "000000" >'
     newpartydiv.appendChild(input);
     var delbutton = document.createElement('div');
     delbutton.className = 'button deletebutton';
