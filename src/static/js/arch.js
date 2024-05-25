@@ -202,14 +202,14 @@ function CallDiagramScript() {
     requestJSON.parties = [];
     for (let party of partylist) {
         if (party) {
-            let partyJSON = {}
             const num = parseInt(party['Num']);
-            partyJSON.name = party['Name'].replace(',', '');
-            partyJSON.nb_seats = parseInt(num);
-            partyJSON.color = '#' + party['Color'];
-            partyJSON.border_size = parseFloat(party['Border']);
-            partyJSON.border_color = '#' + party['BColor'];
-            requestJSON.parties.push(partyJSON);
+            requestJSON.parties.push({
+                name: party['Name'].replace(',', ''),
+                nb_seats: num,
+                color: '#' + party['Color'],
+                border_size: parseFloat(party['Border']),
+                border_color: '#' + party['BColor']
+            });
 
             totalseats += num;
 
