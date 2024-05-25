@@ -86,72 +86,85 @@ $(document).ready(function () {
 
 function addParty(newname = "", newcolor = "", newnseats = 0) {
     // Party list <div> where dynamic content will be placed
-    var partylistcontainer = document.getElementById("partylistcontainer");
+    const partylistcontainer = document.getElementById("partylistcontainer");
     //New party's number: one more than the largest party number so far:
-    i = 0;
+    let i = 0;
     $("div").each(function () {
         if (this.id.match(/^party[0-9]+$/)) {
             i = Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0]));
         }
     });
     i++;
-    var newpartydiv = document.createElement('div');
+
+    const newpartydiv = document.createElement('div');
     newpartydiv.id = "party" + i;
     partylistcontainer.appendChild(newpartydiv);
-    //Party name label
-    var partytitle = document.createElement('div');
+
+    // Party name label
+    const partytitle = document.createElement('div');
     partytitle.className = 'left';
     if (newname == "") { newname = "Party " + i }
     partytitle.innerHTML = "Party " + i + " Name";
     newpartydiv.appendChild(partytitle);
-    //Party name input control
-    var input = document.createElement('div');
+
+    // Party name input control
+    let input = document.createElement('div');
     input.innerHTML = '<input class="right" type="text" name="Name' + i + '" value="' + newname + '">'
     newpartydiv.appendChild(input);
-    //Party support name tag
-    var partysupport = document.createElement('div');
+
+    // Party support name tag
+    const partysupport = document.createElement('div');
     partysupport.className = 'left';
     partysupport.innerHTML = "Party " + i + " delegates";
     newpartydiv.appendChild(partysupport);
-    //Party support input control
-    var input = document.createElement('div');
+
+    // Party support input control
+    input = document.createElement('div');
     input.innerHTML = '<input class="right" type="number" name="Number' + i + '" value= "' + newnseats + '" >';
     newpartydiv.appendChild(input);
-    //Party color name tag
-    var partycolor = document.createElement('div');
+
+    // Party color name tag
+    const partycolor = document.createElement('div');
     partycolor.className = 'left';
     partycolor.innerHTML = "Party " + i + " color";
     newpartydiv.appendChild(partycolor);
-    //Party color input control
-    var input = document.createElement('div');
+
+    // Party color input control
+    input = document.createElement('div');
     if (newcolor == "") { newcolor = getRandomColor() }
     input.innerHTML = '<input class="right jscolor" type="text" name="Color' + i + '" value= "' + newcolor + '" >'
     newpartydiv.appendChild(input);
-    //Party border width name tag
-    var partycolor = document.createElement('div');
-    partycolor.className = 'left';
-    partycolor.innerHTML = "Party " + i + " border width";
-    newpartydiv.appendChild(partycolor);
-    //Party border width control
-    var input = document.createElement('div');
+
+    // Party border width name tag
+    const partybwidth = document.createElement('div');
+    partybwidth.className = 'left';
+    partybwidth.innerHTML = "Party " + i + " border width";
+    newpartydiv.appendChild(partybwidth);
+
+    // Party border width control
+    input = document.createElement('div');
     input.innerHTML = '<input class="right" type="number" name="Border' + i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
     newpartydiv.appendChild(input);
-    //Party border color name tag
-    var partybcolor = document.createElement('div');
+
+    // Party border color name tag
+    const partybcolor = document.createElement('div');
     partybcolor.className = 'left';
     partybcolor.innerHTML = "Party " + i + " border color";
     newpartydiv.appendChild(partybcolor);
-    //Party border color input control
-    var input = document.createElement('div');
+
+    // Party border color input control
+    input = document.createElement('div');
     input.innerHTML = '<input class="right jscolor" type="text" name="BColor' + i + '" value= "000000" >'
     newpartydiv.appendChild(input);
-    var delbutton = document.createElement('div');
+
+    const delbutton = document.createElement('div');
     delbutton.className = 'button deletebutton';
     delbutton.innerHTML = "Delete party " + i;
     delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
     newpartydiv.appendChild(delbutton);
-    //Add a newline
+    // Add a newline
     newpartydiv.appendChild(document.createElement("br"));
+
     //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
     jscolor.installByClassName("jscolor");
 }
