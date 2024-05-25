@@ -449,7 +449,5 @@ function makeUploadLink(inputname, linkdata, legendtext) {
 }
 
 function deleteParty(i) {
-    var delparty = document.getElementById("party" + i);
-    var partylistcontainer = document.getElementById("partylistcontainer");
-    partylistcontainer.removeChild(delparty);
+    document.getElementById("partylistcontainer").removeChild(document.getElementById("party" + i));
 }
