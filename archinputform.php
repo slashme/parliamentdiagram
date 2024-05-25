@@ -119,10 +119,10 @@
   <div class="block card">
     <div class="card-body">
         <div id="postcontainer">
-          <br>
+          <br/>
         </div>
         <div id="postcontainerbutton">
-          <br>
+          <br/>
         </div>
     </div>
   </div>
