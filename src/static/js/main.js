@@ -225,121 +225,153 @@ function CallDiagramScript() {
             data: { data: JSON.stringify(requestJSON) },
         }).done(function (data, status) {
             data = data.trim();
-            var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-            while (postcontainer.hasChildNodes()) { //Remove old images
+
+            // This will get the first node with id "postcontainer"
+            const postcontainer = document.getElementById("postcontainer");
+            // Remove old images
+            while (postcontainer.hasChildNodes()) {
                 postcontainer.removeChild(postcontainer.lastChild);
             }
-            var postcontainerbutton = document.getElementById("postcontainerbutton"); //This will get the first node with id "postcontainerbutton"
-            while (postcontainerbutton.hasChildNodes()) { //Remove stale upload button, if any
+
+            // This will get the first node with id "postcontainerbutton"
+            const postcontainerbutton = document.getElementById("postcontainerbutton");
+            // Remove stale upload button, if any
+            while (postcontainerbutton.hasChildNodes()) {
                 postcontainerbutton.removeChild(postcontainerbutton.lastChild);
             }
-            //Now add the svg image to the page
-            var img = document.createElement("img");
+
+            // Now add the svg image to the page
+            const img = document.createElement("img");
             img.src = data;
             img.setAttribute("id", "SVGdiagram");
             postcontainer.appendChild(img);
-            //and a linebreak
+            // and a linebreak
             postcontainer.appendChild(document.createElement("br"));
-            //Add a link with the new diagram
-            var abtn = document.createElement('a');
-            var linkText = document.createTextNode("Click to download your SVG diagram.");
+
+            // Add a link with the new diagram
+            const abtn = document.createElement('a');
             abtn.className = "btn btn-success"
-            abtn.appendChild(linkText);
+            abtn.appendChild(document.createTextNode("Click to download your SVG diagram."));
             abtn.title = "SVG diagram";
             abtn.href = data;
             abtn.download = data;
             postcontainer.appendChild(abtn);
-            //and a horizontal line
+            // and a horizontal line
             postcontainer.appendChild(document.createElement("hr"));
-            //Now add the legend template text with the party names, colours and support.
-            var legendtitle = document.createElement('h4');
-            var newtext = document.createTextNode("Legend template for use in Wikipedia:");
+
+            // Now add the legend template text with the party names, colours and support.
+            const legendtitle = document.createElement('h4');
             postcontainer.appendChild(legendtitle);
-            legendtitle.appendChild(newtext);
+            legendtitle.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
             postcontainer.appendChild(document.createElement("br"));
-            newtext = document.createTextNode(legendstring);
-            postcontainer.appendChild(newtext);
+            postcontainer.appendChild(document.createTextNode(legendstring));
             postcontainer.appendChild(document.createElement("hr"));
-            //File upload name label
-            var filenametitle = document.createElement('div');
+
+            // File upload name label
+            const filenametitle = document.createElement('div');
             filenametitle.className = 'left greendiv';
             filenametitle.innerHTML = "Filename to upload:";
             postcontainer.appendChild(filenametitle);
-            //File upload name input control
-            var input = document.createElement('div');
-            inputname = data.replace(/.*\//, '').replace(/.svg\s*$/, '');
-            input.innerHTML = '<input class="right" type="text" name="' + inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
+
+            // File upload name input control
+            let input = document.createElement('div');
+            input.innerHTML = '<input class="right" type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
             postcontainer.appendChild(input);
-            //Year label
-            var yeartitle = document.createElement('div');
+
+            // Year label
+            let yeartitle = document.createElement('div');
             yeartitle.className = 'left greendiv';
             yeartitle.innerHTML = "Election year:";
             postcontainer.appendChild(yeartitle);
-            //Year input control
-            var input = document.createElement('div');
+
+            // Year input control
+            input = document.createElement('div');
             input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="' + (new Date()).getFullYear() + '" value=' + (new Date()).getFullYear() + ' oninput="updateFilename()" >';
             postcontainer.appendChild(input);
-            //Country label
-            var countrytitle = document.createElement('div');
+
+            // Country label
+            const countrytitle = document.createElement('div');
             countrytitle.className = 'left greendiv';
             countrytitle.innerHTML = "Country:";
             postcontainer.appendChild(countrytitle);
-            //Country input control
-            var input = document.createElement('div');
+
+            // Country input control
+            input = document.createElement('div');
             input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
             postcontainer.appendChild(input);
-            //Locality label
-            var localitytitle = document.createElement('div');
+
+            // Locality label
+            const localitytitle = document.createElement('div');
             localitytitle.className = 'left greendiv';
             localitytitle.innerHTML = "Locality:";
             postcontainer.appendChild(localitytitle);
-            //Locality input control
-            var input = document.createElement('div');
+
+            // Locality input control
+            input = document.createElement('div');
             input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
             postcontainer.appendChild(input);
-            //Body label
-            var bodytitle = document.createElement('div');
+
+            // Body label
+            const bodytitle = document.createElement('div');
             bodytitle.className = 'left greendiv';
             bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
             postcontainer.appendChild(bodytitle);
-            //Body input control
-            var input = document.createElement('div');
+
+            // Body input control
+            input = document.createElement('div');
             input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
             postcontainer.appendChild(input);
             postcontainer.appendChild(document.createElement("br"));
-            //Button to add a link to upload the new diagram
-            var uploadwarn = document.createElement('div');
+
+            // Button to add a link to upload the new diagram
+            const uploadwarn = document.createElement('div');
             uploadwarn.className = 'notice';
             uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
             postcontainer.appendChild(uploadwarn);
-            var uploadlinkbutton = document.createElement('a');
+
+            const uploadlinkbutton = document.createElement('a');
             uploadlinkbutton.className = 'btn btn-primary';
             uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + inputname + '", "' + data + '", "' + legendstring + '")');
-            var linkText = document.createTextNode("Generate upload link");
-            uploadlinkbutton.appendChild(linkText);
+            uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
             postcontainer.appendChild(uploadlinkbutton);
-            //and a linebreak
+            // and a linebreak
             postcontainer.appendChild(document.createElement("br"));
-        }).fail(function (xhr, textStatus, errorThrown) { //data doesn't contain "svg", so post an error message instead
-            var postcontainer = document.getElementById("postcontainer"); //This will get the first node with id "postcontainer"
-            while (postcontainer.hasChildNodes()) { //Remove old images
+        }).fail(function (xhr, textStatus, errorThrown) {
+            // data doesn't contain "svg", so post an error message instead
+
+            // This will get the first node with id "postcontainer"
+            const postcontainer = document.getElementById("postcontainer");
+
+            // Remove old images
+            while (postcontainer.hasChildNodes()) {
                 postcontainer.removeChild(postcontainer.lastChild);
             }
-            var newpost = document.createElement("div"); //This is the new postcontainer that will hold our stuff.
+
+            // This is the new postcontainer that will hold our stuff.
+            const newpost = document.createElement("div");
             postcontainer.appendChild(newpost);
-            var errordiv = document.createElement('div');
+
+            const errordiv = document.createElement("div");
             errordiv.id = "error";
-            errordiv.className = 'error';
-            errordiv.innerHTML = "Oops, your diagram wasn't successfully generated! Maybe you have more than 31061 seats. If not, please raise a bug report.";
+            errordiv.className = "error";
+            errordiv.appendChild(document.createTextNode("Oops, your diagram wasn't successfully generated!"));
+            errordiv.appendChild(document.createElement("br"));
+            errordiv.appendChild(document.createTextNode("(" + textStatus + ", " + errorThrown + ")"));
+            errordiv.appendChild(document.createElement("br"));
+            errordiv.appendChild(document.createTextNode("Please raise a "));
+            const bugreportlink = document.createElement("a");
+            bugreportlink.href = "https://github.com/slashme/parliamentdiagram/issues/new";
+            bugreportlink.appendChild(document.createTextNode("bug report"));
+            errordiv.appendChild(bugreportlink);
+            errordiv.appendChild(document.createTextNode("."));
             newpost.appendChild(errordiv);
-            //add a linebreak
+            // add a linebreak
             newpost.appendChild(document.createElement("br"));
-            //Even though we failed, still add the legend template text with the party names, colours and support.
-            var newtext = document.createTextNode("Legend template for use in Wikipedia:");
-            newpost.appendChild(newtext);
+
+            // Even though we failed, still add the legend template text with the party names, colours and support.
+            newpost.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
             newpost.appendChild(document.createElement("br"));
-            newtext = document.createTextNode(legendstring);
-            newpost.appendChild(newtext);
+            newpost.appendChild(document.createTextNode(legendstring));
             newpost.appendChild(document.createElement("br"));
         });
         console.log(requestJSON);
