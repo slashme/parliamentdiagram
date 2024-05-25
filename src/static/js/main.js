@@ -422,9 +422,9 @@ function updateFilename() {
 }
 
 function makeUploadLink(inputname, linkdata, legendtext) {
-    var a = document.createElement('a');
+    const a = document.createElement('a');
     a.className = "btn btn-primary";
-    var fname = "";
+    let fname = "";
     //This is kind of dumb: I'm iterating through all the inputs on the
     //page to find any that match the name that's being called. FIXME
     $("input").each(function () {
@@ -433,13 +433,12 @@ function makeUploadLink(inputname, linkdata, legendtext) {
         }
     });
     fname = fname.replace(/(.svg)*$/i, ".svg");
-    var linkText = document.createTextNode("Click to upload " + fname + " to Wikimedia Commons");
-    a.appendChild(linkText);
+    a.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
     //Now get today's date and format it suitably for use in Wikimedia Commons templates:
-    var today = new Date();
-    var DD = today.getDate();
-    var MM = today.getMonth() + 1;
-    var YYYY = today.getFullYear();
+    let today = new Date();
+    let DD = today.getDate();
+    let MM = today.getMonth() + 1;
+    let YYYY = today.getFullYear();
 
     if (DD < 10) {
         DD = '0' + DD
@@ -453,7 +452,7 @@ function makeUploadLink(inputname, linkdata, legendtext) {
     //Now build the query URL that will be used to upload the image to Commons:
     a.href = document.URL.replace(/\?.*$/, '') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/parliamentinputform.html Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n");
     a.setAttribute('target', '_blank');
-    buttonlocation = document.getElementById("postcontainerbutton");
+    const buttonlocation = document.getElementById("postcontainerbutton");
     buttonlocation.innerHtml = "";
     buttonlocation.append(a);
     //    var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
