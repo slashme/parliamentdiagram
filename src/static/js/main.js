@@ -382,22 +382,28 @@ function CallDiagramScript() {
 }
 
 function updateFilename() {
-    newFilename = "";
-    if (document.getElementById("country").value) { newFilename = document.getElementById("country").value }
+    const filenameElements = [];
+    if (document.getElementById("country").value) {
+        filenameElements.push(document.getElementById("country").value);
+    }
     if (document.getElementById("locality").value) {
-        if (newFilename) { newFilename += "_" }
-        newFilename += document.getElementById("locality").value
+        filenameElements.push(document.getElementById("locality").value);
     }
     if (document.getElementById("body").value) {
-        if (newFilename) { newFilename += "_" }
-        newFilename += document.getElementById("body").value
+        filenameElements.push(document.getElementById("body").value);
     }
     if (document.getElementById("year").value) {
-        if (newFilename) { newFilename += "_" }
-        newFilename += document.getElementById("year").value
+        filenameElements.push(document.getElementById("year").value);
     }
-    if (newFilename == "") { newFilename = "My_Parliament" }
+
+    let newFilename = "";
+    if (filenameElements.length > 0) {
+        newFilename = filenameElements.join("_");
+    } else {
+        newFilename = "My_Parliament";
+    }
     newFilename += ".svg";
+
     document.getElementById("inputFilename").value = newFilename;
 }
 
