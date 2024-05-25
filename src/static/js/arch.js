@@ -278,7 +278,8 @@ function CallDiagramScript() {
 
             // File upload name input control
             let input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
+            const inputname = data.replace(/.*\//, '').replace(/.svg\s*$/, '');
+            input.innerHTML = '<input class="right" type="text" name="' + inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
             postcontainer.appendChild(input);
 
             // Year label
