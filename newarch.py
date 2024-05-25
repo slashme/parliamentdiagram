@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import cgi
-import re
-import math
 import datetime
-import sys
-import os
+import hashlib
 import json
+import math
+import os
+import re
 
 # Initialize useful calculated fields:
 # Total number of seats per number of rows in diagram:
@@ -20,113 +20,79 @@ TOTALS = [
     29001, 29679, 30367, 31061
 ]
 
-LOGFILE = None  # A file to log everything we want
-
-def main():
+def main(**inputlist):
     """
     Doesn't return anything, but in case of success: prints a filename, which
     will hence be sent to the web interface.
     """
-    start_time = datetime.datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S-%f")
-    form = cgi.FieldStorage()
-    data = form.getvalue("data", "")
-    inputlist = json.loads(data)
-    # inputlist = sys.argv[1]
+    start_time = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
+    if inputlist:
+        data = json.dumps(inputlist)
+    else:
+        data = cgi.FieldStorage().getvalue("data", "") # type: str
+        inputlist = json.loads(data)
 
     # Open a log file and append input list to it:
-    global LOGFILE
-    LOGFILE = open('log', 'a')
-    log("{} {}".format(start_time, inputlist))
+    with open('log', 'a') as LOGFILE:
+        print(start_time, inputlist, file=LOGFILE)
 
-    # Create always-positive hash of the request string:
-    request_hash = str(hash(data) % ((sys.maxsize + 1) * 2))
+        # Create consistent hash of the request string:
+        request_hash = hashlib.sha256(data.encode()).hexdigest()
 
-    cached_filename = return_file_if_already_exist(request_hash)
-    if cached_filename:
-        print(cached_filename)
-    elif inputlist:
-        filename = treat_inputlist(inputlist, start_time, request_hash)
-        if filename is None :
-            log('Something went wrong. Maybe the input list was badly '
-                'formatted, or had 0 delegates, or had too many delegates.')
-        else :
-            print(filename)
-    else:
-        log('No inputlist')
-    LOGFILE.close()
+        cached_filename = return_file_if_already_exist(request_hash)
+        if cached_filename:
+            print(cached_filename)
+        elif inputlist:
+            filename = treat_inputlist(start_time, request_hash, **inputlist)
+            if filename is None :
+                print('Something went wrong. Maybe the input list was badly '
+                    'formatted, or had 0 delegates, or had too many delegates.', file=LOGFILE)
+            else:
+                print(filename)
+        else:
+            print('No inputlist', file=LOGFILE)
 
-
-def log(message, newline=True):
+def treat_inputlist(start_time, request_hash, parties=(), denser_rows=False, **kwargs):
     """
-    Add message to LOGFILE.
+    Generate a new SVG file and return its name.
 
-    Parameters
-    ----------
-    message : string
-        Message to append to the LOGFILE
-    newline : bool
-        Should we append a \n at the end of the message
-    """
-    LOGFILE.write("{}{}".format(message, '\n' if newline else ''))
-
-
-def treat_inputlist(input_list, start_time, request_hash):
-    """
-    Generate a new SVG file and return it.
-
-    Parameters
-    ----------
-    input_list : dict
-        The request. A dict with the following format : {
-            'parties': [
-                {
-                    'name': <str>,
-                    'nb_seats': <int>,
-                    'color': <str> (fill color, as hex code),
-                    'border_size': <float>,
-                    'border_color': <str> (as hex code)
-                },
-                ... /* other parties */
-            ],
-            'denser_rows': <bool> (should we compact rows)
-        }
     start_time : str
     request_hash : str
-
-    Return
-    ------
-    string|None
+    parties : Iterable[dict]
+        A list of dicts with the following format :
+            {
+                'name': <str>,
+                'nb_seats': <int>,
+                'color': <str> (fill color, as hex code),
+                'border_size': <float>,
+                'border_color': <str> (as hex code)
+            }
+    denser_rows : bool
+    kwargs : dict
+        The rest of the request (should be empty)
     """
     # Create a filename that will be unique each time.
     # Old files are deleted with a cron script.
     svg_filename = "svgfiles/{}-{}.svg".format(start_time, request_hash)
 
-    party_list = input_list['parties']
-    dense_rows = input_list['denser_rows']
-    sum_delegates = count_delegates(party_list)
+    sum_delegates = count_delegates(parties)
     if sum_delegates > 0:
         nb_rows = get_number_of_rows(sum_delegates)
         # Maximum radius of spot is 0.5/nb_rows; leave a bit of space.
         radius = 0.4 / nb_rows
 
-        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, dense_rows)
-        draw_svg(svg_filename, sum_delegates, party_list, pos_list, radius)
+        pos_list = get_spots_centers(sum_delegates, nb_rows, radius, denser_rows)
+        draw_svg(svg_filename, sum_delegates, parties, pos_list, radius)
         return svg_filename
 
 
 def return_file_if_already_exist(request_hash):
     """
     If the requested file has been generated before, return its path/filename.
+    Otherwise, return False
 
-    Parameters
-    ----------
     request_hash : str
         A unique hash representing a POST request.
-
-    Return
-    ------
-    string|bool
-        Either a path/filename, or False if such a file doesn't exist.
     """
     for file in os.listdir("svgfiles"):
         if file.count(str(request_hash)):
@@ -138,8 +104,6 @@ def count_delegates(party_list):
     """
     Sums all delegates from all parties. Return 0 if something fails.
 
-    Parameters
-    ----------
     party_list : <list>
         Data for each party, a dict with the following format : [
             {
@@ -152,9 +116,6 @@ def count_delegates(party_list):
             ... /* other parties */
         ]
 
-    Return
-    ------
-    int
     """
     sum = 0
     for party in party_list:
@@ -183,17 +144,12 @@ def get_number_of_rows(nb_delegates):
 
 def get_spots_centers(nb_delegates, nb_rows, spot_radius, dense_rows):
     """
-    Parameters
-    ----------
+    Returns the position of each single spot, represented as a [angle, x, y] tuple.
+
     nb_delegates : int
     nb_rows : int
     spot_radius : float
-    dense_rows: bool
-
-    Return
-    ------
-    list<3-list<float>>
-        The position of each single spot, represented as a list [angle, x, y]
+    dense_rows : bool
     """
     if dense_rows:
         discarded_rows, diagram_fullness = optimize_rows(nb_delegates, nb_rows)
@@ -336,8 +292,6 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     """
     Draw the actual <circle>s in the SVG
 
-    Parameters
-    ----------
     svg_filename : str
     nb_delegates : int
     party_list : list<dict>
@@ -352,12 +306,11 @@ def draw_svg(svg_filename, nb_delegates, party_list, positions_list, radius):
     radius : float
         Radius of a single spot
     """
-    out_file = open(svg_filename, 'w')
-    write_svg_header(out_file)
-    write_svg_number_of_seats(out_file, nb_delegates)
-    write_svg_seats(out_file, party_list, positions_list, radius)
-    write_svg_footer(out_file)
-    out_file.close()
+    with open(svg_filename, 'w') as out_file:
+        write_svg_header(out_file)
+        write_svg_number_of_seats(out_file, nb_delegates)
+        write_svg_seats(out_file, party_list, positions_list, radius)
+        write_svg_footer(out_file)
 
 
 def write_svg_header(out_file):
@@ -368,7 +321,7 @@ def write_svg_header(out_file):
         '     xmlns="http://www.w3.org/2000/svg" version="1.1"\n'
     # Make 350 px wide, 175 px high diagram with a 5 px blank border
         '     width="360" height="185">\n'
-        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/parliamentinputform.html) -->\n'
+        '    <!-- Created with the Wikimedia parliament diagram creator (http://parliamentdiagram.toolforge.org/archinputform.php) -->\n'
         '    <g>\n')
 
 
@@ -376,7 +329,9 @@ def write_svg_number_of_seats(out_file, nb_seats):
     # Print the number of seats in the middle at the bottom.
     out_file.write(
         '        <text x="180" y="175" \n'
-        '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">{}</text>\n'
+        '              style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;font-family:sans-serif">\n'
+        '            {}\n'
+        '        </text>\n'
         .format(nb_seats))
 
 
@@ -385,8 +340,6 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
     Write the main part of the SVG, each party will have its own <g>, and each
     delegate will be a <circle> inside this <g>.
 
-    Parameters
-    ----------
     out_file : file
     party_list : list<dict>
     positions_list : list<3-list<float>>
@@ -412,7 +365,7 @@ def write_svg_seats(out_file, party_list, positions_list, radius):
                 party_border_color,
                 block_id))
         out_file.write(  # Party name in a tooltip
-            '            <title>{}</title>'.format(party_name.encode('utf-8')))
+            '            <title>{}</title>\n'.format(party_name.encode('utf-8')))
 
         for j in range(drawn_spots, drawn_spots + party_nb_seats):
             x = 5.0 + 100.0 * positions_list[j][1]
