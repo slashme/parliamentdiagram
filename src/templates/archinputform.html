@@ -3,6 +3,11 @@
 
 {% block title %}Arch-style parliament diagram generator{% endblock %}
 
+{% block otherimports %}
+<script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/arch.js')}}"></script>
+{% endblock %}
+
 {% block content %}
         <div class="block card">
           <div class="card-body">

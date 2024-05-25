@@ -2,8 +2,12 @@
 
 {% block title %}Westminster-style parliament diagram generator{% endblock %}
 
+{% block otherimports %}
+<script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/westminster.js')}}"></script>
+{% endblock %}
+
 {% block content %}
-        <script type="text/javascript" src="{{url_for('static', filename='js/westminster.js')}}"></script>
         <div class=block>
           <div class="notice">This tool is in Beta testing. Please help to test it, but if you use it to generate diagrams for Wikipedia, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.</div><br/>
           This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.<br/>
