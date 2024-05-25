@@ -435,6 +435,7 @@ function makeUploadLink(inputname, linkdata, legendtext) {
     fname = fname.replace(/(.svg)*$/i, ".svg");
     a.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
     //Now get today's date and format it suitably for use in Wikimedia Commons templates:
+    // const today = (new Date()).split("T")[0];
     let today = new Date();
     let DD = today.getDate();
     let MM = today.getMonth() + 1;
