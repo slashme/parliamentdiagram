@@ -169,11 +169,12 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     jscolor.installByClassName("jscolor");
 }
 
-//Generate random color, based on http://stackoverflow.com/questions/1484506
+// Generate random color, based on http://stackoverflow.com/questions/1484506
+// TODO: make this function imported by the other scripts instead of redefined
 function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = ''; // In my case, I don't want the leading #
-    for (var i = 0; i < 6; i++) {
+    const letters = '0123456789ABCDEF'.split('');
+    let color = ''; // In my case, I don't want the leading #
+    for (let i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
