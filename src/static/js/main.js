@@ -397,17 +397,18 @@ function CallDiagramScript() {
 
 function updateFilename() {
     const filenameElements = [];
-    if (document.getElementById("country").value) {
-        filenameElements.push(document.getElementById("country").value);
+    let country, locality, body, year;
+    if (country = document.getElementById("country").value) {
+        filenameElements.push(country);
     }
-    if (document.getElementById("locality").value) {
-        filenameElements.push(document.getElementById("locality").value);
+    if (locality = document.getElementById("locality").value) {
+        filenameElements.push(locality);
     }
-    if (document.getElementById("body").value) {
-        filenameElements.push(document.getElementById("body").value);
+    if (body = document.getElementById("body").value) {
+        filenameElements.push(body);
     }
-    if (document.getElementById("year").value) {
-        filenameElements.push(document.getElementById("year").value);
+    if (year = document.getElementById("year").value) {
+        filenameElements.push(year);
     }
 
     let newFilename = "";
