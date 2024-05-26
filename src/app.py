@@ -214,9 +214,11 @@ def oauth_callback():
     return app.redirect(app.url_for("root"))
 
 @app.route("/logout")
+@app.post("/logout")
 def logout():
-    # nothing links there, only for testing purposes
     session.clear()
+    if request.method == "POST":
+        return "Success"
     return app.redirect(app.url_for("root"))
 
 @app.post("/commons_upload")
@@ -286,10 +288,18 @@ def commons_upload():
 
     # TODO: test uploadrequest_data for warnings and errors
 
+    if uploadrequest_data.get("upload", {}).get("result", None) != "Success":
+        pass
+    # result = uploadrequest_data["upload"]["result"]
+    # if result == "Warning":
+    #     session.setdefault("override_tickets", set()).add((filetosend, commons_file_name))
+
     # return whether the upload was successful or not,
     # and probably send a flash feedback to the user
-    # (make the upload button disabled during the process)
 
     # read and learn from response.php
+
+    # The JS possibly makes the decision of what do do,
+    # but we make the decision of whether to authorize an override or not
 
     return uploadrequest_data
