@@ -293,8 +293,7 @@ function CallDiagramScript() {
 
             // File upload name input control
             let input = document.createElement('div');
-            const inputname = data.replace(/.*\//, '').replace(/.svg\s*$/, '');
-            input.innerHTML = '<input class="right" type="text" name="' + inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
+            input.innerHTML = '<input class="right" type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
             postcontainer.appendChild(input);
 
             // Year label
@@ -350,7 +349,7 @@ function CallDiagramScript() {
 
             const uploadlinkbutton = document.createElement('a');
             uploadlinkbutton.className = 'btn btn-primary';
-            uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + inputname + '", "' + data + '", "' + legendstring + '")');
+            uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
             uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
             postcontainer.appendChild(uploadlinkbutton);
             // and a linebreak
@@ -427,43 +426,32 @@ function updateFilename() {
     document.getElementById("inputFilename").value = newFilename;
 }
 
-function makeUploadLink(inputname, linkdata, legendtext) {
-    const a = document.createElement('a');
-    a.className = "btn btn-primary";
-    let fname = "";
-    //This is kind of dumb: I'm iterating through all the inputs on the
-    //page to find any that match the name that's being called. FIXME
-    $("input").each(function () {
-        if (this.name == inputname) {
-            fname = this.value
-        }
-    });
-    fname = fname.replace(/(.svg)*$/i, ".svg");
-    a.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
-    //Now get today's date and format it suitably for use in Wikimedia Commons templates:
-    // const today = (new Date()).split("T")[0];
-    let today = new Date();
-    let DD = today.getDate();
-    let MM = today.getMonth() + 1;
-    let YYYY = today.getFullYear();
+function makeUploadLink(linkdata, legendtext) {
+    const fname = document.getElementById("inputFilename").value.replace(/(.svg)*$/i, ".svg");
 
-    if (DD < 10) {
-        DD = '0' + DD
-    }
+    const uploadlink = document.createElement('a');
+    uploadlink.className = 'btn btn-primary';
+    uploadlink.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '")');
+    uploadlink.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
 
-    if (MM < 10) {
-        MM = '0' + MM
-    }
-
-    today = YYYY + '-' + MM + '-' + DD;
-    //Now build the query URL that will be used to upload the image to Commons:
-    a.href = document.URL.replace(/\?.*$/, '') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/parliamentinputform.html Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n");
-    a.setAttribute('target', '_blank');
     const buttonlocation = document.getElementById("postcontainerbutton");
-    buttonlocation.innerHtml = "";
-    buttonlocation.append(a);
-    //    var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
-    //    var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
-    //    diagramparent.insertBefore(a, SVGdiagram.nextSibling); //Insert our new node after the diagram
-    //    diagramparent.insertBefore(document.createElement("br"), SVGdiagram.nextSibling); //Insert a linebreak after the diagram
+    buttonlocation.innerHTML = "";
+    buttonlocation.append(uploadlink);
+}
+
+function postToUpload(fname, linkdata, legendtext) {
+    // TODO: deactivate the button during processing
+    const today = (new Date()).toISOString().split("T")[0];
+    $.ajax({
+        type: "POST",
+        url: "commons_upload",
+        data: {
+            uri: linkdata,
+            filename: fname,
+            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
+            ignore: false,
+        },
+    })
+    // TODO: have some feedback when the request is done
+    // remove the upload button if successful, replace its text if it's a warning override
 }

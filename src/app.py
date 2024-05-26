@@ -3,11 +3,14 @@ import hashlib
 import os
 import tomllib
 from typing import Any
+from urllib.parse import unquote_plus
 
 from flask import Flask, abort, render_template, request, session
 import mwoauth
 from parliamentarch import SeatData, write_svg_from_attribution
 from parliamentarch.geometry import FillingStrategy
+from requests import get as requests_get, post as requests_post
+from requests_oauthlib import OAuth1
 
 from westminster import treat_inputlist as westminster_treat_inputlist
 
@@ -180,7 +183,7 @@ def login():
     session["request_token"] = request_token._asdict()
     return app.redirect(redirect)
 
-@app.route("/oauth-callback")
+@app.route("/oauth_callback")
 def oauth_callback():
     if not app.config["oauth_enabled"]:
         abort(501, "OAuth is not enabled on this server")
@@ -215,3 +218,78 @@ def logout():
     # nothing links there, only for testing purposes
     session.clear()
     return app.redirect(app.url_for("root"))
+
+@app.post("/commons_upload")
+def commons_upload():
+    # parameters that should be included in the request:
+        # uri / filetosend
+            # prolly make that start with "static/" so that python can open the file
+            # or full url enabled with _external=True, if Commons allows copy uploads (but it seems not)
+        # filename / new_file_name / commons_file_name
+            # the one usually starting with a capital, ending with .svg, handled by the JS up til then
+            # the one that will identify the file on Commons
+        # pagecontent / desc
+            # the description of the file, filled by the JS
+        # comment
+            # "Direct upload from the ParliamentDiagram tool" - a constant
+            # the former one was slightly different, but this one is better
+        # ignore / ignorewarnings
+            # format to be decided, probably a boolean but to be authorized by a session marker
+
+    params = request.form
+    try:
+        filetosend = params["uri"].lstrip("/\\")
+        commons_file_name = params["filename"]
+        desc = unquote_plus(params["pagecontent"])
+    except KeyError as e:
+        app.logger.error("Missing parameter %s", e)
+        abort(400, f"Missing parameter {e}")
+    comment = "Direct upload from the ParliamentDiagram tool"
+    ignorewarnings = params.get("ignore", False)
+
+    # TODO: check in session for permission to use ignorewarnings
+    ignorewarnings = False
+
+    # TODO: security: test that the file is in the static/svgfiles directory (security)
+
+    url = "https://commons.wikimedia.org/w/api.php"
+
+    auth = OAuth1(
+        app.config["CONSUMER_KEY"],
+        client_secret=app.config["CONSUMER_SECRET"],
+        resource_owner_key=session["access_token"]["key"],
+        resource_owner_secret=session["access_token"]["secret"],
+    )
+
+    tokenrequest_data = requests_get(url=url, auth=auth, params=dict(
+        action="query",
+        meta="tokens",
+        format="json",
+    )).json()
+
+    crsf_token = tokenrequest_data["query"]["tokens"]["csrftoken"]
+
+    with open(filetosend, "rb") as f:
+        uploadrequest_data = requests_post(url=url, auth=auth,
+            files=dict(file=(os.path.basename(filetosend), f, "multipart/form-data")),
+            data=dict(
+                action="upload",
+                format="json",
+
+                filename=commons_file_name,
+                comment=comment,
+                # tags=?,
+                text=desc,
+                ignorewarnings=ignorewarnings, # to be managed
+                token=crsf_token,
+            )).json()
+
+    # TODO: test uploadrequest_data for warnings and errors
+
+    # return whether the upload was successful or not,
+    # and probably send a flash feedback to the user
+    # (make the upload button disabled during the process)
+
+    # read and learn from response.php
+
+    return uploadrequest_data
