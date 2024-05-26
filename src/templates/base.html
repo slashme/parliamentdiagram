@@ -21,10 +21,10 @@
       {% if config["oauth_enabled"] %}
       <div class="container" style="text-align: end;">
         OAuth:
-        {% if "profile" in session %}
-        Authorized as {{ session["profile"] }}
+        {% if "username" in session %}
+        Authorized as {{ session["username"] }}
         {% else %}
-        <a href="google.com" title="Authorize the application to post diagrams on Wikimedia Commons from your account">Connect</a>
+        <a href="{{url_for('login')}}" title="Authorize the application to post diagrams on Wikimedia Commons from your account">Connect</a>
         {% endif %}
       </div>
       {% endif %}

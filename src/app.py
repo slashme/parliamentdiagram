@@ -4,7 +4,8 @@ import os
 import tomllib
 from typing import Any
 
-from flask import Flask, abort, render_template, request
+from flask import Flask, abort, render_template, request, session
+import mwoauth
 from parliamentarch import SeatData, write_svg_from_attribution
 from parliamentarch.geometry import FillingStrategy
 
@@ -158,3 +159,59 @@ def already_existing_file(request_hash: str) -> str|None:
         if request_hash in file:
             return f"svgfiles/{file}"
     return None
+
+
+# oauth
+@app.route("/login")
+def login():
+    if not app.config["oauth_enabled"]:
+        abort(501, "OAuth is not enabled on this server")
+
+    # if already logged in, redirect away
+
+    # this is copy-adapted from the Toolforge Wiki OAuth tutorial
+    consumer_token = mwoauth.ConsumerToken(app.config["CONSUMER_KEY"], app.config["CONSUMER_SECRET"])
+    try:
+        redirect, request_token = mwoauth.initiate(app.config["OAUTH_MWURI"], consumer_token)
+    except Exception:
+        app.logger.exception("mwoauth.initiate failed")
+        abort(400, "OAuth initiation failed")
+
+    session["request_token"] = request_token._asdict()
+    return app.redirect(redirect)
+
+@app.route("/oauth-callback")
+def oauth_callback():
+    if not app.config["oauth_enabled"]:
+        abort(501, "OAuth is not enabled on this server")
+
+    # this is copy-adapted from the Toolforge Wiki OAuth tutorial
+    if "request_token" not in session:
+        abort(400, "OAuth callback failed. Are cookies disabled?")
+
+    consumer_token = mwoauth.ConsumerToken(app.config["CONSUMER_KEY"], app.config["CONSUMER_SECRET"])
+
+    try:
+        access_token = mwoauth.complete(
+            app.config["OAUTH_MWURI"],
+            consumer_token,
+            mwoauth.RequestToken(**session["request_token"]),
+            request.query_string)
+
+        identity = mwoauth.identify(app.config["OAUTH_MWURI"], consumer_token, access_token)
+    except Exception:
+        app.logger.exception("OAuth authentication failed")
+        abort(400, "OAuth authentication failed")
+
+    session["access_token"] = access_token._asdict()
+    session["username"] = identity["username"]
+
+    # rethink that redirect
+    # probably save an after_oauth_callback route in the session (and check it too)
+    return app.redirect(app.url_for("root"))
+
+@app.route("/logout")
+def logout():
+    # nothing links there, only for testing purposes
+    session.clear()
+    return app.redirect(app.url_for("root"))
