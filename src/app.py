@@ -170,9 +170,8 @@ def login():
     if not app.config["oauth_enabled"]:
         abort(501, "OAuth is not enabled on this server")
 
-    # if already logged in, redirect away
+    # TODO: if already logged in, redirect away
 
-    # this is copy-adapted from the Toolforge Wiki OAuth tutorial
     consumer_token = mwoauth.ConsumerToken(app.config["CONSUMER_KEY"], app.config["CONSUMER_SECRET"])
     try:
         redirect, request_token = mwoauth.initiate(app.config["OAUTH_MWURI"], consumer_token)
@@ -188,7 +187,6 @@ def oauth_callback():
     if not app.config["oauth_enabled"]:
         abort(501, "OAuth is not enabled on this server")
 
-    # this is copy-adapted from the Toolforge Wiki OAuth tutorial
     if "request_token" not in session:
         abort(400, "OAuth callback failed. Are cookies disabled?")
 
@@ -247,12 +245,22 @@ def commons_upload():
         app.logger.error("Missing parameter %s", e)
         abort(400, f"Missing parameter {e}")
     comment = "Direct upload from the ParliamentDiagram tool"
-    ignorewarnings = params.get("ignore", False)
+    ignorewarnings = params.get("ignorewarnings", False)
 
-    # TODO: check in session for permission to use ignorewarnings
-    ignorewarnings = False
+    override_tickets = session.setdefault("override_tickets", {})
+    # using a dict because sets aren't serializable in JSON
 
-    # TODO: security: test that the file is in the static/svgfiles directory (security)
+    if ignorewarnings and ((filetosend, commons_file_name) not in override_tickets):
+        app.logger.error("Unauthorized use of ignorewarnings")
+        abort(403, "Unauthorized use of ignorewarnings")
+
+    absfiletosend = os.path.abspath(filetosend)
+    if os.path.dirname(absfiletosend) != os.path.abspath("static/svgfiles"):
+        app.logger.error("File not in the correct directory")
+        abort(403, "File not at the authorized location")
+    if not os.path.exists(absfiletosend):
+        app.logger.error("File not found")
+        abort(400, "File not found")
 
     url = "https://commons.wikimedia.org/w/api.php"
 
@@ -286,18 +294,11 @@ def commons_upload():
                 token=crsf_token,
             )).json()
 
-    # TODO: test uploadrequest_data for warnings and errors
+    override_tickets.pop((filetosend, commons_file_name), None)
 
-    if uploadrequest_data.get("upload", {}).get("result", None) != "Success":
-        pass
-    # result = uploadrequest_data["upload"]["result"]
-    # if result == "Warning":
-    #     session.setdefault("override_tickets", set()).add((filetosend, commons_file_name))
-
-    # return whether the upload was successful or not,
-    # and probably send a flash feedback to the user
-
-    # read and learn from response.php
+    if uploadrequest_data.get("upload", {}).get("result", None) == "Warning":
+        if all((k == "duplicate") or k.startswith("exists") for k in uploadrequest_data["upload"]["warnings"]):
+            override_tickets[(filetosend, commons_file_name)] = None
 
     # The JS possibly makes the decision of what do do,
     # but we make the decision of whether to authorize an override or not

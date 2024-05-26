@@ -453,7 +453,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
             uri: linkdata,
             filename: fname,
             pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
-            ignore: ignore,
+            ignorewarnings: ignore,
         },
     }).done(function (data) {
         let force_removebutton = false;
@@ -472,8 +472,6 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
             successdiv.append(".");
 
             force_removebutton = true;
-        } else if (false) {
-            // denied by the backend - possibly an unauthorized ignore
         } else if (data.error) {
             // WM error case
             // alert(`Error (code "${data.error.code}"): " + ${data.error.info}`);
@@ -583,5 +581,12 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
         } else {
             uploadbutton.remove();
         }
+    }).fail(function (xhr, textStatus, errorThrown) {
+        // Error, including those thrown by the server
+        const errordiv = document.createElement('div');
+        errordiv.className = 'error';
+        uploadbutton.parentElement.appendChild(errordiv);
+        errordiv.innerHTML = xhr.responseText || ("Error: " + textStatus + ", " + errorThrown);
+        uploadbutton.remove();
     });
 }
