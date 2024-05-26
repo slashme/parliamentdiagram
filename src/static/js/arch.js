@@ -429,18 +429,22 @@ function updateFilename() {
 function makeUploadLink(linkdata, legendtext) {
     const fname = document.getElementById("inputFilename").value.replace(/(.svg)*$/i, ".svg");
 
-    const uploadlink = document.createElement('a');
-    uploadlink.className = 'btn btn-primary';
-    uploadlink.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '")');
-    uploadlink.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
+    const uploadbutton = document.createElement('button');
+    uploadbutton.id = "uploadbutton";
+    uploadbutton.className = 'btn btn-primary';
+    uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '")');
+    uploadbutton.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
 
     const buttonlocation = document.getElementById("postcontainerbutton");
     buttonlocation.innerHTML = "";
-    buttonlocation.append(uploadlink);
+    buttonlocation.append(uploadbutton);
 }
 
 function postToUpload(fname, linkdata, legendtext) {
-    // TODO: deactivate the button during processing
+    // deactivate the button during processing
+    const uploadbutton = document.getElementById("uploadbutton");
+    uploadbutton.disabled = true;
+
     const today = (new Date()).toISOString().split("T")[0];
     $.ajax({
         type: "POST",
@@ -451,7 +455,9 @@ function postToUpload(fname, linkdata, legendtext) {
             pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
             ignore: false,
         },
-    })
+    }).done(function (data) {
+        uploadbutton.remove();
+    });
     // TODO: have some feedback when the request is done
-    // remove the upload button if successful, replace its text if it's a warning override
+    // remove the upload button if successful, replace its text for a warning override
 }
