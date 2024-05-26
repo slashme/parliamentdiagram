@@ -10,7 +10,7 @@
     <script src='https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.2.1/jquery.min.js' type='text/javascript'></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/jscolor.js')}}"></script>
     <script src="{{url_for('static', filename='js/select2.min.js')}}"></script>
-    <script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
+    {% block otherimports %}{% endblock %}
   </head>
 
   <body>

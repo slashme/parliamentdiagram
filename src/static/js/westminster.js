@@ -1,16 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     jscolor.installByClassName("jscolor");
 });
-
-//Generate random color, based on http://stackoverflow.com/questions/1484506
-function getRandomColor() {
-    const letters = '0123456789ABCDEF'.split('');
-    let color = ''; // In my case, I don't want the leading #
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 
 function CallDiagramScript() {
     // Create request payload
@@ -30,7 +20,7 @@ function CallDiagramScript() {
     let bigparty = 0;
     let bigpartysize = 0;
 
-    $("input").each(function() {
+    $("input").each(function () {
         if (this.name.startsWith("radius")) {
             spotradius = Math.max(0, parseFloat(this.value));
         } else if (this.name.startsWith("spacing")) {
@@ -46,7 +36,7 @@ function CallDiagramScript() {
         } else if (this.name.startsWith("autospeaker")) {
             autospeaker = Math.max(0, parseInt(this.value));
         } else if (this.name.startsWith("Name")) {
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])] = {Name: this.value};
+            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])] = { Name: this.value };
         } else if (this.name.startsWith("Number")) {
             // Don't allow parties without delegates: if we have a number field, make the value at least 1.
             // It's a bit of a hack, but shouldn't be much of a limitation.
@@ -56,7 +46,7 @@ function CallDiagramScript() {
             partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Color'] = this.value;
         }
     });
-    $("select").each(function() {
+    $("select").each(function () {
         if (this.name.startsWith("Group")) {
             partylist[/[0-9]+$/.exec(this.name)[0]]['Group'] = this.value;
         }
@@ -117,8 +107,8 @@ function CallDiagramScript() {
         $.ajax({
             type: "POST",
             url: "westminster.py",
-            data: {data: requeststring},
-        }).done(function(data, status) {
+            data: { data: requeststring },
+        }).done(function (data, status) {
             data = data.trim();
 
             // This will get the first node with id "postcontainer"
@@ -160,13 +150,13 @@ function CallDiagramScript() {
     }
 }
 
-function addParty(){
+function addParty() {
     // Party list <div> where dynamic content will be placed
     const partylistcontainer = document.getElementById("partylistcontainer");
 
     //New party's number: one more than the largest party number so far:
     let i = 0;
-    $("div").each(function() {
+    $("div").each(function () {
         if (this.id.match(/^party[0-9]+$/)) {
             i = Math.max(i, parseInt(/[0-9]+$/.exec(this.id)[0]));
         }
@@ -237,10 +227,4 @@ function addParty(){
     // Add a newline
     newpartydiv.appendChild(document.createElement("br"));
     jscolor.installByClassName("jscolor");
-}
-
-function deleteParty(i){
-    const delparty = document.getElementById("party" + i);
-    const partylistcontainer = document.getElementById("partylistcontainer");
-    partylistcontainer.removeChild(delparty);
 }
