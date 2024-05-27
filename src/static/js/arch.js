@@ -467,7 +467,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
             successdiv.className = 'success';
             successdiv.append("Image successfully uploaded on ");
             const a = successdiv.appendChild(document.createElement("a"));
-            a.href = fname.replace(" ", "_");
+            a.href = "commons.wikimedia.org/wiki/File:" + fname.replace(" ", "_");
             a.append("Commons");
             successdiv.append(".");
             uploadbutton.parentElement.appendChild(successdiv);
