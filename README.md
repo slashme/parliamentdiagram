@@ -20,7 +20,7 @@ It is advised to clear the src/static/svgfiles directory regularly.
 ## OAuth
 
 To enable the feature of uploading the created diagrams to Wikimedia Commons, you need to
-[create an OAuth 1.a consumer](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose/oauth1a)
+[create an OAuth 1.0a consumer](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose/oauth1a)
 with the right of editing existing pages, create, edit and move pages, upload new files,
 and upload, replace and rename files. The credentials of that consumer then go in the
 "oauth_config.toml" file. The callback URL should be "http://<domain>/oauth_callback".
