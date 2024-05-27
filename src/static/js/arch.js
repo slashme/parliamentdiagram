@@ -472,6 +472,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
             } catch (e) {
                 a.href = "https://commons.wikimedia.org/wiki/File:" + fname.replace(" ", "_");
             }
+            a.setAttribute("target", "_blank");
             a.append("Commons");
             successdiv.append(".");
             uploadbutton.parentElement.appendChild(successdiv);
@@ -524,6 +525,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
                 } else if (w.startsWith("exists")) {
                     let a = document.createElement("a");
                     a.href = "https://commons.wikimedia.org/wiki/File:" + fname.replace(" ", "_");
+                    a.setAttribute("target", "_blank");
                     a.append(fname);
 
                     if (w === "exists-normalized") {
