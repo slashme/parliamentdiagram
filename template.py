@@ -11,11 +11,35 @@ import xml.etree.ElementTree as ET
 SeatData = dict[str, str]
 # Warning : all values must be str, no numbers allowed
 
-def main(**kwargs) -> int|str|None:
-    # switch between the two
-    pass
+def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = False) -> int|str|None:
+    """
+    Considers the template file and the output file to be a file descriptor or a file path.
+    """
+    if isinstance(template_file, str):
+        with open(template_file, "r") as file:
+            return main(file, output_file, use_ET=use_ET)
+    if isinstance(output_file, str):
+        with open(output_file, "w") as file:
+            return main(template_file, file, use_ET=use_ET)
 
-def scan_ET_template(template) -> list[int]:
+    if use_ET:
+        template_ET = ET.fromstring(template_file.read())
+    else:
+        template_str = template_file.read()
+
+    if filling is None:
+        if use_ET:
+            print(scan_ET_template(template_ET), file=output_file)
+        else:
+            print(scan_str_template(template_str), file=output_file)
+    else:
+        if use_ET:
+            fill_ET_template(template_ET, filling)
+            print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
+        else:
+            output_file.write(fill_str_template(template_str, filling))
+
+def scan_ET_template(template: ET.Element) -> list[int]:
     # part 1:
     # identify the seats
     # return the number of seats per area to the form generator
@@ -23,7 +47,7 @@ def scan_ET_template(template) -> list[int]:
     _sorted_areas, l1_elements_by_area = extract_ET_template(template, check_unicity=True)
     return list(map(len, l1_elements_by_area))
 
-def scan_str_template(template) -> list[int]:
+def scan_str_template(template: str) -> list[int]:
     # part 1:
     # identify the seats
     # return the number of seats per area to the form generator
@@ -31,7 +55,7 @@ def scan_str_template(template) -> list[int]:
     _sorted_areas, l1_elements_by_area = extract_str_template(template, check_unicity=True)
     return list(map(len, l1_elements_by_area))
 
-def extract_ET_template(template, *, check_unicity=False):
+def extract_ET_template(template: ET.Element, *, check_unicity=False):
     elements_by_area = defaultdict(dict[int, ET.Element])
     for node in template.findall(".*"): # check that it takes the subelements
         if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:&(\d+))?&(\d+)', id)) is not None:
@@ -45,7 +69,7 @@ def extract_ET_template(template, *, check_unicity=False):
 
     return sorted_areas, l1_elements_by_area
 
-def extract_str_template(template, *, check_unicity=False):
+def extract_str_template(template: str, *, check_unicity=False):
     elements_by_area = defaultdict(set[int])
     for ma in re.finditer(r'id="(?:&(\d+))?&(\d+)"', template):
         area = elements_by_area[int(ma.group(1) or "0")]
@@ -59,7 +83,7 @@ def extract_str_template(template, *, check_unicity=False):
     return sorted_areas, l1_elements_by_area
 
 
-def fill_ET_template(template: ET.ElementTree, filling: list[dict[SeatData, int]]) -> None:
+def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     # The operation is done in-place and mutates the ElementTree
     # part 2 :
     # take a template (contents)
@@ -128,4 +152,4 @@ def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     return template
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(*sys.argv[1:]))
