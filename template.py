@@ -114,6 +114,43 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
                 if v:
                     node.set(k, v)
 
+def fill_ET_template2(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+    # do it more cleanly, take advantage of the ET
+    # make a <style> node inside the svg node
+    # inside, define .partyn{fill:#c01085;stroke:#000000;} classes
+    # one per SeatData
+    # then, for each seat, add the class to the seat
+        # if the node has a class, append the new one separated by a space
+
+    sorted_areas, l1_elements_by_area = extract_ET_template(template)
+
+    l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
+
+    # add the style node
+    style_node = ET.Element("style")
+    template.insert(0, style_node)
+    # fill the style nodes
+    style_node_text = [""]
+    for areaid, aread in zip(sorted_areas, filling, strict=True):
+        for i, seat_data in enumerate(aread):
+            style_node_text.append(f".area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items()) + "}")
+    style_node_text.append("")
+    style_node.text = "\n".join(style_node_text)
+
+    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
+        fillings_iter = chain(*(repeat(i, r) for i, (sd, r) in enumerate(fillings.items())))
+        for element_id in elements:
+            try:
+                nparty = next(fillings_iter)
+            except StopIteration:
+                raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
+
+            node = elements[element_id]
+            node_class = f"area{area_id}party{nparty}"
+            if "class" in node.attrib:
+                node_class = node.attrib["class"] + " " + node_class
+            node.set("class", node_class)
+
 def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     # The operation is not done in-place since str is immutable
     # part 2 :
