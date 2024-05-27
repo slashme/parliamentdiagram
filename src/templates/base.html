@@ -22,7 +22,7 @@
       <div class="container" style="text-align: end;">
         OAuth:
         {% if "username" in session %}
-        Authorized as {{ session["username"] }}
+        Authorized as {{ session["username"] }} - <a href="{{url_for('logout')}}" title="Disconnect your account from this tool">Logout</a>
         {% else %}
         <a href="{{url_for('login')}}" title="Authorize the application to post diagrams on Wikimedia Commons from your account">Connect</a>
         {% endif %}
