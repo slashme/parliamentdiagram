@@ -93,16 +93,12 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
     # group them by area
     sorted_areas, l1_elements_by_area = extract_ET_template(template)
 
-    # check the size of each area (and the number of areas)
-    if len(filling) != len(l1_elements_by_area):
-        raise ValueError("Incorrect number of areas")
-
     # sort each area's set of seats (by number, not by alphabet)
     # converting from list of unsorted dicts to list of sorted dicts
     l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
 
     # for each area:
-    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling):
+    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
         fillings_iter = chain(*(repeat(sd, r) for sd, r in fillings.items()))
         # for each seat element:
         for element_id in elements:
@@ -112,7 +108,7 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
                 raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
 
             # fill the seats progressively, by applying them the style properties and removing their id
-            node: ET.Element = elements[element_id]
+            node = elements[element_id]
             del node.attrib["id"]
             for k, v in seat_data.items():
                 if v:
@@ -128,16 +124,12 @@ def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     # group them by area
     sorted_areas, l1_elements_by_area = extract_str_template(template)
 
-    # check the size of each area (and the number of areas)
-    if len(filling) != len(l1_elements_by_area):
-        raise ValueError("Incorrect number of areas")
-
     # sort each area's set of seats (by number, not by alphabet)
     # converting from list of sets to list of sorted lists
     l2_elements_by_area = list(map(sorted, l1_elements_by_area))
 
     # for each area:
-    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling):
+    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
         fillings_iter = chain(*(repeat(sd, r) for sd, r in fillings.items()))
         # for each seat element:
         for element_id in elements:
