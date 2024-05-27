@@ -245,12 +245,12 @@ def commons_upload():
         app.logger.error("Missing parameter %s", e)
         abort(400, f"Missing parameter {e}")
     comment = "Direct upload from the ParliamentDiagram tool"
-    ignorewarnings = params.get("ignorewarnings", False)
+    ignorewarnings = params.get("ignorewarnings", "false") # everything coming in is a string
 
     override_tickets = session.setdefault("override_tickets", {})
     # using a dict because sets aren't serializable in JSON
 
-    if ignorewarnings and ((filetosend, commons_file_name) not in override_tickets):
+    if (ignorewarnings != "false") and ((filetosend, commons_file_name) not in override_tickets):
         app.logger.error("Unauthorized use of ignorewarnings")
         abort(403, "Unauthorized use of ignorewarnings")
 
