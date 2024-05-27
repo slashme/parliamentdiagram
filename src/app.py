@@ -236,6 +236,12 @@ def commons_upload():
         # ignore / ignorewarnings
             # format to be decided, probably a boolean but to be authorized by a session marker
 
+    if not app.config["oauth_enabled"]:
+        abort(501, "OAuth is not enabled on this server")
+
+    if "access_token" not in session:
+        abort(401, "Not logged in")
+
     params = request.form
     try:
         filetosend = params["uri"].lstrip("/\\")
