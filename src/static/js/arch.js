@@ -347,13 +347,15 @@ function CallDiagramScript() {
             uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
             postcontainer.appendChild(uploadwarn);
 
-            const uploadlinkbutton = document.createElement('a');
-            uploadlinkbutton.className = 'btn btn-primary';
-            uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
-            uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
-            postcontainer.appendChild(uploadlinkbutton);
-            // and a linebreak
-            postcontainer.appendChild(document.createElement("br"));
+            if (oauth_enabled) {
+                const uploadlinkbutton = document.createElement('a');
+                uploadlinkbutton.className = 'btn btn-primary';
+                uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
+                uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
+                postcontainer.appendChild(uploadlinkbutton);
+                // and a linebreak
+                postcontainer.appendChild(document.createElement("br"));
+            }
         }).fail(function (xhr, textStatus, errorThrown) {
             // data doesn't contain "svg", so post an error message instead
 
@@ -427,17 +429,50 @@ function updateFilename() {
 }
 
 function makeUploadLink(linkdata, legendtext) {
-    const fname = document.getElementById("inputFilename").value.replace(/(.svg)*$/i, ".svg");
+    if (!oauth_enabled) {
+        alert("OAuth is not enabled on this server.");
+        return;
+    }
 
-    const uploadbutton = document.createElement('button');
-    uploadbutton.id = "uploadbutton";
-    uploadbutton.className = 'btn btn-primary';
-    uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '", ignore=false)');
-    uploadbutton.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
-
+    // check if the oauth is logged in
+    // if not, request to check
+    // if still not, instead of adding an upload button, add a newtab login button
+    // so when the user comes back, a click on "generate upload link" will pass the query check
+    if (!username) {
+        $.ajax({
+            url: "get_username",
+            async: false, // very important, otherwise the if below will be taken before the done function runs
+        }).done(function (data) {
+            username = data["username"].toString(); // force an error if undefined
+        }).fail(function () {
+            throw new Error("OAuth is enabled but an error occurred when retrieving the username.");
+        });
+    }
     const buttonlocation = document.getElementById("postcontainerbutton");
-    buttonlocation.innerHTML = "";
-    buttonlocation.append(uploadbutton);
+    if (username) {
+        const fname = document.getElementById("inputFilename").value.replace(/(.svg)*$/i, ".svg");
+
+        const uploadbutton = document.createElement('button');
+        uploadbutton.id = "uploadbutton";
+        uploadbutton.className = 'btn btn-primary';
+        uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '", ignore=false)');
+        uploadbutton.append("Click to upload " + fname + " to Wikimedia Commons");
+
+        buttonlocation.innerHTML = "";
+        buttonlocation.append(uploadbutton);
+    } else {
+        const loginbutton = document.createElement('a');
+        loginbutton.id = "uploadloginbutton";
+        loginbutton.className = 'btn btn-primary';
+        loginbutton.href = "login";
+        loginbutton.setAttribute("target", "_blank");
+        loginbutton.append("Login to Wikimedia Commons");
+        // TODO: if possible the callback should redirect to a page that closes the tab
+        loginbutton.setAttribute("onClick", 'document.getElementById("uploadloginbutton").remove();');
+
+        buttonlocation.innerHTML = "";
+        buttonlocation.append(loginbutton);
+    }
 }
 
 function postToUpload(fname, linkdata, legendtext, ignore = false) {

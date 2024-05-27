@@ -4,6 +4,14 @@
 {% block title %}Arch-style parliament diagram generator{% endblock %}
 
 {% block otherimports %}
+<script>
+  {% if config["oauth_enabled"] %}
+  const oauth_enabled = true;
+  {% else %}
+  const oauth_enabled = false;
+  {% endif %}
+  let username = "{{ session.get('username', '') }}";
+</script>
 <script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/arch.js')}}"></script>
 {% endblock %}

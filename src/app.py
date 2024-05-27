@@ -170,7 +170,7 @@ def login():
     if not app.config["oauth_enabled"]:
         abort(501, "OAuth is not enabled on this server")
 
-    # TODO: if already logged in, redirect away
+    # TODO: if already logged in, redirect away?
 
     consumer_token = mwoauth.ConsumerToken(app.config["CONSUMER_KEY"], app.config["CONSUMER_SECRET"])
     try:
@@ -207,8 +207,9 @@ def oauth_callback():
     session["access_token"] = access_token._asdict()
     session["username"] = identity["username"]
 
-    # rethink that redirect
+    # TODO: rethink that redirect
     # probably save an after_oauth_callback route in the session (and check it too)
+    # makeUploadLink in arch.js could use that
     return app.redirect(app.url_for("root"))
 
 @app.route("/logout")
@@ -217,7 +218,12 @@ def logout():
     session.clear()
     if request.method == "POST":
         return "Success"
+    # TODO: same, the logout link in base.html could use a better redirect
     return app.redirect(app.url_for("root"))
+
+@app.get("/get_username")
+def get_username():
+    return {"username": session.get("username", "")}
 
 @app.post("/commons_upload")
 def commons_upload():
