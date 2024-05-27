@@ -470,6 +470,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
             a.href = fname.replace(" ", "_");
             a.append("Commons");
             successdiv.append(".");
+            uploadbutton.parentElement.appendChild(successdiv);
 
             force_removebutton = true;
         } else if (data.error) {
