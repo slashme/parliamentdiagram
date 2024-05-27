@@ -22,10 +22,16 @@ It is advised to clear the src/static/svgfiles directory regularly.
 To enable the feature of uploading the created diagrams to Wikimedia Commons, you need to
 [create an OAuth 1.0a consumer](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration/propose/oauth1a)
 with the right of editing existing pages, create, edit and move pages, upload new files,
-and upload, replace and rename files. The credentials of that consumer then go in the
-"oauth_config.toml" file. The callback URL should be "http://<domain>/oauth_callback".
+and upload, replace and rename files. The callback URL should be "http://<domain>/oauth_callback".
 
-If you want to run the tool without that feature, the toml file should be removed entirely.
+ The credentials of that consumer then go in "src/oauth_config.toml", using the following pattern.
+
+```toml
+SECRET_KEY = "abcd" # import secrets; print(secrets.token_urlsafe(48))
+OAUTH_MWURI = "https://meta.wikimedia.org/w/index.php"
+CONSUMER_KEY = "abcd" # the 'consumer token' value from the OAuth consumer registration
+CONSUMER_SECRET = "abcd" # the 'secret token' value from the OAuth consumer registration
+```
 
 ## License
 
