@@ -38,7 +38,7 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
 
     if filling is True:
         nseats_by_area = scan_str_template(template_str)
-        filling = [{SeatData(fill=color): 1 for color in generate_rainbow(nseats)} for nseats in nseats_by_area]
+        filling = [{SeatData(fill=color): 1 for color in generate_rainbow(nseats, 250)} for nseats in nseats_by_area]
 
     if filling is None:
         if use_ET:
