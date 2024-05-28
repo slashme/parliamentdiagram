@@ -28,7 +28,15 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
             return main(template_file, file, filling=filling, use_ET=use_ET)
 
     if use_ET:
-        template_ET = ET.fromstring(template_file.read())
+        # strip the namespace from the element tags
+        template_str = template_file.read()
+        namespace_match = re.search(r'xmlns="([^"]+)"\s*', template_str)
+        if namespace_match is not None:
+            namespace = namespace_match.group(1)
+            namespace_to_replace = namespace_match.group(0)
+            template_str = template_str.replace(namespace_to_replace, "")
+        template_ET = ET.fromstring(template_str)
+        template_ET.set("xmlns", namespace)
     else:
         template_str = template_file.read()
 
@@ -132,7 +140,7 @@ def fill_ET_template2(template: ET.Element, filling: list[dict[SeatData, int]]) 
     l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
 
     # add the style node
-    style_node = ET.Element("ns0:style", type="text/css")
+    style_node = ET.Element("style", type="text/css")
     template.insert(0, style_node)
     # fill the style nodes
     style_node_text = [""]
