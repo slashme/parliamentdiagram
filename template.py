@@ -220,6 +220,8 @@ def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
 
             # fill the seats progressively, by applying them the style properties and removing their id
             template = template.replace(f'id="@{area_id}@{element_id}"', " ".join(f'{k}="{v}"' for k, v in seat_data.items()))
+            if not area_id:
+                template = template.replace(f'id="@{element_id}"', " ".join(f'{k}="{v}"' for k, v in seat_data.items()))
 
     return template
 
