@@ -19,6 +19,11 @@ class SeatData(dict[str, str]):
 def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = False) -> int|str|None:
     """
     Considers the template file and the output file to be a file descriptor or a file path.
+    If filling is None, prints the number of seats by area.
+    If filling is a list of SeatData: nseats dicts,
+    where there is one dict per area and the sum of nseats is the number of seats in that area,
+    then the template gets filled using that filling.
+    If filling is True, it is replaced by a rainbow filling.
     """
     if isinstance(template_file, str):
         with open(template_file, "r") as file:
@@ -29,7 +34,11 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
 
     template_str = template_file.read()
     if use_ET:
-        template_ET = parse_ET_without_namespaces(template_file.read())
+        template_ET = parse_ET_without_namespaces(template_str)
+
+    if filling is True:
+        nseats_by_area = scan_ET_template(template_ET)
+        filling = [{SeatData(fill=color): 1 for color in generate_rainbow(nseats)} for nseats in nseats_by_area]
 
     if filling is None:
         if use_ET:
@@ -38,7 +47,7 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
             print(scan_str_template(template_str), file=output_file)
     else:
         if use_ET:
-            fill_ET_template2(template_ET, filling)
+            fill_ET_template_by_class(template_ET, filling)
             print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
         else:
             output_file.write(fill_str_template(template_str, filling))
@@ -56,6 +65,21 @@ def parse_ET_without_namespaces(string) -> ET.Element:
     for namespace_id, namespace in found_namespaces.items():
         element.set(namespace_id, namespace)
     return element
+
+def generate_rainbow(n, born=300):
+    """
+    Generates a rainbow of that many CSS colors going from full red (inclusive) to born (inclusive, defaulting to purple).
+    If born is an integer, it is interpreted as a number of degrees. If it is a float, it is interpreted as a fraction of a turn.
+    """
+    if not isinstance(born, int):
+        born = round(born*360) # ints are more precise than floats
+
+    if born % (n-1):
+        it = (f"hsl({born*i/(n-1)}deg 100% 50%)" for i in range(n))
+    else:
+        # write ints, if possible without losing precision
+        it = (f"hsl({born*i//(n-1)}deg 100% 50%)" for i in range(n))
+    yield from it
 
 def scan_ET_template(template: ET.Element) -> list[int]:
     # part 1:
@@ -132,7 +156,7 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
                 if v:
                     node.set(k, v)
 
-def fill_ET_template2(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     # do it more cleanly, take advantage of the ET
     # make a <style> node inside the svg node
     # inside, define .partyn{fill:#c01085;stroke:#000000;} classes
