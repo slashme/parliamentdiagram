@@ -17,10 +17,10 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
     """
     if isinstance(template_file, str):
         with open(template_file, "r") as file:
-            return main(file, output_file, use_ET=use_ET)
+            return main(file, output_file, filling=filling, use_ET=use_ET)
     if isinstance(output_file, str):
         with open(output_file, "w") as file:
-            return main(template_file, file, use_ET=use_ET)
+            return main(template_file, file, filling=filling, use_ET=use_ET)
 
     if use_ET:
         template_ET = ET.fromstring(template_file.read())
