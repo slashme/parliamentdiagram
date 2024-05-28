@@ -27,18 +27,9 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
         with open(output_file, "w") as file:
             return main(template_file, file, filling=filling, use_ET=use_ET)
 
+    template_str = template_file.read()
     if use_ET:
-        # strip the namespace from the element tags
-        template_str = template_file.read()
-        namespace_match = re.search(r'xmlns="([^"]+)"\s*', template_str)
-        if namespace_match is not None:
-            namespace = namespace_match.group(1)
-            namespace_to_replace = namespace_match.group(0)
-            template_str = template_str.replace(namespace_to_replace, "")
-        template_ET = ET.fromstring(template_str)
-        template_ET.set("xmlns", namespace)
-    else:
-        template_str = template_file.read()
+        template_ET = parse_ET_without_namespaces(template_file.read())
 
     if filling is None:
         if use_ET:
@@ -51,6 +42,20 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
             print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
         else:
             output_file.write(fill_str_template(template_str, filling))
+
+def parse_ET_without_namespaces(string) -> ET.Element:
+    """
+    Prevents Python's xml parser from substituting the namespaces in the elements' tags.
+    Warning : works only if the namespaces are on the outer node.
+    """
+    found_namespaces = {}
+    for namespace_match in re.finditer(r'(xmlns(?::\w+)?)="([^"]+)"\s*', string):
+        found_namespaces[namespace_match.group(1)] = namespace_match.group(2)
+        string = string.replace(namespace_match.group(0), "")
+    element = ET.fromstring(string)
+    for namespace_id, namespace in found_namespaces.items():
+        element.set(namespace_id, namespace)
+    return element
 
 def scan_ET_template(template: ET.Element) -> list[int]:
     # part 1:
