@@ -62,8 +62,7 @@ def parse_ET_without_namespaces(string) -> ET.Element:
         found_namespaces[namespace_match.group(1)] = namespace_match.group(2)
         string = string.replace(namespace_match.group(0), "")
     element = ET.fromstring(string)
-    for namespace_id, namespace in found_namespaces.items():
-        element.set(namespace_id, namespace)
+    element.attrib = found_namespaces | element.attrib
     return element
 
 def generate_rainbow(n, born=300):
