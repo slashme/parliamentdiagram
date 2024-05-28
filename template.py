@@ -169,14 +169,15 @@ def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData,
 
     # add the style node
     style_node = ET.Element("style", type="text/css")
+    sep = (template.text or "")
+    style_node.tail = sep
     template.insert(0, style_node)
     # fill the style nodes
     style_node_text = [""]
     for areaid, aread in zip(sorted_areas, filling, strict=True):
         for i, seat_data in enumerate(aread, start=1):
             style_node_text.append(f"    .area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items()) + "}")
-    style_node_text.append("")
-    style_node.text = "\n".join(style_node_text)
+    style_node.text = sep.join(style_node_text) + sep
 
     for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
         fillings_iter = chain(*(repeat(i, r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
