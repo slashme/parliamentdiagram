@@ -5,7 +5,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 # watch out for malformed templates and attacks
-# maybe make one with no xml parsing whatsoever, relying only on regex, replacing id="&\d*&\d+" with the fill, stroke and stroke-width.
+# maybe make one with no xml parsing whatsoever, relying only on regex, replacing id="@\d*@\d+" with the fill, stroke and stroke-width.
 
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
 SeatData = dict[str, str]
@@ -58,7 +58,7 @@ def scan_str_template(template: str) -> list[int]:
 def extract_ET_template(template: ET.Element, *, check_unicity=False):
     elements_by_area = defaultdict(dict[int, ET.Element])
     for node in template.findall(".//"): # check that it takes the subelements
-        if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:&(\d+))?&(\d+)', id)) is not None:
+        if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:@(\d+))?@(\d+)', id)) is not None:
             area = elements_by_area[int(ma.group(1) or "0")]
             seat = int(ma.group(2))
             if check_unicity and (seat in area):
@@ -71,7 +71,7 @@ def extract_ET_template(template: ET.Element, *, check_unicity=False):
 
 def extract_str_template(template: str, *, check_unicity=False):
     elements_by_area = defaultdict(set[int])
-    for ma in re.finditer(r'id="(?:&(\d+))?&(\d+)"', template):
+    for ma in re.finditer(r'id="(?:@(\d+))?@(\d+)"', template):
         area = elements_by_area[int(ma.group(1) or "0")]
         seat = int(ma.group(2))
         if check_unicity and (seat in area):
@@ -176,7 +176,7 @@ def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
                 raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
 
             # fill the seats progressively, by applying them the style properties and removing their id
-            template = template.replace(f'id="&{area_id}&{element_id}"', " ".join(f'{k}="{v}"' for k, v in seat_data.items()))
+            template = template.replace(f'id="@{area_id}@{element_id}"', " ".join(f'{k}="{v}"' for k, v in seat_data.items()))
 
     return template
 
