@@ -195,10 +195,11 @@ def seats(*,
     # 5 from the edge, vertically centered
     for x in range(centercols):
         thiscol = min(centerrows, sumdelegates['center']-x*centerrows)
-        poslist['center'].append((
-            svgwidth-5-(centercols-x-option_spacing/2) * blocksize,
-            (svgheight-thiscol*blocksize)/2+blocksize*(option_spacing/2),
-        ))
+        for y in range(thiscol):
+            poslist['center'].append((
+                svgwidth-5-(centercols-x+option_spacing/2) * blocksize,
+                (svgheight-thiscol*blocksize)/2+blocksize*(y+option_spacing/2),
+            ))
     poslist['center'].sort(key=lambda point: point[1])
 
     for x in range(wingcols):
