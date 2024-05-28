@@ -57,7 +57,7 @@ def scan_str_template(template: str) -> list[int]:
 
 def extract_ET_template(template: ET.Element, *, check_unicity=False):
     elements_by_area = defaultdict(dict[int, ET.Element])
-    for node in template.findall(".*"): # check that it takes the subelements
+    for node in template.findall(".//"): # check that it takes the subelements
         if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:&(\d+))?&(\d+)', id)) is not None:
             area = elements_by_area[int(ma.group(1) or "0")]
             seat = int(ma.group(2))
