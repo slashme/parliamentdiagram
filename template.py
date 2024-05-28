@@ -10,8 +10,11 @@ import xml.etree.ElementTree as ET
 # TODO: replace invalid @0@0 ids with a0s0 ids
 
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
-SeatData = dict[str, str]
+# SeatData = dict[str, str]
 # Warning : all values must be str, no numbers allowed
+class SeatData(dict[str, str]):
+    def __hash__(self):
+        return hash(frozenset(self.items()))
 
 def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = False) -> int|str|None:
     """
