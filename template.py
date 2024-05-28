@@ -39,7 +39,7 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
             print(scan_str_template(template_str), file=output_file)
     else:
         if use_ET:
-            fill_ET_template(template_ET, filling)
+            fill_ET_template2(template_ET, filling)
             print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
         else:
             output_file.write(fill_str_template(template_str, filling))
@@ -132,13 +132,13 @@ def fill_ET_template2(template: ET.Element, filling: list[dict[SeatData, int]]) 
     l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
 
     # add the style node
-    style_node = ET.Element("style")
+    style_node = ET.Element("ns0:style", type="text/css")
     template.insert(0, style_node)
     # fill the style nodes
     style_node_text = [""]
     for areaid, aread in zip(sorted_areas, filling, strict=True):
         for i, seat_data in enumerate(aread):
-            style_node_text.append(f".area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items()) + "}")
+            style_node_text.append(f"    .area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items()) + "}")
     style_node_text.append("")
     style_node.text = "\n".join(style_node_text)
 
