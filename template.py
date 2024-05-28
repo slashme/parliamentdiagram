@@ -37,7 +37,7 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
         template_ET = parse_ET_without_namespaces(template_str)
 
     if filling is True:
-        nseats_by_area = scan_ET_template(template_ET)
+        nseats_by_area = scan_str_template(template_str)
         filling = [{SeatData(fill=color): 1 for color in generate_rainbow(nseats)} for nseats in nseats_by_area]
 
     if filling is None:
