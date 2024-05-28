@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 # watch out for malformed templates and attacks
 # maybe make one with no xml parsing whatsoever, relying only on regex, replacing id="@\d*@\d+" with the fill, stroke and stroke-width.
 
+# TODO: replace invalid @0@0 ids with a0s0 ids
+
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
 SeatData = dict[str, str]
 # Warning : all values must be str, no numbers allowed
@@ -150,6 +152,7 @@ def fill_ET_template2(template: ET.Element, filling: list[dict[SeatData, int]]) 
             if "class" in node.attrib:
                 node_class = node.attrib["class"] + " " + node_class
             node.set("class", node_class)
+            node.attrib.pop("id")
 
 def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     # The operation is not done in-place since str is immutable
