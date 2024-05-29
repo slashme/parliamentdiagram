@@ -69,6 +69,8 @@ $(document).ready(function () {
             } else {
                 alert("Can't find number of seats, this is possibly an old diagram or one where the legend has been modified.")
             }
+        }).fail(function () {
+            alert("Failed to retrieve the file from Commons. Please check the filename and try again.");
         });
     });
 
