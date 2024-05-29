@@ -54,17 +54,21 @@ $(document).ready(function () {
                 partiesdata.push([partyname, color, nseats]);
             }
 
-            // Delete all parties first
-            $("div").each(function () {
-                const thisid = this.id;
-                if (thisid.match(/^party[0-9]+$/)) {
-                    deleteParty(parseInt(/[0-9]+$/.exec(thisid)[0]));
-                }
-            });
+            if (partiesdata.length > 0) {
+                // Delete all parties first
+                $("div").each(function () {
+                    const thisid = this.id;
+                    if (thisid.match(/^party[0-9]+$/)) {
+                        deleteParty(parseInt(/[0-9]+$/.exec(thisid)[0]));
+                    }
+                });
 
-            partiesdata.forEach(function (triplet) {
-                addParty(...triplet);
-            });
+                partiesdata.forEach(function (triplet) {
+                    addParty(...triplet);
+                });
+            } else {
+                alert("Can't find number of seats, this is possibly an old diagram or one where the legend has been modified.")
+            }
         });
     });
 
