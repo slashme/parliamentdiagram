@@ -44,10 +44,19 @@ $(document).ready(function () {
             dataType: "json",
             url: "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=" + $("#inputfile").val() + "&rvprop=content&rvlimit=1&callback=?",
         }).done(function (data) {
-            let wikitext;
-            $.each(data.query.pages, function (i, item) {
-                wikitext = item.revisions[0]['*'];
-            });
+            let wikitext = 0;
+            try {
+                $.each(data.query.pages, function (i, item) {
+                    wikitext = item.revisions[0]['*'];
+                });
+            } catch (e) {
+                console.log(e);
+                wikitext = 0;
+            }
+            if (wikitext == 0) {
+                alert("Can't find the file on Commons. Please check the filename and try again.");
+                return;
+            }
 
             const partiesdata = [];
             for (let [, color, partyname, nseats] of wikitext.matchAll(wikitextregexp)) {
@@ -70,7 +79,7 @@ $(document).ready(function () {
                 alert("Can't find number of seats, this is possibly an old diagram or one where the legend has been modified.")
             }
         }).fail(function () {
-            alert("Failed to retrieve the file from Commons. Please check the filename and try again.");
+            alert("The request to Commons failed. Please check the filename and try again.");
         });
     });
 
