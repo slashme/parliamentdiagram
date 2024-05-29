@@ -38,7 +38,7 @@ $(document).ready(function () {
     });
 
     // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
-    const wikitextregexp = /{{\s*legend\s*\|\s*([^|]*)\|\s*([^:]*)(?::\s*(\d+))?/g;
+    const wikitextregexp = /{{\s*legend\s*(?:\||｜)\s*([^|｜]*)(?:\||｜)\s*([^:：]*)(?::|：)\s*(\d+)[^}]*}}/g;
     $('#getfile').click(function () {
         $.ajax({
             dataType: "json",
