@@ -38,33 +38,48 @@ $(document).ready(function () {
     });
 
     // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
-    const wikitextregexp = /{{\s*legend\s*\|\s*([^|]*)\|\s*([^:]*)(?::\s*(\d+))?/g;
+    const wikitextregexp = /{{\s*legend\s*(?:\||｜)\s*([^|｜]*)(?:\||｜)\s*([^:：]*)(?::|：)\s*(\d+)[^}]*}}/g;
     $('#getfile').click(function () {
         $.ajax({
             dataType: "json",
             url: "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=revisions&titles=" + $("#inputfile").val() + "&rvprop=content&rvlimit=1&callback=?",
         }).done(function (data) {
-            let wikitext;
-            $.each(data.query.pages, function (i, item) {
-                wikitext = item.revisions[0]['*'];
-            });
+            let wikitext = 0;
+            try {
+                $.each(data.query.pages, function (i, item) {
+                    wikitext = item.revisions[0]['*'];
+                });
+            } catch (e) {
+                console.log(e);
+                wikitext = 0;
+            }
+            if (wikitext == 0) {
+                alert("Can't find the file on Commons. Please check the filename and try again.");
+                return;
+            }
 
             const partiesdata = [];
             for (let [, color, partyname, nseats] of wikitext.matchAll(wikitextregexp)) {
                 partiesdata.push([partyname, color, nseats]);
             }
 
-            // Delete all parties first
-            $("div").each(function () {
-                const thisid = this.id;
-                if (thisid.match(/^party[0-9]+$/)) {
-                    deleteParty(parseInt(/[0-9]+$/.exec(thisid)[0]));
-                }
-            });
+            if (partiesdata.length > 0) {
+                // Delete all parties first
+                $("div").each(function () {
+                    const thisid = this.id;
+                    if (thisid.match(/^party[0-9]+$/)) {
+                        deleteParty(parseInt(/[0-9]+$/.exec(thisid)[0]));
+                    }
+                });
 
-            partiesdata.forEach(function (triplet) {
-                addParty(...triplet);
-            });
+                partiesdata.forEach(function (triplet) {
+                    addParty(...triplet);
+                });
+            } else {
+                alert("Can't find number of seats, this is possibly an old diagram or one where the legend has been modified.")
+            }
+        }).fail(function () {
+            alert("The request to Commons failed. Please check the filename and try again.");
         });
     });
 
