@@ -65,9 +65,7 @@
 <div class=button onclick="addParty()">
   Add a party
 </div>
-<div class=button onclick="CallDiagramScript()">
-  Make my diagram
-</div>
+<button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
 <div class="block">
   <div id="postcontainer">
     <br/>
