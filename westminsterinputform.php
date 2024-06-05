@@ -62,9 +62,7 @@
     </div>
   </div>
 </div>
-<div class=button onclick="addParty()">
-  Add a party
-</div>
+<button class="btn btn-primary" onclick="addParty()">Add a party</button>
 <button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
 <div class="block">
   <div id="postcontainer">
