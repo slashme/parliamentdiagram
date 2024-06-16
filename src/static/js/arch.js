@@ -111,9 +111,14 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     });
     i++;
 
+    const partycard = document.createElement('div');
+    partycard.id = "party" + i;
+    partycard.className = 'card';
+    partylistcontainer.appendChild(partycard);
+
     const newpartydiv = document.createElement('div');
-    newpartydiv.id = "party" + i;
-    partylistcontainer.appendChild(newpartydiv);
+    newpartydiv.className = 'card-body';
+    partycard.appendChild(newpartydiv);
 
     // Party name label
     const partytitle = document.createElement('div');
@@ -243,6 +248,9 @@ function CallDiagramScript() {
             data: { data: JSON.stringify(requestJSON) },
         }).done(function (data, status) {
             data = data.trim();
+
+            // Show the default-hidden div
+            $("#togglablepost").show();
 
             // This will get the first node with id "postcontainer"
             const postcontainer = document.getElementById("postcontainer");
