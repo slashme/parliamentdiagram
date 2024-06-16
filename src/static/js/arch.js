@@ -233,11 +233,11 @@ function CallDiagramScript() {
 
             totalseats += num;
 
-            if (num == 1) {
-                legendstring += "{{legend|#" + party['Color'] + "|" + party['Name'] + ": 1 seat}} ";
-            } else {
-                legendstring += "{{legend|#" + party['Color'] + "|" + party['Name'] + ": " + num + " seats}} ";
+            legendstring += `{{legend|#${party['Color']}|${party['Name']}: ${num} seat`;
+            if (num != 1) {
+                legendstring += "s";
             }
+            legendstring += "}} ";
         }
     }
     if (totalseats > 0) {
