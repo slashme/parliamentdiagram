@@ -188,7 +188,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // Party border width control
     input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="number" name="Border' + i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
+    input.innerHTML = '<input class="right" type="number" name="Border' + i + '" step="0.01" min="0.0" max="1.0" value="0.00">'
     newpartydiv.appendChild(input);
 
     // Party border color name tag
