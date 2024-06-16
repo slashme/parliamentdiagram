@@ -1,5 +1,6 @@
 $(document).ready(function () {
     jscolor.installByClassName("jscolor");
+    addParty(newcolor = "#AD1FFF");
 });
 
 function CallDiagramScript() {
@@ -150,7 +151,7 @@ function CallDiagramScript() {
     }
 }
 
-function addParty() {
+function addParty(newcolor = "") {
     // Party list <div> where dynamic content will be placed
     const partylistcontainer = document.getElementById("partylistcontainer");
 
@@ -215,7 +216,8 @@ function addParty() {
 
     // Party color input control
     input = document.createElement('div');
-    input.innerHTML = `<input class="right jscolor" type="text" name="Color${i}" value="${getRandomColor()}">`;
+    if (newcolor == "") { newcolor = getRandomColor() }
+    input.innerHTML = `<input class="right jscolor" type="text" name="Color${i}" value="${newcolor}">`;
     newpartydiv.appendChild(input);
 
     // Delete button
