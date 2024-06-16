@@ -172,8 +172,8 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     input.innerHTML = '<input class="right jscolor" type="text" name="BColor' + i + '" value= "000000" >'
     newpartydiv.appendChild(input);
 
-    const delbutton = document.createElement('div');
-    delbutton.className = 'button deletebutton';
+    const delbutton = document.createElement('button');
+    delbutton.className = 'btn btn-danger';
     delbutton.innerHTML = "Delete party " + i;
     delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
     newpartydiv.appendChild(delbutton);
