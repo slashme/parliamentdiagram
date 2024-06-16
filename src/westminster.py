@@ -1,11 +1,6 @@
 #!/usr/bin/python3
-import cgi
-import datetime
-import hashlib
-import json
 import math
 import os
-import sys
 import typing
 
 class Party(typing.NamedTuple):
@@ -13,44 +8,6 @@ class Party(typing.NamedTuple):
     num: int
     group: str
     color: str
-
-def main(**inputlist) -> "int|str|None":
-    if inputlist:
-        data = json.dumps(inputlist)
-    else:
-        data = cgi.FieldStorage().getvalue("data", "") # type: str
-        inputlist = json.loads(data)
-
-    if not inputlist:
-        return "No input."
-
-    nowstrftime = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d-%H-%M-%S-%f")
-
-    # Append input list to log file:
-    with open('wmlog', 'a') as logfile:
-        print(nowstrftime, inputlist, file=logfile)
-
-    # Create consistent hash of the request string:
-    requesthash = hashlib.sha256(data.encode()).hexdigest()
-    # Check whether we have a file made from this exact string in the directory:
-    if print_file_if_already_exists(requesthash):
-        return
-
-    # If we get here, we didn't find a matching request, so continue.
-    return treat_inputlist(nowstrftime, requesthash,
-        option_wingrows=inputlist.pop("wingrows", None),
-        partylist=inputlist.pop("parties", ()),
-        **inputlist)
-
-def print_file_if_already_exists(requesthash: str):
-    """
-    Returns whether the file has been found (and its path printed) or not.
-    """
-    for file in os.listdir("svgfiles"):
-        if requesthash in file:
-            print(f"svgfiles/{file}")
-            return True
-    return False
 
 def treat_inputlist(nowstrftime, requesthash, *,
         option_wingrows: "int|None" = None,
@@ -60,7 +17,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
         centercols: int,
         radius: float,
         spacing: float,
-        **kwargs) -> "int|str|None":
+        **kwargs) -> str:
     # Create a filename that will be unique each time.  Old files are deleted with a cron script.
     svgfilename = f"svgfiles/{nowstrftime}-{requesthash}.svg"
 
@@ -77,7 +34,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
                 sumdelegates[g] += p.num
 
     if sum(sumdelegates.values()) < 1:
-        return "No delegates."
+        raise ValueError("No delegates.")
 
     poslist, wingrows, radius, blocksize, svgwidth, svgheight = seats(
         parties=parties,
@@ -91,7 +48,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
     )
 
     # Open svg file for writing:
-    with open(svgfilename, 'w') as outfile:
+    with open(os.path.join("static", svgfilename), 'w') as outfile:
         # Write svg:
         print(build_svg(
                 parties=parties,
@@ -105,7 +62,7 @@ def treat_inputlist(nowstrftime, requesthash, *,
             ), file=outfile)
 
     # Pass the output filename to the calling page.
-    print(svgfilename)
+    return svgfilename
 
 def seats(*,
         parties: dict[Party, int],
@@ -238,10 +195,11 @@ def seats(*,
     # 5 from the edge, vertically centered
     for x in range(centercols):
         thiscol = min(centerrows, sumdelegates['center']-x*centerrows)
-        poslist['center'].append((
-            svgwidth-5-(centercols-x-option_spacing/2) * blocksize,
-            (svgheight-thiscol*blocksize)/2+blocksize*(option_spacing/2),
-        ))
+        for y in range(thiscol):
+            poslist['center'].append((
+                svgwidth-5-(centercols-x+option_spacing/2) * blocksize,
+                (svgheight-thiscol*blocksize)/2+blocksize*(y+option_spacing/2),
+            ))
     poslist['center'].sort(key=lambda point: point[1])
 
     for x in range(wingcols):
@@ -352,7 +310,7 @@ def build_svg(*,
         '<svg xmlns:svg="http://www.w3.org/2000/svg"',
         '     xmlns="http://www.w3.org/2000/svg" version="1.1"',
        f'     width="{svgwidth:.1f}" height="{svgheight:.1f}">',
-        '  <!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->',
+        '  <!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform) -->',
         '  <g id="diagram">',
     ]
 
@@ -384,6 +342,3 @@ def build_svg(*,
     svglines.append('</svg>')
 
     return "\n".join(svglines)
-
-if __name__ == "__main__":
-    sys.exit(main())
