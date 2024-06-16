@@ -7,3 +7,5 @@ TAGS
 tags
 /#*
 __pycache__
+
+src/oauth_config.toml

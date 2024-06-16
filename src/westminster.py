@@ -310,7 +310,7 @@ def build_svg(*,
         '<svg xmlns:svg="http://www.w3.org/2000/svg"',
         '     xmlns="http://www.w3.org/2000/svg" version="1.1"',
        f'     width="{svgwidth:.1f}" height="{svgheight:.1f}">',
-        '  <!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform.php) -->',
+        '  <!-- Created with the Wikimedia westminster parliament diagram creator (http://parliamentdiagram.toolforge.org/westminsterinputform) -->',
         '  <g id="diagram">',
     ]
 

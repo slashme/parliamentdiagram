@@ -293,8 +293,7 @@ function CallDiagramScript() {
 
             // File upload name input control
             let input = document.createElement('div');
-            const inputname = data.replace(/.*\//, '').replace(/.svg\s*$/, '');
-            input.innerHTML = '<input class="right" type="text" name="' + inputname + '" id="inputFilename" value= "My_Parliament.svg" >';
+            input.innerHTML = '<input class="right" type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
             postcontainer.appendChild(input);
 
             // Year label
@@ -348,13 +347,15 @@ function CallDiagramScript() {
             uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
             postcontainer.appendChild(uploadwarn);
 
-            const uploadlinkbutton = document.createElement('a');
-            uploadlinkbutton.className = 'btn btn-primary';
-            uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + inputname + '", "' + data + '", "' + legendstring + '")');
-            uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
-            postcontainer.appendChild(uploadlinkbutton);
-            // and a linebreak
-            postcontainer.appendChild(document.createElement("br"));
+            if (oauth_enabled) {
+                const uploadlinkbutton = document.createElement('a');
+                uploadlinkbutton.className = 'btn btn-primary';
+                uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
+                uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
+                postcontainer.appendChild(uploadlinkbutton);
+                // and a linebreak
+                postcontainer.appendChild(document.createElement("br"));
+            }
         }).fail(function (xhr, textStatus, errorThrown) {
             // data doesn't contain "svg", so post an error message instead
 
@@ -427,43 +428,207 @@ function updateFilename() {
     document.getElementById("inputFilename").value = newFilename;
 }
 
-function makeUploadLink(inputname, linkdata, legendtext) {
-    const a = document.createElement('a');
-    a.className = "btn btn-primary";
-    let fname = "";
-    //This is kind of dumb: I'm iterating through all the inputs on the
-    //page to find any that match the name that's being called. FIXME
-    $("input").each(function () {
-        if (this.name == inputname) {
-            fname = this.value
-        }
-    });
-    fname = fname.replace(/(.svg)*$/i, ".svg");
-    a.appendChild(document.createTextNode("Click to upload " + fname + " to Wikimedia Commons"));
-    //Now get today's date and format it suitably for use in Wikimedia Commons templates:
-    // const today = (new Date()).split("T")[0];
-    let today = new Date();
-    let DD = today.getDate();
-    let MM = today.getMonth() + 1;
-    let YYYY = today.getFullYear();
-
-    if (DD < 10) {
-        DD = '0' + DD
+function makeUploadLink(linkdata, legendtext) {
+    if (!oauth_enabled) {
+        alert("OAuth is not enabled on this server.");
+        return;
     }
 
-    if (MM < 10) {
-        MM = '0' + MM
+    // check if the oauth is logged in
+    // if not, request to check
+    // if still not, instead of adding an upload button, add a newtab login button
+    // so when the user comes back, a click on "generate upload link" will pass the query check
+    if (!username) {
+        $.ajax({
+            url: "get_username",
+            async: false, // very important, otherwise the if below will be taken before the done function runs
+        }).done(function (data) {
+            username = data["username"].toString(); // force an error if undefined
+        }).fail(function () {
+            throw new Error("OAuth is enabled but an error occurred when retrieving the username.");
+        });
     }
-
-    today = YYYY + '-' + MM + '-' + DD;
-    //Now build the query URL that will be used to upload the image to Commons:
-    a.href = document.URL.replace(/\?.*$/, '') + "?action=upload&uri=/data/project/parliamentdiagram/public_html/" + linkdata + "&filename=" + fname + "&pagecontent=" + encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/parliamentinputform.html Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n");
-    a.setAttribute('target', '_blank');
     const buttonlocation = document.getElementById("postcontainerbutton");
-    buttonlocation.innerHtml = "";
-    buttonlocation.append(a);
-    //    var SVGdiagram = document.getElementById("SVGdiagram"); //This will get the first node with id "SVGdiagram"
-    //    var diagramparent = SVGdiagram.parentNode; //This will get the parent div that contains the diagram
-    //    diagramparent.insertBefore(a, SVGdiagram.nextSibling); //Insert our new node after the diagram
-    //    diagramparent.insertBefore(document.createElement("br"), SVGdiagram.nextSibling); //Insert a linebreak after the diagram
+    if (username) {
+        const fname = document.getElementById("inputFilename").value.replace(/(.svg)*$/i, ".svg");
+
+        const uploadbutton = document.createElement('button');
+        uploadbutton.id = "uploadbutton";
+        uploadbutton.className = 'btn btn-primary';
+        uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '", ignore=false)');
+        uploadbutton.append("Click to upload " + fname + " to Wikimedia Commons");
+
+        buttonlocation.innerHTML = "";
+        buttonlocation.append(uploadbutton);
+    } else {
+        const loginbutton = document.createElement('a');
+        loginbutton.id = "uploadloginbutton";
+        loginbutton.className = 'btn btn-primary';
+        loginbutton.href = "login";
+        loginbutton.setAttribute("target", "_blank");
+        loginbutton.append("Login to Wikimedia Commons");
+        // TODO: if possible the callback should redirect to a page that closes the tab
+        loginbutton.setAttribute("onClick", 'document.getElementById("uploadloginbutton").remove();');
+
+        buttonlocation.innerHTML = "";
+        buttonlocation.append(loginbutton);
+    }
+}
+
+function postToUpload(fname, linkdata, legendtext, ignore = false) {
+    // deactivate the button during processing
+    const uploadbutton = document.getElementById("uploadbutton");
+    uploadbutton.disabled = true;
+
+    const today = (new Date()).toISOString().split("T")[0];
+    $.ajax({
+        type: "POST",
+        url: "commons_upload",
+        data: {
+            uri: linkdata,
+            filename: fname,
+            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
+            ignorewarnings: ignore,
+        },
+    }).done(function (data) {
+        let force_removebutton = false;
+        let retry_ignore = false;
+
+        // It is possible that the request returns both warnings and a successful result,
+        // but assuming it's only in the case of ignorewarnings=true, the warnings are not shown
+        if (data.upload && (data.upload.result === "Success")) {
+            // Success
+            const successdiv = document.createElement('div');
+            successdiv.className = 'success';
+            successdiv.append("Image successfully uploaded on ");
+            const a = successdiv.appendChild(document.createElement("a"));
+            try {
+                a.href = data.upload.imageinfo.descriptionurl;
+            } catch (e) {
+                a.href = "https://commons.wikimedia.org/wiki/File:" + fname.replace(" ", "_");
+            }
+            a.setAttribute("target", "_blank");
+            a.append("Commons");
+            successdiv.append(".");
+            uploadbutton.parentElement.appendChild(successdiv);
+
+            force_removebutton = true;
+        } else if (data.error) {
+            // WM error case
+            // alert(`Error (code "${data.error.code}"): " + ${data.error.info}`);
+            const errordiv = document.createElement('div');
+            errordiv.className = 'error';
+            uploadbutton.parentElement.appendChild(errordiv);
+
+            force_removebutton = true;
+
+            if (data.error.code === "mwoauth-invalid-authorization") {
+                $.ajax({
+                    type: "POST",
+                    url: "logout",
+                });
+                errordiv.append(
+                    "You need to (re-)authorize the tool to upload files on your behalf.",
+                    document.createElement("br"),
+                );
+                const a = errordiv.appendChild(document.createElement("a"));
+                a.href = "login";
+                a.append("Authorize");
+            } else {
+                errordiv.append(
+                    `Error (code "${data.error.code}"):`,
+                    document.createElement("br"),
+                    data.error.info,
+                    document.createElement("br"),
+                    "Please raise an issue on the GitHub Issue tracker if the error seems internal to the Tool.",
+                );
+            }
+        } else if (data.upload && data.upload.warnings) {
+            // WM warning case - copied from PHP, not tested in practice
+            const warningdiv = document.createElement('div');
+            warningdiv.className = 'warning';
+            uploadbutton.parentElement.appendChild(warningdiv);
+
+            for (let w in data.upload.warnings) {
+                if (w === "badfilename") {
+                    warningdiv.append(
+                        "The filename is not valid for Wikimedia Commons. Please choose a different one.",
+                    );
+                    force_removebutton = true;
+
+                    // include other warnings from response.php
+                } else if (w.startsWith("exists")) {
+                    let a = document.createElement("a");
+                    a.href = "https://commons.wikimedia.org/wiki/File:" + fname.replace(" ", "_");
+                    a.setAttribute("target", "_blank");
+                    a.append(fname);
+
+                    if (w === "exists-normalized") {
+                        warningdiv.append(
+                            "Warning: a file with a similar name already exists on Commons.",
+                            document.createElement("br"),
+                        );
+                    } else {
+                        warningdiv.append(
+                            "Warning: the file ",
+                            a,
+                            " already exists on Commons.",
+                            document.createElement("br"),
+                        );
+                    }
+                    if (fname.replace(" ", "_") === "My_Parliament.svg") {
+                        warningdiv.append("This is a testing file, which you can try to overwrite ");
+                    } else {
+                        warningdiv.append("If you have confirmed that you want to overwrite that file, you can try to overwrite it ");
+                    }
+                    warningdiv.append(
+                        "by clicking on the Upload button again.",
+                        document.createElement("br"),
+                        "Commons usually does not allow to do that, depending on your user rights. In any case, if you abuse this feature, you will be blocked."
+                    );
+                    retry_ignore = true;
+                } else if (w === "duplicate") {
+                    warningdiv.append(
+                        "Warning: the file you are trying to upload is a duplicate of an existing file on Commons.",
+                        document.createElement("br"),
+                        "If you are sure that you want to upload it anyway, you can click the Upload button again.",
+                    );
+                    retry_ignore = true;
+                } else {
+                    // unrecognized warning
+                    warningdiv.append(
+                        `Warning: ${w}: ${data.upload.warnings[w]}`,
+                    );
+                    force_removebutton = true;
+                }
+            }
+        } else {
+            // other error case
+            const div = document.createElement('div');
+            div.className = 'error';
+            div.append(
+                "Unrecognized API response from server:",
+                document.createElement("br"),
+                JSON.stringify(data),
+            );
+
+            uploadbutton.parentElement.appendChild(div);
+            force_removebutton = true;
+        }
+
+        if (retry_ignore && !force_removebutton) {
+            uploadbutton.disabled = false;
+            const onClick = uploadbutton.getAttribute("onClick");
+            uploadbutton.setAttribute("onClick", onClick.replace("ignore=false", "ignore=true"));
+        } else {
+            uploadbutton.remove();
+        }
+    }).fail(function (xhr, textStatus, errorThrown) {
+        // Error, including those thrown by the server
+        const errordiv = document.createElement('div');
+        errordiv.className = 'error';
+        uploadbutton.parentElement.appendChild(errordiv);
+        errordiv.innerHTML = xhr.responseText || ("Error: " + textStatus + ", " + errorThrown);
+        uploadbutton.remove();
+    });
 }

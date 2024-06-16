@@ -1,9 +1,16 @@
-<!-- <?php require('auth.php'); ?> -->
 {% extends 'base.html' %}
 
 {% block title %}Arch-style parliament diagram generator{% endblock %}
 
 {% block otherimports %}
+<script>
+  {% if config["oauth_enabled"] %}
+  const oauth_enabled = true;
+  {% else %}
+  const oauth_enabled = false;
+  {% endif %}
+  let username = "{{ session.get('username', '') }}";
+</script>
 <script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='js/arch.js')}}"></script>
 {% endblock %}
@@ -30,7 +37,6 @@
             </p>
             <p>If the layout of the seats in the diagram is strange (this sometimes happens for small parliaments) you can click on "Enable advanced parameters" and try the "compact-rows diagram" option.</p>
             <p class="card-text">Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.</p>
-            <!-- <?php require('response.php'); ?> -->
           </div>
         </div>
 

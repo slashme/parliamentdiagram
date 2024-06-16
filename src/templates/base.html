@@ -18,6 +18,17 @@
       <nav class="navbar navbar-dark bg-primary shadow-sm text-white">
         <h1 class="justify-content-center container"><a class="navbar-brand">Parliament Diagrams</a></h1>
       </nav>
+      {% if config["oauth_enabled"] %}
+      <div class="container" style="text-align: end;">
+        OAuth:
+        {% if "username" in session %}
+        <!-- TODO: make that logout refresh the page (or redirect to the current page) -->
+        Authorized as {{ session["username"] }} - <a href="{{url_for('logout')}}" title="Disconnect your account from this tool">Logout</a>
+        {% else %}
+        <a href="{{url_for('login')}}" title="Authorize the application to post diagrams on Wikimedia Commons from your account">Connect</a>
+        {% endif %}
+      </div>
+      {% endif %}
 
       <div class="container">
         <div class="block card-deck">
