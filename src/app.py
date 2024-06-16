@@ -66,6 +66,10 @@ def usinputform():
 def westminsterinputform():
     return render_template("westminsterinputform.html")
 
+@app.route("/templateform")
+def templateform():
+    return render_template("templateform.html")
+
 
 # direct requests
 @app.post("/newarch")
