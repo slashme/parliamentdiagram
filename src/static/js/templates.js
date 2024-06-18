@@ -120,7 +120,6 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     partybwidthinput.id = `party${party_number}_border`;
     partybwidthinput.step = 0.01;
     partybwidthinput.min = 0.0;
-    partybwidthinput.max = 1.0;
     partybwidthinput.value = 0.0;
 
     // Party border color label
