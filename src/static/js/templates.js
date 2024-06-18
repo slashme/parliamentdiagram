@@ -133,7 +133,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
         .appendChild(document.createElement("input"));
     partybcolorinput.className = "right jscolor";
     partybcolorinput.type = "text";
-    partybcolorinput.id = `party${party_number}_bordercolor`;
+    partybcolorinput.id = `party${party_number}_bcolor`;
     partybcolorinput.value = "000000";
 
     // Party delete button
