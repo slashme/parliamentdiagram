@@ -2,11 +2,12 @@ $(document).ready(function () {
 });
 
 // hardcoded list of metadata for each template
-const templates_metadata = {
-    assnat: {
+const templates_metadata = [
+    {
+        id: "assnat",
         nseats_per_area: [582],
     },
-};
+];
 
 let selected_template = null;
 
@@ -26,7 +27,7 @@ function actuateVacants() {
 
 function selectTemplate(template_id) {
     // get the metadata for the selected template
-    selected_template = templates_metadata[template_id];
+    selected_template = templates_metadata.find((template) => template.id === template_id);
 
     // TODO
     // show the selected template metadata container
@@ -45,11 +46,6 @@ function selectTemplate(template_id) {
 }
 
 function addParty(newname = "", newcolor = "", newnseats = 0) {
-    // pretty much the same as in arch.js
-    // add min="0" for number inputs
-    // add a max, equal to the number of seats of the template
-    // add a callback to actuateVacants when changing the number of seats of a party
-
     const partylistcontainer = document.getElementById("partylistcontainer");
     // New party's number: one more than the bigger party number so far
     let party_number = 0;
@@ -150,7 +146,98 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 }
 
 function callDiagramScript() {
-    // call the python script to generate the diagram
-    // display the post container and empty it
-    // put the diagram inside
+    const payload = { template_id: selected_template.id };
+
+    let partylist = [];
+    $("input").each(function () {
+        const [matchresult] = [...this.id.matchAll(/party(\d+)_(\w+)/g)];
+        if (matchresult) {
+            let [, partynumber, property] = matchresult;
+            if (partylist[partynumber] == undefined) {
+                partylist[partynumber] = {};
+            }
+            let value;
+            switch (property) {
+                case "name":
+                    // TODO: implement the name/data/title feature to fix the legend string
+                    // property = "name";
+                    // value = this.value;
+                    // break;
+                    return;
+                case "number":
+                    property = "nb_seats";
+                    value = parseInt(this.value);
+                    break;
+                case "color":
+                    value = "#" + this.value;
+                    break;
+                case "border":
+                    property = "border_size";
+                    value = parseFloat(this.value);
+                    break;
+                case "bcolor":
+                    property = "border_color";
+                    value = "#" + this.value;
+                    break;
+                default:
+                    return;
+            }
+            partylist[partynumber][property] = value;
+        }
+    });
+    partylist = partylist.filter((party) => party !== undefined);
+    const vacants = actuateVacants();
+    if (vacants < 0) {
+        alert("There are too many seats for the template's capacity.");
+        return;
+    }
+    partylist.push({
+        nb_seats: vacants,
+        color: "#" + $("#color_vacant").val(),
+        border_size: parseFloat($("#border_vacant").val()),
+        border_color: "#" + $("#bcolor_vacant").val(),
+    });
+
+    payload.partylist_per_area = [partylist];
+
+    let legendstring = "";
+    for (let party of partylist) {
+        legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
+        if (party.nb_seats !== 1) {
+            legendstring += 's';
+        }
+        legendstring += '}} ';
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "template.py",
+        data: { data: JSON.stringify(payload) },
+    }).done(function (data) {
+        data = data.trim();
+
+        $("#togglablepost").show();
+
+        const postcontainer = document.getElementById("postcontainer");
+        postcontainer.innerHTML = "";
+
+        const img = postcontainer.appendChild(document.createElement("img"));
+        img.src = data;
+        img.id = "SVGDiagram";
+
+        const download = postcontainer.appendChild(document.createElement("a"));
+        download.append("Click to download your SVG diagram.");
+        download.className = "btn btn-success";
+        download.title = "SVG diagram";
+        download.href = download.download = data;
+        postcontainer.appendChild(document.createElement("hr"));
+
+        postcontainer.append(
+            "Legend template for use in Wikipedia:",
+            document.createElement("br"),
+            legendstring,
+        );
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        alert("Error " + textStatus + ": " + errorThrown);
+    });
 }
