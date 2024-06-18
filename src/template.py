@@ -12,7 +12,12 @@ import xml.etree.ElementTree as ET
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
 # SeatData = dict[str, str]
 # Warning : all values must be str, no numbers allowed
-class SeatData(dict[str, str]):
+# class SeatData(dict[str, str]):
+class SeatData:
+    def __init__(self, **kwargs):
+        self._dict = kwargs
+        self.items = self._dict.items
+
     def __hash__(self):
         return hash(frozenset(self.items()))
 

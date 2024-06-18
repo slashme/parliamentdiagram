@@ -13,6 +13,7 @@ from requests import get as requests_get, post as requests_post
 from requests_oauthlib import OAuth1
 
 from westminster import treat_inputlist as westminster_treat_inputlist
+from template import main as template_main, SeatData as TemplateSeatData
 
 app = Flask(__name__)
 
@@ -133,6 +134,41 @@ def westminster_generation():
             option_wingrows=inputdata.pop("wingrows", None),
             partylist=inputdata.pop("parties", ()),
             **inputdata)
+
+    return app.url_for("static", filename=filename)
+
+@app.post("/template")
+@app.post("/template.py")
+def template_generation():
+    nowstrftime, request_hash, inputdata = common_handling("tlog")
+
+    filename = already_existing_file(request_hash)
+    if filename is not None:
+        app.logger.info("File already exists")
+        os.utime("static/"+filename)
+    else:
+        filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
+
+        # expect the same SeatData format as parliamentarch
+        # data, color, border_size, border_color
+        # convert it to svg properties
+        # title, fill, stroke-width, stroke
+        # also manage the seat numbers, from nb_seats to dict value
+        # also forget about data/title for now
+        filling = []
+        for partylist in inputdata.pop("partylist_per_area", ()):
+            area_filling = {}
+            for party in partylist:
+                nb_seats = party.pop("nb_seats", 1)
+                party["fill"] = party.pop("color")
+                party["stroke-width"] = party.pop("border_size", 0)
+                party["stroke"] = party.pop("border_color", "black")
+                area_filling[TemplateSeatData(**party)] = nb_seats
+            filling.append(area_filling)
+
+        template_main("static/svg_templates/"+inputdata.pop("template_id")+"_template.svg", "static/"+filename,
+            filling=filling,
+        )
 
     return app.url_for("static", filename=filename)
 
