@@ -149,22 +149,25 @@ def template_generation():
     else:
         filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
 
-        # expect the same SeatData format as parliamentarch
-        # data, color, border_size, border_color
-        # convert it to svg properties
-        # title, fill, stroke-width, stroke
-        # also manage the seat numbers, from nb_seats to dict value
-        # also forget about data/title for now
-        filling = []
-        for partylist in inputdata.pop("partylist_per_area", ()):
-            area_filling = {}
-            for party in partylist:
-                nb_seats = party.pop("nb_seats", 1)
-                party["fill"] = party.pop("color")
-                party["stroke-width"] = party.pop("border_size", 0)
-                party["stroke"] = party.pop("border_color", "black")
-                area_filling[TemplateSeatData(**party)] = nb_seats
-            filling.append(area_filling)
+        if inputdata.pop("demo", False):
+            filling = True
+        else:
+            # expect the same SeatData format as parliamentarch
+            # data, color, border_size, border_color
+            # convert it to svg properties
+            # title, fill, stroke-width, stroke
+            # also manage the seat numbers, from nb_seats to dict value
+            # also forget about data/title for now
+            filling = []
+            for partylist in inputdata.pop("partylist_per_area", ()):
+                area_filling = {}
+                for party in partylist:
+                    nb_seats = party.pop("nb_seats", 1)
+                    party["fill"] = party.pop("color")
+                    party["stroke-width"] = party.pop("border_size", 0)
+                    party["stroke"] = party.pop("border_color", "black")
+                    area_filling[TemplateSeatData(**party)] = nb_seats
+                filling.append(area_filling)
 
         template_main("static/svg_templates/"+inputdata.pop("template_id")+"_template.svg", "static/"+filename,
             filling=filling,

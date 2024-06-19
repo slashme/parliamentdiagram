@@ -29,10 +29,12 @@ function selectTemplate(template_id) {
     // get the metadata for the selected template
     selected_template = templates_metadata.find((template) => template.id === template_id);
 
-    // TODO
     // show the selected template metadata container
+    $("#togglabletemplateinfo").show();
+    // TODO
     // put in the title and description and number of seats of the template,
     // taken from the element with id "template_" + template_id
+    // in templateinfocontainer
 
     // show the parties container
     $("#togglablepartylistcontainer").show();
@@ -144,68 +146,74 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     jscolor.installByClassName("jscolor");
 }
 
-function callDiagramScript() {
+function callDiagramScript(demo = false) {
     const payload = { template_id: selected_template.id };
 
-    let partylist = [];
-    $("input").each(function () {
-        const [matchresult] = [...this.id.matchAll(/party(\d+)_(\w+)/g)];
-        if (matchresult) {
-            let [, partynumber, property] = matchresult;
-            if (partylist[partynumber] == undefined) {
-                partylist[partynumber] = {};
-            }
-            let value;
-            switch (property) {
-                case "name":
-                    // TODO: implement the name/data/title feature to fix the legend string
-                    // property = "name";
-                    // value = this.value;
-                    // break;
-                    return;
-                case "number":
-                    property = "nb_seats";
-                    value = parseInt(this.value);
-                    break;
-                case "color":
-                    value = "#" + this.value;
-                    break;
-                case "border":
-                    property = "border_size";
-                    value = parseFloat(this.value);
-                    break;
-                case "bcolor":
-                    property = "border_color";
-                    value = "#" + this.value;
-                    break;
-                default:
-                    return;
-            }
-            partylist[partynumber][property] = value;
-        }
-    });
-    partylist = partylist.filter((party) => party !== undefined);
-    const vacants = actuateVacants();
-    if (vacants < 0) {
-        alert("There are too many seats for the template's capacity.");
-        return;
-    }
-    partylist.push({
-        nb_seats: vacants,
-        color: "#" + $("#color_vacant").val(),
-        border_size: parseFloat($("#border_vacant").val()),
-        border_color: "#" + $("#bcolor_vacant").val(),
-    });
-
-    payload.partylist_per_area = [partylist];
-
+    let partylist;
     let legendstring = "";
-    for (let party of partylist) {
-        legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
-        if (party.nb_seats !== 1) {
-            legendstring += 's';
+    if (!demo) {
+        partylist = [];
+        $("input").each(function () {
+            const [matchresult] = [...this.id.matchAll(/party(\d+)_(\w+)/g)];
+            if (matchresult) {
+                let [, partynumber, property] = matchresult;
+                if (partylist[partynumber] == undefined) {
+                    partylist[partynumber] = {};
+                }
+                let value;
+                switch (property) {
+                    case "name":
+                        // TODO: implement the name/data/title feature to fix the legend string
+                        // property = "name";
+                        // value = this.value;
+                        // break;
+                        return;
+                    case "number":
+                        property = "nb_seats";
+                        value = parseInt(this.value);
+                        break;
+                    case "color":
+                        value = "#" + this.value;
+                        break;
+                    case "border":
+                        property = "border_size";
+                        value = parseFloat(this.value);
+                        break;
+                    case "bcolor":
+                        property = "border_color";
+                        value = "#" + this.value;
+                        break;
+                    default:
+                        return;
+                }
+                partylist[partynumber][property] = value;
+            }
+        });
+        partylist = partylist.filter((party) => party !== undefined);
+        const vacants = actuateVacants();
+        if (vacants < 0) {
+            alert("There are too many seats for the template's capacity.");
+            return;
         }
-        legendstring += '}} ';
+        partylist.push({
+            nb_seats: vacants,
+            color: "#" + $("#color_vacant").val(),
+            border_size: parseFloat($("#border_vacant").val()),
+            border_color: "#" + $("#bcolor_vacant").val(),
+        });
+
+        payload.partylist_per_area = [partylist];
+
+        // building the legend string
+        for (let party of partylist) {
+            legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
+            if (party.nb_seats !== 1) {
+                legendstring += 's';
+            }
+            legendstring += '}} ';
+        }
+    } else {
+        payload.demo = true;
     }
 
     $.ajax({
@@ -229,13 +237,15 @@ function callDiagramScript() {
         download.className = "btn btn-success";
         download.title = "SVG diagram";
         download.href = download.download = data;
-        postcontainer.appendChild(document.createElement("hr"));
 
-        postcontainer.append(
-            "Legend template for use in Wikipedia:",
-            document.createElement("br"),
-            legendstring,
-        );
+        if (!demo) {
+            postcontainer.append(
+                document.createElement("hr"),
+                "Legend template for use in Wikipedia:",
+                document.createElement("br"),
+                legendstring,
+            );
+        }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         alert("Error " + textStatus + ": " + errorThrown);
     });
