@@ -25,6 +25,7 @@
             <h3 class="card-text">Select a template</h3>
             <div class="card-deck" id="templatecontainer">
               <a class="card text-center btn w-25" id="template_assnat" onclick="selectTemplate('assnat')">
+                <!-- use the demo as the template card ? -->
                 <img src="{{url_for('static', filename='svg_templates/assnat_template.svg')}}" class="card-img">
                 <div class="card-overlay">
                   <h5 class="card-title">Assemblée nationale</h5>
@@ -36,7 +37,17 @@
         </div>
 
         <!-- selected template metadata card, hidden by default -->
-         <!-- when template chosen, show number of seats (or default to 0) -->
+        <!-- when template chosen, show number of seats (or default to 0) -->
+        <div class="block card" id="togglabletemplateinfo" style="display: none;">
+          <div class="card-body">
+            <h3 class="card-text">Template information</h3>
+
+            <div id="templateinfocontainer">
+            </div>
+
+            <button class="btn btn-primary" onclick="callDiagramScript(demo=true)">Demo</button>
+          </div>
+        </div>
 
         <div class="block card" id="togglablepartylistcontainer" style="display: none;">
           <div class="card-body">
