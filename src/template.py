@@ -55,7 +55,7 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
             fill_ET_template_by_class(template_ET, filling)
             print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
         else:
-            output_file.write(fill_str_template(template_str, filling))
+            print(fill_str_template(template_str, filling), file=output_file)
 
 def parse_ET_without_namespaces(string) -> ET.Element:
     """
