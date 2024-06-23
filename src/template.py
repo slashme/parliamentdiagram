@@ -70,19 +70,19 @@ def parse_ET_without_namespaces(string) -> ET.Element:
     element.attrib = found_namespaces | element.attrib
     return element
 
-def generate_rainbow(n, born=300):
+def generate_rainbow(n, boun=300):
     """
-    Generates a rainbow of that many CSS colors going from full red (inclusive) to born (inclusive, defaulting to purple).
-    If born is an integer, it is interpreted as a number of degrees. If it is a float, it is interpreted as a fraction of a turn.
+    Generates a rainbow of that many CSS colors going from full red (inclusive) to boun (inclusive, defaulting to purple).
+    If boun is an integer, it is interpreted as a number of degrees. If it is a float, it is interpreted as a fraction of a turn.
     """
-    if not isinstance(born, int):
-        born = round(born*360) # ints are more precise than floats
+    if not isinstance(boun, int):
+        boun = round(boun*360) # ints are more precise than floats
 
-    if born % (n-1):
-        it = (f"hsl({born*i/(n-1)}deg 100% 50%)" for i in range(n))
+    if boun % (n-1):
+        it = (f"hsl({boun*i/(n-1)}deg 100% 50%)" for i in range(n))
     else:
         # write ints, if possible without losing precision
-        it = (f"hsl({born*i//(n-1)}deg 100% 50%)" for i in range(n))
+        it = (f"hsl({boun*i//(n-1)}deg 100% 50%)" for i in range(n))
     yield from it
 
 def scan_ET_template(template: ET.Element) -> list[int]:
