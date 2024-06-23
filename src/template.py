@@ -158,7 +158,12 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
             del node.attrib["id"]
             for k, v in seat_data.items():
                 if v:
-                    node.set(k, v)
+                    if k in ("title", "desc"):
+                        el = ET.Element(k)
+                        el.text = v
+                        node.append(el)
+                    else:
+                        node.set(k, str(v))
 
 def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     # do it more cleanly, take advantage of the ET
