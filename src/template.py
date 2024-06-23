@@ -130,10 +130,10 @@ def extract_str_template(template: str, *, check_unicity=False):
 
 
 def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
-    # The operation is done in-place and mutates the ElementTree
-    # part 2 :
-    # take a template (contents)
-    # take a [{seat_data: nseats} for each area]
+    """
+    The operation is done in-place and mutates the ElementTree.
+    This method is the only one to properly support the title and desc seat data.
+    """
 
     # extract the seat svg elements again
     # group them by area
@@ -166,12 +166,12 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
                         node.set(k, str(v))
 
 def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
-    # do it more cleanly, take advantage of the ET
-    # make a <style> node inside the svg node
-    # inside, define .partyn{fill:#c01085;stroke:#000000;} classes
-    # one per SeatData
-    # then, for each seat, add the class to the seat
-        # if the node has a class, append the new one separated by a space
+    """
+    This does it more cleanly, taking advantage of the ET.
+    Each party's class definition is put in a <style> node.
+    Then the class is added to the seats.
+    title and desc are not properly managed (treated as attributes).
+    """
 
     sorted_areas, l1_elements_by_area = extract_ET_template(template)
 
@@ -206,10 +206,10 @@ def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData,
             node.attrib.pop("id")
 
 def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
-    # The operation is not done in-place since str is immutable
-    # part 2 :
-    # take a template (contents)
-    # take a [{seat_data: nseats} for each area]
+    """
+    The operation is not done in-place since str is immutable.
+    title and desc are not properly managed (treated as attributes).
+    """
 
     # extract the seat svg elements again
     # group them by area
