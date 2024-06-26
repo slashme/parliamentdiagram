@@ -8,18 +8,27 @@
 {% endblock %}
 
 {% block content %}
-        <div class=block>
-          <div class="notice">This tool is in Beta testing. Please help to test it, but if you use it to generate diagrams for Wikipedia, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.</div><br/>
-          This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.<br/>
-        </div>
-        <div class=block>
-          To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
-          Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
-          To use it in Wikipedia, I recommend uploading it to Wikimedia Commons.
-          If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br/>
-        </div>
-        <div class=block>
-          <div id="spotshapeoptioncontainer" class=block>
+
+ <div class="block card">
+          <div class="card-body">
+            <h2 class="card-text">This is a tool to generate a Westminster-based parliament diagrams.</h2>
+            <h3 class="card-text">
+                This tool is in Beta testing. Please help to test it, but if you use it to generate diagrams for Wikipedia, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.</div><br/>
+                This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.
+            </h3>
+            <p>
+                To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
+                Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
+                To use it in Wikipedia, I recommend uploading it to Wikimedia Commons.
+                If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br/>
+            </p>
+            <p>If the layout of the seats in the diagram is strange (this sometimes happens for small parliaments) you can click on "Enable advanced parameters" and try the "compact-rows diagram" option.</p>
+            <p class="card-text">Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.</p>
+          </div>
+</div>
+
+<div class=block>
+        <div id="spotshapeoptioncontainer" class=block>
             <h3>Spot shape options</h3>
             Try out different values of corner radius to round out the blocks (negative
             values will be set to 0, and anything over 0.5 is a circle). Many Wikipedia
