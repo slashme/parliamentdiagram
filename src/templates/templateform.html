@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Parliament template diagram generator{% endblock %}
+
+{% block otherimports %}
+<script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/templates.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+        <div class="block card">
+          <div class="card-body">
+            <h2 class="card-text">
+              This is a tool to generate parliament diagrams based on fixed-seat templates.
+            </h2>
+            <p class="card-text">
+              Here go explanations on how to use. (TODO)
+          </div>
+        </div>
+
+        <!-- template selector card grid -->
+        <div class="block card">
+          <!-- fold when selected ? -->
+          <div class="card-body">
+            <h3 class="card-text">Select a template</h3>
+            <div class="card-deck" id="templatecontainer">
+              <a class="card text-center btn w-25" id="template_assnat" onclick="selectTemplate('assnat')">
+                <img src="{{url_for('static', filename='images/assnat_template_demo.svg')}}" class="card-img">
+                <div class="card-overlay">
+                  <h5 class="card-title">Assemblée nationale</h5>
+                  <p class="card-text">This is the french assembly.</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- selected template metadata card, hidden by default -->
+        <!-- when template chosen, show number of seats (or default to 0) -->
+        <div class="block card" id="togglabletemplateinfo" style="display: none;">
+          <div class="card-body">
+            <h3 class="card-text">Template information</h3>
+
+            <div id="templateinfocontainer">
+            </div>
+
+            <button class="btn btn-primary" onclick="callDiagramScript(demo=true)">Demo</button>
+          </div>
+        </div>
+
+        <div class="block card" id="togglablepartylistcontainer" style="display: none;">
+          <div class="card-body">
+            <div id="partylistcontainer">
+            </div>
+
+            <p>
+              <button class="btn btn-success" onclick="addParty()">+ Add a party manually</button>
+            </p>
+
+            <div id="party_vacant" class="block card">
+              <div class="card-body">
+                <div class="left">Vacant seats</div>
+                <div>
+                  <input class="right" type="number" id="number_vacant" disabled="disabled" value="0">
+                </div>
+                <div class="left">Vacant seats color</div>
+                <div>
+                  <input class="right jscolor" type="text" id="color_vacant" value="DDDDDD"/>
+                </div>
+                <div class="left">Vacant seats border width</div>
+                <div>
+                  <input class="right" type="number" id="border_vacant" value="0" step="0.01" min="0.0"/>
+                </div>
+                <div class="left">Vacant seats border color</div>
+                <div>
+                  <input class="right jscolor" type="text" id="bcolor_vacant" value="000000"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- button to create diagram, only active when number of vacant is positive or 0 -->
+            <button class="btn btn-primary" onclick="callDiagramScript()">Make my diagram</button>
+          </div>
+        </div>
+
+        <!-- generated diagram displayer, hidden and empty by default -->
+        <div class="block card" id="togglablepost" style="display: none;">
+          <div class="card-body" id="postcontainer">
+
+          </div>
+        </div>
+
+{% endblock %}
