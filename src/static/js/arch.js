@@ -97,6 +97,19 @@ $(document).ready(function () {
         disable_advanced_btn.hide();
         advanced_body.hide();
     });
+
+    $('.sortableContainer').each(function (index, liz) {
+        $(liz).sortable({
+            // handle: '.handle', // class name of the content of each element from which the element will be draggable
+            containment: $(liz).parents('.card'), // takes the first parent with a card class
+            cursor: 'move', // unless the "cursor: move;" style is set to the handle class
+            // update: function () {
+            //     $('.card', liz).each(function (index, sortableElem) {
+            //         // update the index of each element, if the order rules is not updated elsewhere
+            //     })
+            // },
+        });
+    });
 });
 
 function addParty(newname = "", newcolor = "", newnseats = 0) {
