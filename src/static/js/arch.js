@@ -101,6 +101,8 @@ $(document).ready(function () {
     $('.sortableContainer').each(function (index, liz) {
         $(liz).sortable({
             handle: '.handle', // class name of the content of each element from which the element will be draggable
+            // axis: 'y',
+            // containment: liz,
             containment: $(liz).parents('.card'), // takes the first parent with a card class
             cursor: 'move', // unless the "cursor: move;" style is set to the handle class
             // update: function () {
@@ -135,7 +137,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // ordering handle
     const mover = newpartydiv.appendChild(document.createElement('span'));
-    mover.className = 'handle';
+    mover.className = 'handle btn btn-secondary';
     mover.innerHTML = '☰';
     Object.assign(mover.style, {
         cursor: 'move',
@@ -149,8 +151,6 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
         padding: '0 10px',
         "margin-right": '20px',
-        "border-radius": '3px',
-        background: '#ccc',
     });
 
     // Party name label
