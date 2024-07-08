@@ -128,7 +128,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     const partycard = document.createElement('div');
     partycard.id = "party" + i;
-    partycard.className = 'card';
+    partycard.className = 'card partycard';
     partylistcontainer.appendChild(partycard);
 
     const newpartydiv = document.createElement('div');
@@ -227,25 +227,19 @@ function CallDiagramScript() {
     // Retrieve advanced parameters
     requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
 
-    const partylist = new Array();
-    $("input").each(function () {
-        const thisname = this.name;
-        if (thisname.startsWith("Name")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]] = { Name: this.value };
-        } else if (thisname.startsWith("Number")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Num'] = this.value;
-        } else if (thisname.startsWith("Color")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Color'] = this.value;
-        } else if (thisname.startsWith("Border")) {
-            //If we're processing a border width, add value if it's a number, maxing out at 1.
-            //Add 0 if it's not a number or if it's equal to 0.
-            let bwidth = parseFloat(this.value);
-            if (isNaN(bwidth)) { bwidth = 0 }; //!\\
-            bwidth = Math.min(Math.max(bwidth, 0), 1);
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Border'] = bwidth;
-        } else if (thisname.startsWith("BColor")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['BColor'] = this.value;
-        }
+    const partylist = [];
+    $(".partycard").each(function () {
+        const thisobj = {};
+        const jme = $(this);
+        thisobj.Name = jme.find("input[name^='Name']").val();
+        thisobj.Num = jme.find("input[name^='Number']").val();
+        thisobj.Color = jme.find("input[name^='Color']").val();
+        let bwidth = jme.find("input[name^='Border']").val();
+        if (isNaN(bwidth)) { bwidth = 0 }; //!\\
+        bwidth = Math.min(Math.max(bwidth, 0), 1);
+        thisobj.Border = bwidth;
+        thisobj.BColor = jme.find("input[name^='BColor']").val();
+        partylist.push(thisobj);
     });
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
