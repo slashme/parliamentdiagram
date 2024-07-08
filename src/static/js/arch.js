@@ -227,45 +227,35 @@ function CallDiagramScript() {
     // Retrieve advanced parameters
     requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
 
-    const partylist = [];
-    $(".partycard").each(function () {
-        const thisobj = {};
-        const jme = $(this);
-        thisobj.Name = jme.find("input[name^='Name']").val();
-        thisobj.Num = jme.find("input[name^='Number']").val();
-        thisobj.Color = jme.find("input[name^='Color']").val();
-        let bwidth = jme.find("input[name^='Border']").val();
-        if (isNaN(bwidth)) { bwidth = 0 }; //!\\
-        bwidth = Math.min(Math.max(bwidth, 0), 1);
-        thisobj.Border = bwidth;
-        thisobj.BColor = jme.find("input[name^='BColor']").val();
-        partylist.push(thisobj);
-    });
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     let legendstring = "";
     let totalseats = 0; //count total seats to check for empty diagram
     requestJSON.parties = [];
-    for (let party of partylist) {
-        if (party) {
-            const num = parseInt(party['Num']);
-            requestJSON.parties.push({
-                name: party['Name'].replace(',', ''),
-                nb_seats: num,
-                color: '#' + party['Color'],
-                border_size: parseFloat(party['Border']),
-                border_color: '#' + party['BColor']
-            });
+    $(".partycard").each(function () {
+        const jme = $(this);
 
-            totalseats += num;
+        let bwidth = parseFloat(jme.find("input[name^='Border']").val());
+        if (isNaN(bwidth)) { bwidth = 0 }; //!\\
+        bwidth = Math.min(Math.max(bwidth, 0), 1);
+        let name = jme.find("input[name^='Name']").val();
+        const party = {
+            name: name.replace(',', ''),
+            nb_seats: parseInt(jme.find("input[name^='Number']").val()),
+            color: '#' + jme.find("input[name^='Color']").val(),
+            border_size: bwidth,
+            border_color: '#' + jme.find("input[name^='BColor']").val(),
+        };
+        requestJSON.parties.push(party);
 
-            legendstring += `{{legend|#${party['Color']}|${party['Name']}: ${num} seat`;
-            if (num != 1) {
-                legendstring += "s";
-            }
-            legendstring += "}} ";
+        totalseats += party.nb_seats;
+
+        legendstring += `{{legend|${party.color}|${name}: ${party.nb_seats} seat`;
+        if (party.nb_seats != 1) {
+            legendstring += "s";
         }
-    }
+        legendstring += "}} ";
+    });
     if (totalseats > 0) {
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
