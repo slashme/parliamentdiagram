@@ -145,12 +145,11 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
         "font-size": '30px',
 
         position: 'absolute',
-        right: '0',
+        right: '20px',
         top: '50%',
         transform: 'translateY(-50%)',
 
         padding: '0 10px',
-        "margin-right": '20px',
     });
 
     // Party name label
