@@ -100,7 +100,7 @@ $(document).ready(function () {
 
     $('.sortableContainer').each(function (index, liz) {
         $(liz).sortable({
-            // handle: '.handle', // class name of the content of each element from which the element will be draggable
+            handle: '.handle', // class name of the content of each element from which the element will be draggable
             containment: $(liz).parents('.card'), // takes the first parent with a card class
             cursor: 'move', // unless the "cursor: move;" style is set to the handle class
             // update: function () {
@@ -132,6 +132,26 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     const newpartydiv = document.createElement('div');
     newpartydiv.className = 'card-body';
     partycard.appendChild(newpartydiv);
+
+    // ordering handle
+    const mover = newpartydiv.appendChild(document.createElement('span'));
+    mover.className = 'handle';
+    mover.innerHTML = '☰';
+    Object.assign(mover.style, {
+        cursor: 'move',
+
+        "font-size": '30px',
+
+        position: 'absolute',
+        right: '0',
+        top: '50%',
+        transform: 'translateY(-50%)',
+
+        padding: '0 10px',
+        "margin-right": '20px',
+        "border-radius": '3px',
+        background: '#ccc',
+    });
 
     // Party name label
     const partytitle = document.createElement('div');
