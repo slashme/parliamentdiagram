@@ -98,11 +98,11 @@ $(document).ready(function () {
         advanced_body.hide();
     });
 
-    $('.sortableContainer').each(function (index, liz) {
-        $(liz).sortable({
-            handle: '.handle', // class name of the content of each element from which the element will be draggable
-            containment: $(liz).parents('.card'), // takes the first parent with a card class
-            cursor: 'move', // unless the "cursor: move;" style is set to the handle class
+    $(".sortableContainer").each(function (index, liz) {
+        const jliz = $(liz);
+        jliz.sortable({
+            handle: ".handle", // class name of the content of each element from which the element will be draggable
+            containment: jliz.parents(".card"), // takes the first parent with a card class
         });
     });
 });
@@ -128,7 +128,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     newpartydiv.className = 'card-body';
     partycard.appendChild(newpartydiv);
 
-    // ordering handle
+    // Ordering handle
     const mover = newpartydiv.appendChild(document.createElement('span'));
     mover.className = 'handle btn btn-secondary';
     mover.innerHTML = '☰';
