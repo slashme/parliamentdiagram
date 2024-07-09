@@ -27,7 +27,7 @@
         </div>
 
         <div class="block card">
-          <div id="spotshapeoptioncontainer" class=block>
+          <div id="spotshapeoptioncontainer" class="card-body">
             <h3>Spot shape options</h3>
             Try out different values of corner radius to round out the blocks (negative
             values will be set to 0, and anything over 0.5 is a circle). Many Wikipedia
@@ -38,7 +38,10 @@
             give invisible spots.)<br/>
             <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br/>
           </div>
-          <div id="layoutoptioncontainer" class=block>
+        </div>
+
+        <div class="block card">
+          <div id="layoutoptioncontainer" class="card-body">
             <h3>Layout options</h3>
             To use the automatic layout, leave "wing rows" and "cross-bench columns" at
             0, otherwise use them to specify the number of rows in the left and right
@@ -57,12 +60,22 @@
             To create a group of spots for "speakers" or similar functions, you can add parties with the "group" set to "Speaker". To automatically create one or more "speaker" spots with the colour of the largest party, without creating them as separate parties, you can just type a number in the checkbox below:<br/>
             <div class="left">Speaker spots</div><input class="right" type="number" name="autospeaker" value = 0 ><br/>
           </div>
-          <div id="partylistcontainer" class=block>
-            <h3>List of parties</h3>
-          </div>
-          <button class="btn btn-primary" onclick="addParty()">Add a party</button>
         </div>
+
+        <div class="block card">
+          <div class="card-body">
+            <h3>List of parties</h3>
+
+            <div id="partylistcontainer"></div>
+
+            <p>
+              <button class="btn btn-primary" onclick="addParty()">Add a party</button>
+            </p>
+          </div>
+        </div>
+
         <button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
+
         <div class="block">
           <div id="postcontainer">
             <br/>

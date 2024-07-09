@@ -164,10 +164,12 @@ function addParty(newcolor = "") {
     });
     i++;
 
-    // Create a new party <div>
-    const newpartydiv = document.createElement('div');
-    newpartydiv.id = "party" + i;
-    partylistcontainer.appendChild(newpartydiv);
+    const partycard = partylistcontainer.appendChild(document.createElement('div'));
+    partycard.id = "party" + i;
+    partycard.className = "card";
+
+    const newpartydiv = partycard.appendChild(document.createElement('div'));
+    newpartydiv.className = "card-body";
 
     // Party name label
     const partytitle = document.createElement('div');
