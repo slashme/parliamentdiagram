@@ -13,66 +13,40 @@ $(document).ready(function () {
 
 function CallDiagramScript() {
     // Create request payload
-    let payload = {};
+    const payload = {
+        radius: Math.max(0, parseFloat($("input[name^='radius']").val())),
+        spacing: Math.max(0, Math.min(parseFloat($("input[name^='spacing'").val()), .99)),
+        wingrows: Math.max(0, parseInt($("input[name^='wingrows']").val())),
+        centercols: Math.max(0, parseInt($("input[name^='centercols']").val())),
+        fullwidth: new Boolean($("input[name^='fullwidth']").prop("checked")),
+        cozy: new Boolean($("input[name^='cozy']").prop("checked")),
+        parties: [],
+    };
+
+    const partylist = payload.parties;
+
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     let legendstring = "";
-
-    let spotradius = 0;
-    let spotspacing = 0;
-    let wingrows = 0;
-    let centercols = 0;
-    let fullwidth = 0;
-    let cozy = 0;
-    let autospeaker = 0;
-    let partylist = [];
     //this variable will hold the index of the party with the biggest support: used for creating an auto-speaker spot.
     let bigparty = 0;
     let bigpartysize = 0;
-
-    $("input").each(function () {
-        if (this.name.startsWith("radius")) {
-            spotradius = Math.max(0, parseFloat(this.value));
-        } else if (this.name.startsWith("spacing")) {
-            spotspacing = Math.max(0, Math.min(parseFloat(this.value), .99)); //don't allow spots of size 0.
-        } else if (this.name.startsWith("wingrows")) {
-            wingrows = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("centercols")) {
-            centercols = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("fullwidth")) {
-            fullwidth = new Boolean(this.checked);
-        } else if (this.name.startsWith("cozy")) {
-            cozy = new Boolean(this.checked);
-        } else if (this.name.startsWith("autospeaker")) {
-            autospeaker = Math.max(0, parseInt(this.value));
-        }
-    });
-
-    payload.radius = spotradius;
-    payload.spacing = spotspacing;
-    payload.wingrows = wingrows;
-    payload.centercols = centercols;
-    payload.fullwidth = fullwidth;
-    payload.cozy = cozy;
-
-    let parties = payload.parties = [];
-
     $(".partycard").each(function () {
         const jme = $(this);
-        const index = parties.length;
+        const index = partylist.length;
 
         const party = {
             name: jme.find("input[name^='Name']").val(),
-            num: Math.max(1, ParseInt(jme.find("input[name^='Number']").val())),
+            num: Math.max(1, parseInt(jme.find("input[name^='Number']").val())),
             group: jme.find("select[name^='Group']").val(),
             color: "#" + jme.find("input[name^='Color']").val(),
-        }
+        };
 
         if (party.num > bigpartysize) {
             bigparty = index;
             bigpartysize = party.num;
         }
 
-        parties.push(party);
+        partylist.push(party);
 
         if (party.group !== "head") {
             legendstring += `{{legend|${party.color}|${party.name}: ${party.num} seat`
@@ -83,15 +57,15 @@ function CallDiagramScript() {
         }
     });
 
+    const autospeaker = Math.max(0, parseInt($("input[name^='autospeaker']").val()));
     if (autospeaker) {
-        parties.push({
-            name: partylist[bigparty].Name,
+        partylist.push({
+            name: partylist[bigparty].name,
             num: autospeaker,
             group: "head",
-            color: '#' + partylist[bigparty].Color
+            color: '#' + partylist[bigparty].color
         });
     }
-
 
     if (partylist.length) {
         //Now post the request to the script which actually makes the diagram.
