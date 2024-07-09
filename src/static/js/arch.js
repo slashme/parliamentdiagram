@@ -101,15 +101,8 @@ $(document).ready(function () {
     $('.sortableContainer').each(function (index, liz) {
         $(liz).sortable({
             handle: '.handle', // class name of the content of each element from which the element will be draggable
-            // axis: 'y',
-            // containment: liz,
             containment: $(liz).parents('.card'), // takes the first parent with a card class
             cursor: 'move', // unless the "cursor: move;" style is set to the handle class
-            // update: function () {
-            //     $('.card', liz).each(function (index, sortableElem) {
-            //         // update the index of each element, if the order rules is not updated elsewhere
-            //     })
-            // },
         });
     });
 });
@@ -141,14 +134,11 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     mover.innerHTML = '☰';
     Object.assign(mover.style, {
         cursor: 'move',
-
         "font-size": '30px',
-
         position: 'absolute',
         right: '20px',
         top: '50%',
-        transform: 'translateY(-50%)',
-
+        transform: 'translateY(-50%)', // yalign .5
         padding: '0 10px',
     });
 
