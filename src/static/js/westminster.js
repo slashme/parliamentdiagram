@@ -117,18 +117,15 @@ function CallDiagramScript() {
 
             // This will get the first node with id "postcontainer"
             const postcontainer = document.getElementById("postcontainer");
-            // This is the new postcontainer that will hold our stuff.
-            const newpost = document.createElement("div");
-            newpost.setAttribute("id", "postcontainer");
 
-            postcontainer.parentNode.insertBefore(newpost, postcontainer);
+            const newdiagdiv = postcontainer.appendChild(document.createElement('div'));
 
             // Now add the svg image to the page
             const img = document.createElement("img");
             img.src = data;
-            newpost.appendChild(img);
+            newdiagdiv.appendChild(img);
             // and a linebreak
-            newpost.appendChild(document.createElement("br"));
+            newdiagdiv.appendChild(document.createElement("br"));
 
             // Add a link with the new diagram
             const a = document.createElement('a');
@@ -136,15 +133,15 @@ function CallDiagramScript() {
             a.title = "SVG diagram";
             a.href = data;
             a.download = data;
-            newpost.appendChild(a);
+            newdiagdiv.appendChild(a);
             // and a linebreak
-            newpost.appendChild(document.createElement("br"));
+            newdiagdiv.appendChild(document.createElement("br"));
 
             // Now add the legend template text with the party names, colours and support.
-            newpost.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
-            newpost.appendChild(document.createElement("br"));
-            newpost.appendChild(document.createTextNode(legendstring));
-            newpost.appendChild(document.createElement("br"));
+            newdiagdiv.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
+            newdiagdiv.appendChild(document.createElement("br"));
+            newdiagdiv.appendChild(document.createTextNode(legendstring));
+            newdiagdiv.appendChild(document.createElement("br"));
         });
 
         console.log(requeststring);
