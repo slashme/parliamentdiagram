@@ -118,30 +118,31 @@ function CallDiagramScript() {
             // This will get the first node with id "postcontainer"
             const postcontainer = document.getElementById("postcontainer");
 
-            const newdiagdiv = postcontainer.appendChild(document.createElement('div'));
+            const newdiag = postcontainer.appendChild(document.createElement('p'));
 
             // Now add the svg image to the page
             const img = document.createElement("img");
             img.src = data;
-            newdiagdiv.appendChild(img);
+            newdiag.appendChild(img);
             // and a linebreak
-            newdiagdiv.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("br"));
 
             // Add a link with the new diagram
             const a = document.createElement('a');
+            a.className = "btn btn-success";
             a.appendChild(document.createTextNode("Click to download your SVG diagram."));
             a.title = "SVG diagram";
             a.href = data;
             a.download = data;
-            newdiagdiv.appendChild(a);
+            newdiag.appendChild(a);
             // and a linebreak
-            newdiagdiv.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("br"));
 
             // Now add the legend template text with the party names, colours and support.
-            newdiagdiv.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
-            newdiagdiv.appendChild(document.createElement("br"));
-            newdiagdiv.appendChild(document.createTextNode(legendstring));
-            newdiagdiv.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
+            newdiag.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createTextNode(legendstring));
+            newdiag.appendChild(document.createElement("br"));
         });
 
         console.log(requeststring);
