@@ -1,6 +1,14 @@
 $(document).ready(function () {
     jscolor.installByClassName("jscolor");
     addParty(newcolor = "#AD1FFF");
+
+    $(".sortableContainer").each(function (index, liz) {
+        const jliz = $(liz);
+        jliz.sortable({
+            handle: ".handle",
+            containment: jliz.parents(".block"),
+        });
+    });
 });
 
 function CallDiagramScript() {
@@ -36,20 +44,6 @@ function CallDiagramScript() {
             cozy = new Boolean(this.checked);
         } else if (this.name.startsWith("autospeaker")) {
             autospeaker = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("Name")) {
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])] = { Name: this.value };
-        } else if (this.name.startsWith("Number")) {
-            // Don't allow parties without delegates: if we have a number field, make the value at least 1.
-            // It's a bit of a hack, but shouldn't be much of a limitation.
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Num'] = Math.max(1, parseInt(this.value));
-        } else if (this.name.startsWith("Color")) {
-            // If we are processing a colour string, add a # before the hex values.
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Color'] = this.value;
-        }
-    });
-    $("select").each(function () {
-        if (this.name.startsWith("Group")) {
-            partylist[/[0-9]+$/.exec(this.name)[0]]['Group'] = this.value;
         }
     });
 
@@ -62,35 +56,32 @@ function CallDiagramScript() {
 
     let parties = payload.parties = [];
 
-    for (let i = 1; i < partylist.length; i++) {
-        const party = partylist[i];
-        if (party) {
-            // Find the biggest party while going through the list
-            // This is such a cheap operation that I'm not going to bother
-            // to check each time whether "autospeaker" is checked.
+    $(".partycard").each(function () {
+        const jme = $(this);
+        const index = parties.length;
 
-            // Update bigparty as the index of the biggest party
-            if (party.Num > bigpartysize) {
-                bigparty = i;
-                bigpartysize = party.Num;
-            }
-
-            parties.push({
-                name: party.Name,
-                num: party.Num,
-                group: party.Group,
-                color: '#' + party.Color
-            });
-
-            if (party.Group !== "head") {
-                legendstring += `{{legend|#${party.Color}|${party.Name}: ${party.Num} seat`;
-                if (party.Num !== 1) {
-                    legendstring += 's';
-                }
-                legendstring += '}} ';
-            }
+        const party = {
+            name: jme.find("input[name^='Name']").val(),
+            num: Math.max(1, ParseInt(jme.find("input[name^='Number']").val())),
+            group: jme.find("select[name^='Group']").val(),
+            color: "#" + jme.find("input[name^='Color']").val(),
         }
-    }
+
+        if (party.num > bigpartysize) {
+            bigparty = index;
+            bigpartysize = party.num;
+        }
+
+        parties.push(party);
+
+        if (party.group !== "head") {
+            legendstring += `{{legend|${party.color}|${party.name}: ${party.num} seat`
+            if (party.num !== 1) {
+                legendstring += 's';
+            }
+            legendstring += '}} ';
+        }
+    });
 
     if (autospeaker) {
         parties.push({
@@ -164,10 +155,24 @@ function addParty(newcolor = "") {
 
     const partycard = partylistcontainer.appendChild(document.createElement('div'));
     partycard.id = "party" + i;
-    partycard.className = "card";
+    partycard.className = "card partycard";
 
     const newpartydiv = partycard.appendChild(document.createElement('div'));
     newpartydiv.className = "card-body";
+
+    // Ordering handle
+    const mover = newpartydiv.appendChild(document.createElement('span'));
+    mover.className = 'handle btn btn-secondary';
+    mover.innerHTML = '☰';
+    Object.assign(mover.style, {
+        cursor: "move",
+        "font-size": "30px",
+        position: 'absolute',
+        right: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)', // yalign .5
+        padding: '0 10px',
+    })
 
     // Party name label
     const partytitle = document.createElement('div');
