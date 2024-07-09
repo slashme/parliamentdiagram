@@ -53,20 +53,20 @@ function CallArchScript() {
     }).done(function (data, status) {
         data = data.trim();
 
+        // Show the default-hidden div
+        $("#togglablepost").show();
+
         // This will get the first node with id "postcontainer"
         const postcontainer = document.getElementById("postcontainer");
 
-        // This is the new postcontainer that will hold our stuff.
-        const newpost = document.createElement("div");
-        postcontainer.parentNode.insertBefore(newpost, postcontainer);
-        newpost.setAttribute("id", "postcontainer");
+        const newdiagdiv = postcontainer.appendChild(document.createElement('div'));
 
         // Now add the svg image to the page
         const img = document.createElement("img");
         img.src = data;
-        newpost.appendChild(img);
+        newdiagdiv.appendChild(img);
         // and a linebreak
-        newpost.appendChild(document.createElement("br"));
+        newdiagdiv.appendChild(document.createElement("br"));
 
         // Add a link with the new diagram
         const a = document.createElement('a');
@@ -74,8 +74,8 @@ function CallArchScript() {
         a.title = "SVG diagram";
         a.href = data;
         a.download = data;
-        newpost.appendChild(a);
+        newdiagdiv.appendChild(a);
         // and a linebreak
-        newpost.appendChild(document.createElement("br"));
+        newdiagdiv.appendChild(document.createElement("br"));
     });
 }
