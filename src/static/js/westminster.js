@@ -112,15 +112,16 @@ function CallDiagramScript() {
         }).done(function (data, status) {
             data = data.trim();
 
+            // Show the default-hidden div
+            $("#togglablepost").show();
+
             // This will get the first node with id "postcontainer"
             const postcontainer = document.getElementById("postcontainer");
-            // This will get the parent div that contains all the graphs
-            const postparent = postcontainer.parentNode;
             // This is the new postcontainer that will hold our stuff.
             const newpost = document.createElement("div");
-
-            postparent.insertBefore(newpost, postcontainer);
             newpost.setAttribute("id", "postcontainer");
+
+            postcontainer.parentNode.insertBefore(newpost, postcontainer);
 
             // Now add the svg image to the page
             const img = document.createElement("img");
