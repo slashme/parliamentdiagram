@@ -84,9 +84,9 @@ $(document).ready(function () {
     });
 
     // Enable/disable advanced parameters
-    let enable_advanced_btn = $('#enable-advanced');
-    let disable_advanced_btn = $('#disable-advanced');
-    let advanced_body = $('#advanced-body');
+    const enable_advanced_btn = $('#enable-advanced');
+    const disable_advanced_btn = $('#disable-advanced');
+    const advanced_body = $('#advanced-body');
     enable_advanced_btn.click(function () {
         enable_advanced_btn.hide();
         disable_advanced_btn.show();
@@ -103,6 +103,9 @@ $(document).ready(function () {
         jliz.sortable({
             handle: ".handle", // class name of the content of each element from which the element will be draggable
             containment: jliz.parents(".card"), // takes the first parent with a card class
+            opacity: .7,
+            revert: 30,
+            tolerance: "pointer",
         });
     });
 });
