@@ -6,7 +6,10 @@ $(document).ready(function () {
         const jliz = $(liz);
         jliz.sortable({
             handle: ".handle",
-            containment: jliz.parents(".block"),
+            containment: jliz.parents(".card"),
+            opacity: .7,
+            revert: 30,
+            tolerance: "pointer",
         });
     });
 });
@@ -30,6 +33,7 @@ function CallDiagramScript() {
     //this variable will hold the index of the party with the biggest support: used for creating an auto-speaker spot.
     let bigparty = 0;
     let bigpartysize = 0;
+    let totalseats = 0; //count total seats to check for empty diagram
     $(".partycard").each(function () {
         const jme = $(this);
         const index = partylist.length;
@@ -48,6 +52,8 @@ function CallDiagramScript() {
 
         partylist.push(party);
 
+        totalseats += party.num;
+
         if (party.group !== "head") {
             legendstring += `{{legend|${party.color}|${party.name}: ${party.num} seat`
             if (party.num !== 1) {
@@ -65,9 +71,10 @@ function CallDiagramScript() {
             group: "head",
             color: '#' + partylist[bigparty].color
         });
+        totalseats += autospeaker;
     }
 
-    if (partylist.length) {
+    if (totalseats > 0) {
         //Now post the request to the script which actually makes the diagram.
         const requeststring = JSON.stringify(payload);
         $.ajax({
@@ -146,7 +153,7 @@ function addParty(newcolor = "") {
         top: '50%',
         transform: 'translateY(-50%)', // yalign .5
         padding: '0 10px',
-    })
+    });
 
     // Party name label
     const partytitle = document.createElement('div');
