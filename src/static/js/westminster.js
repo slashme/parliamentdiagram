@@ -105,8 +105,6 @@ function addParty(newcolor = "") {
     delbutton.innerHTML = `Delete party ${i}`;
     delbutton.setAttribute("onClick", `deleteParty(${i})`);
     newpartydiv.appendChild(delbutton);
-    // Add a newline
-    newpartydiv.appendChild(document.createElement("br"));
     jscolor.installByClassName("jscolor");
 }
 
@@ -117,8 +115,8 @@ function CallDiagramScript() {
         spacing: Math.max(0, Math.min(parseFloat($("input[name^='spacing'").val()), .99)),
         wingrows: Math.max(0, parseInt($("input[name^='wingrows']").val())),
         centercols: Math.max(0, parseInt($("input[name^='centercols']").val())),
-        fullwidth: new Boolean($("input[name^='fullwidth']").prop("checked")),
-        cozy: new Boolean($("input[name^='cozy']").prop("checked")),
+        fullwidth: !!($("input[name^='fullwidth']").prop("checked")),
+        cozy: !!($("input[name^='cozy']").prop("checked")),
         parties: [],
     };
 

@@ -207,8 +207,6 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     delbutton.innerHTML = "Delete party " + i;
     delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
     newpartydiv.appendChild(delbutton);
-    // Add a newline
-    newpartydiv.appendChild(document.createElement("br"));
 
     //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
     jscolor.installByClassName("jscolor");
