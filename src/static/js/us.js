@@ -59,7 +59,7 @@ function CallArchScript() {
         // This will get the first node with id "postcontainer"
         const postcontainer = document.getElementById("postcontainer");
 
-        const newdiag = postcontainer.appendChild(document.createElement('p'));
+        const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
 
         // Now add the svg image to the page
         const img = document.createElement("img");
