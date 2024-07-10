@@ -1,4 +1,16 @@
 $(document).ready(function () {
+    jscolor.installByClassName("jscolor");
+
+    $(".sortableContainer").each(function (index, liz) {
+        const jliz = $(liz);
+        jliz.sortable({
+            handle: ".handle",
+            containment: jliz.parents(".card"),
+            opacity: .7,
+            revert: 30,
+            tolerance: "pointer",
+        });
+    });
 });
 
 // hardcoded list of metadata for each template
@@ -64,6 +76,20 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     const newpartydiv = partycard.appendChild(document.createElement("div"));
     newpartydiv.className = "card-body";
+
+    // Ordering handle
+    const mover = newpartydiv.appendChild(document.createElement("span"));
+    mover.className = "handle btn btn-secondary";
+    mover.innerHTML = "☰";
+    Object.assign(mover.style, {
+        cursor: "move",
+        "font-size": "30px",
+        position: "absolute",
+        right: "20px",
+        top: "50%",
+        transform: "translateY(-50%)", // yalign .5
+        padding: "0 10px",
+    });
 
     // Party name label
     const partytitle = newpartydiv.appendChild(document.createElement("div"));
