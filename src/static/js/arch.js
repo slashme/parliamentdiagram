@@ -84,9 +84,9 @@ $(document).ready(function () {
     });
 
     // Enable/disable advanced parameters
-    let enable_advanced_btn = $('#enable-advanced');
-    let disable_advanced_btn = $('#disable-advanced');
-    let advanced_body = $('#advanced-body');
+    const enable_advanced_btn = $('#enable-advanced');
+    const disable_advanced_btn = $('#disable-advanced');
+    const advanced_body = $('#advanced-body');
     enable_advanced_btn.click(function () {
         enable_advanced_btn.hide();
         disable_advanced_btn.show();
@@ -96,6 +96,17 @@ $(document).ready(function () {
         enable_advanced_btn.show();
         disable_advanced_btn.hide();
         advanced_body.hide();
+    });
+
+    $(".sortableContainer").each(function (index, liz) {
+        const jliz = $(liz);
+        jliz.sortable({
+            handle: ".handle", // class name of the content of each element from which the element will be draggable
+            containment: jliz.parents(".card"), // takes the first parent with a card class
+            opacity: .7,
+            revert: 30,
+            tolerance: "pointer",
+        });
     });
 });
 
@@ -113,12 +124,26 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     const partycard = document.createElement('div');
     partycard.id = "party" + i;
-    partycard.className = 'card';
+    partycard.className = 'card partycard';
     partylistcontainer.appendChild(partycard);
 
     const newpartydiv = document.createElement('div');
     newpartydiv.className = 'card-body';
     partycard.appendChild(newpartydiv);
+
+    // Ordering handle
+    const mover = newpartydiv.appendChild(document.createElement('span'));
+    mover.className = 'handle btn btn-secondary';
+    mover.innerHTML = '☰';
+    Object.assign(mover.style, {
+        cursor: 'move',
+        "font-size": '30px',
+        position: 'absolute',
+        right: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)', // yalign .5
+        padding: '0 10px',
+    });
 
     // Party name label
     const partytitle = document.createElement('div');
@@ -195,51 +220,35 @@ function CallDiagramScript() {
     // Retrieve advanced parameters
     requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
 
-    const partylist = new Array();
-    $("input").each(function () {
-        const thisname = this.name;
-        if (thisname.startsWith("Name")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]] = { Name: this.value };
-        } else if (thisname.startsWith("Number")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Num'] = this.value;
-        } else if (thisname.startsWith("Color")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Color'] = this.value;
-        } else if (thisname.startsWith("Border")) {
-            //If we're processing a border width, add value if it's a number, maxing out at 1.
-            //Add 0 if it's not a number or if it's equal to 0.
-            let bwidth = parseFloat(this.value);
-            if (isNaN(bwidth)) { bwidth = 0 }; //!\\
-            bwidth = Math.min(Math.max(bwidth, 0), 1);
-            partylist[/[0-9]+$/.exec(thisname)[0]]['Border'] = bwidth;
-        } else if (thisname.startsWith("BColor")) {
-            partylist[/[0-9]+$/.exec(thisname)[0]]['BColor'] = this.value;
-        }
-    });
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     let legendstring = "";
     let totalseats = 0; //count total seats to check for empty diagram
     requestJSON.parties = [];
-    for (let party of partylist) {
-        if (party) {
-            const num = parseInt(party['Num']);
-            requestJSON.parties.push({
-                name: party['Name'].replace(',', ''),
-                nb_seats: num,
-                color: '#' + party['Color'],
-                border_size: parseFloat(party['Border']),
-                border_color: '#' + party['BColor']
-            });
+    $(".partycard").each(function () {
+        const jme = $(this);
 
-            totalseats += num;
+        let bwidth = parseFloat(jme.find("input[name^='Border']").val());
+        if (isNaN(bwidth)) { bwidth = 0 }; //!\\
+        bwidth = Math.min(Math.max(bwidth, 0), 1);
+        let name = jme.find("input[name^='Name']").val();
+        const party = {
+            name: name.replace(',', ''),
+            nb_seats: parseInt(jme.find("input[name^='Number']").val()),
+            color: '#' + jme.find("input[name^='Color']").val(),
+            border_size: bwidth,
+            border_color: '#' + jme.find("input[name^='BColor']").val(),
+        };
+        requestJSON.parties.push(party);
 
-            legendstring += `{{legend|#${party['Color']}|${party['Name']}: ${num} seat`;
-            if (num != 1) {
-                legendstring += "s";
-            }
-            legendstring += "}} ";
+        totalseats += party.nb_seats;
+
+        legendstring += `{{legend|${party.color}|${name}: ${party.nb_seats} seat`;
+        if (party.nb_seats != 1) {
+            legendstring += "s";
         }
-    }
+        legendstring += "}} ";
+    });
     if (totalseats > 0) {
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
