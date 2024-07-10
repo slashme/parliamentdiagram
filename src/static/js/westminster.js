@@ -1,153 +1,18 @@
 $(document).ready(function () {
     jscolor.installByClassName("jscolor");
     addParty(newcolor = "#AD1FFF");
+
+    $(".sortableContainer").each(function (index, liz) {
+        const jliz = $(liz);
+        jliz.sortable({
+            handle: ".handle",
+            containment: jliz.parents(".card"),
+            opacity: .7,
+            revert: 30,
+            tolerance: "pointer",
+        });
+    });
 });
-
-function CallDiagramScript() {
-    // Create request payload
-    let payload = {};
-    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
-    let legendstring = "";
-
-    let spotradius = 0;
-    let spotspacing = 0;
-    let wingrows = 0;
-    let centercols = 0;
-    let fullwidth = 0;
-    let cozy = 0;
-    let autospeaker = 0;
-    let partylist = [];
-    //this variable will hold the index of the party with the biggest support: used for creating an auto-speaker spot.
-    let bigparty = 0;
-    let bigpartysize = 0;
-
-    $("input").each(function () {
-        if (this.name.startsWith("radius")) {
-            spotradius = Math.max(0, parseFloat(this.value));
-        } else if (this.name.startsWith("spacing")) {
-            spotspacing = Math.max(0, Math.min(parseFloat(this.value), .99)); //don't allow spots of size 0.
-        } else if (this.name.startsWith("wingrows")) {
-            wingrows = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("centercols")) {
-            centercols = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("fullwidth")) {
-            fullwidth = new Boolean(this.checked);
-        } else if (this.name.startsWith("cozy")) {
-            cozy = new Boolean(this.checked);
-        } else if (this.name.startsWith("autospeaker")) {
-            autospeaker = Math.max(0, parseInt(this.value));
-        } else if (this.name.startsWith("Name")) {
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])] = { Name: this.value };
-        } else if (this.name.startsWith("Number")) {
-            // Don't allow parties without delegates: if we have a number field, make the value at least 1.
-            // It's a bit of a hack, but shouldn't be much of a limitation.
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Num'] = Math.max(1, parseInt(this.value));
-        } else if (this.name.startsWith("Color")) {
-            // If we are processing a colour string, add a # before the hex values.
-            partylist[parseInt(/[0-9]+$/.exec(this.name)[0])]['Color'] = this.value;
-        }
-    });
-    $("select").each(function () {
-        if (this.name.startsWith("Group")) {
-            partylist[/[0-9]+$/.exec(this.name)[0]]['Group'] = this.value;
-        }
-    });
-
-    payload.radius = spotradius;
-    payload.spacing = spotspacing;
-    payload.wingrows = wingrows;
-    payload.centercols = centercols;
-    payload.fullwidth = fullwidth;
-    payload.cozy = cozy;
-
-    let parties = payload.parties = [];
-
-    for (let i = 1; i < partylist.length; i++) {
-        const party = partylist[i];
-        if (party) {
-            // Find the biggest party while going through the list
-            // This is such a cheap operation that I'm not going to bother
-            // to check each time whether "autospeaker" is checked.
-
-            // Update bigparty as the index of the biggest party
-            if (party.Num > bigpartysize) {
-                bigparty = i;
-                bigpartysize = party.Num;
-            }
-
-            parties.push({
-                name: party.Name,
-                num: party.Num,
-                group: party.Group,
-                color: '#' + party.Color
-            });
-
-            if (party.Group !== "head") {
-                legendstring += `{{legend|#${party.Color}|${party.Name}: ${party.Num} seat`;
-                if (party.Num !== 1) {
-                    legendstring += 's';
-                }
-                legendstring += '}} ';
-            }
-        }
-    }
-
-    if (autospeaker) {
-        parties.push({
-            name: partylist[bigparty].Name,
-            num: autospeaker,
-            group: "head",
-            color: '#' + partylist[bigparty].Color
-        });
-    }
-
-
-    if (partylist.length) {
-        //Now post the request to the script which actually makes the diagram.
-        const requeststring = JSON.stringify(payload);
-        $.ajax({
-            type: "POST",
-            url: "westminster.py",
-            data: { data: requeststring },
-        }).done(function (data, status) {
-            data = data.trim();
-
-            // Show the default-hidden div
-            $("#togglablepost").show();
-
-            // This will get the first node with id "postcontainer"
-            const postcontainer = document.getElementById("postcontainer");
-
-            const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
-
-            // Now add the svg image to the page
-            const img = document.createElement("img");
-            img.src = data;
-            newdiag.appendChild(img);
-            // and a linebreak
-            newdiag.appendChild(document.createElement("br"));
-
-            // Add a link with the new diagram
-            const a = document.createElement('a');
-            a.className = "btn btn-success";
-            a.append("Click to download your SVG diagram.");
-            a.title = "SVG diagram";
-            a.href = data;
-            a.download = data;
-            newdiag.appendChild(a);
-            // and a linebreak
-            newdiag.appendChild(document.createElement("br"));
-
-            // Now add the legend template text with the party names, colours and support.
-            newdiag.appendChild(document.createElement("h4"))
-                .append("Legend template for use in Wikipedia:");
-            newdiag.append(legendstring);
-        });
-
-        console.log(requeststring);
-        console.log(legendstring);
-    }
-}
 
 function addParty(newcolor = "") {
     // Party list <div> where dynamic content will be placed
@@ -164,10 +29,24 @@ function addParty(newcolor = "") {
 
     const partycard = partylistcontainer.appendChild(document.createElement('div'));
     partycard.id = "party" + i;
-    partycard.className = "card";
+    partycard.className = "card partycard";
 
     const newpartydiv = partycard.appendChild(document.createElement('div'));
     newpartydiv.className = "card-body";
+
+    // Ordering handle
+    const mover = newpartydiv.appendChild(document.createElement('span'));
+    mover.className = 'handle btn btn-secondary';
+    mover.innerHTML = '☰';
+    Object.assign(mover.style, {
+        cursor: "move",
+        "font-size": "30px",
+        position: 'absolute',
+        right: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)', // yalign .5
+        padding: '0 10px',
+    });
 
     // Party name label
     const partytitle = document.createElement('div');
@@ -229,4 +108,111 @@ function addParty(newcolor = "") {
     // Add a newline
     newpartydiv.appendChild(document.createElement("br"));
     jscolor.installByClassName("jscolor");
+}
+
+function CallDiagramScript() {
+    // Create request payload
+    const payload = {
+        radius: Math.max(0, parseFloat($("input[name^='radius']").val())),
+        spacing: Math.max(0, Math.min(parseFloat($("input[name^='spacing'").val()), .99)),
+        wingrows: Math.max(0, parseInt($("input[name^='wingrows']").val())),
+        centercols: Math.max(0, parseInt($("input[name^='centercols']").val())),
+        fullwidth: new Boolean($("input[name^='fullwidth']").prop("checked")),
+        cozy: new Boolean($("input[name^='cozy']").prop("checked")),
+        parties: [],
+    };
+
+    const partylist = payload.parties;
+
+    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
+    let legendstring = "";
+    //this variable will hold the index of the party with the biggest support: used for creating an auto-speaker spot.
+    let bigparty = 0;
+    let bigpartysize = 0;
+    let totalseats = 0; //count total seats to check for empty diagram
+    $(".partycard").each(function () {
+        const jme = $(this);
+        const index = partylist.length;
+
+        const party = {
+            name: jme.find("input[name^='Name']").val(),
+            num: Math.max(1, parseInt(jme.find("input[name^='Number']").val())),
+            group: jme.find("select[name^='Group']").val(),
+            color: "#" + jme.find("input[name^='Color']").val(),
+        };
+
+        if (party.num > bigpartysize) {
+            bigparty = index;
+            bigpartysize = party.num;
+        }
+
+        partylist.push(party);
+
+        totalseats += party.num;
+
+        if (party.group !== "head") {
+            legendstring += `{{legend|${party.color}|${party.name}: ${party.num} seat`
+            if (party.num !== 1) {
+                legendstring += 's';
+            }
+            legendstring += '}} ';
+        }
+    });
+
+    const autospeaker = Math.max(0, parseInt($("input[name^='autospeaker']").val()));
+    if (autospeaker) {
+        partylist.push({
+            name: partylist[bigparty].name,
+            num: autospeaker,
+            group: "head",
+            color: '#' + partylist[bigparty].color
+        });
+        totalseats += autospeaker;
+    }
+
+    if (totalseats > 0) {
+        //Now post the request to the script which actually makes the diagram.
+        const requeststring = JSON.stringify(payload);
+        $.ajax({
+            type: "POST",
+            url: "westminster.py",
+            data: { data: requeststring },
+        }).done(function (data, status) {
+            data = data.trim();
+
+            // Show the default-hidden div
+            $("#togglablepost").show();
+
+            // This will get the first node with id "postcontainer"
+            const postcontainer = document.getElementById("postcontainer");
+
+            const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
+
+            // Now add the svg image to the page
+            const img = document.createElement("img");
+            img.src = data;
+            newdiag.appendChild(img);
+            // and a linebreak
+            newdiag.appendChild(document.createElement("br"));
+
+            // Add a link with the new diagram
+            const a = document.createElement('a');
+            a.className = "btn btn-success";
+            a.append("Click to download your SVG diagram.");
+            a.title = "SVG diagram";
+            a.href = data;
+            a.download = data;
+            newdiag.appendChild(a);
+            // and a linebreak
+            newdiag.appendChild(document.createElement("br"));
+
+            // Now add the legend template text with the party names, colours and support.
+            newdiag.appendChild(document.createElement("h4"))
+                .append("Legend template for use in Wikipedia:");
+            newdiag.append(legendstring);
+        });
+
+        console.log(requeststring);
+        console.log(legendstring);
+    }
 }
