@@ -27,10 +27,28 @@
 
         <div class="block card">
           <div id="container" class="card-body">
-            <div class="left" style="font-weight:bold; color:blue"   >Democrat seats   </div><input class="right" type="number" name="Dem" value=40><br/>
-            <div class="left" style="font-weight:bold; color:red"    >Republican seats </div><input class="right" type="number" name="Rep" value=40><br/>
-            <div class="left" style="font-weight:bold; color:#C9C9C9">Independent seats</div><input class="right" type="number" name="Ind" value=0><br/>
-            <div class="left" style="font-weight:bold; color:#6B6B6B">Vacant seats     </div><input class="right" type="number" name="Vac" value=0><br/>
+            <span class="left" style="font-weight:bold; color:blue">
+              Democrat seats
+            </span>
+            <input id="demNumber" class="right" type="number" min="0" value="40"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:red">
+              Republican seats
+            </span>
+            <input id="repNumber" class="right" type="number" min="0" value="40"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:#C9C9C9">
+              Independent seats
+            </span>
+            <input id="indNumber" class="right" type="number" min="0" value="0"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:#6B6B6B">
+              Vacant seats
+            </span>
+            <input id="vacNumber" class="right" type="number" min="0" value="0"/>
           </div>
         </div>
 
