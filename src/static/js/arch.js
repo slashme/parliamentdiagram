@@ -215,16 +215,16 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 }
 
 function CallDiagramScript() {
-    const requestJSON = {};  // This is what we send to the python script
-
-    // Retrieve advanced parameters
-    requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
-
+    // This is what we send to the python script
+    const requestJSON = {
+        // Retrieve advanced parameters
+        denser_rows: $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked'),
+        parties: [],
+    };
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     let legendstring = "";
     let totalseats = 0; //count total seats to check for empty diagram
-    requestJSON.parties = [];
     $(".partycard").each(function () {
         const jme = $(this);
 
@@ -249,6 +249,7 @@ function CallDiagramScript() {
         }
         legendstring += "}} ";
     });
+
     if (totalseats > 0) {
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
@@ -286,7 +287,7 @@ function CallDiagramScript() {
             // Add a link with the new diagram
             const abtn = document.createElement('a');
             abtn.className = "btn btn-success"
-            abtn.appendChild(document.createTextNode("Click to download your SVG diagram."));
+            abtn.append("Click to download your SVG diagram.");
             abtn.title = "SVG diagram";
             abtn.href = data;
             abtn.download = data;
@@ -295,11 +296,9 @@ function CallDiagramScript() {
             postcontainer.appendChild(document.createElement("hr"));
 
             // Now add the legend template text with the party names, colours and support.
-            const legendtitle = document.createElement('h4');
-            postcontainer.appendChild(legendtitle);
-            legendtitle.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
-            postcontainer.appendChild(document.createElement("br"));
-            postcontainer.appendChild(document.createTextNode(legendstring));
+            postcontainer.appendChild(document.createElement('h4'))
+                .append("Legend template for use in Wikipedia:");
+            postcontainer.append(legendstring);
             postcontainer.appendChild(document.createElement("hr"));
 
             // File upload name label
@@ -368,7 +367,7 @@ function CallDiagramScript() {
                 const uploadlinkbutton = document.createElement('a');
                 uploadlinkbutton.className = 'btn btn-primary';
                 uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
-                uploadlinkbutton.appendChild(document.createTextNode("Generate upload link"));
+                uploadlinkbutton.append("Generate upload link");
                 postcontainer.appendChild(uploadlinkbutton);
                 // and a linebreak
                 postcontainer.appendChild(document.createElement("br"));
@@ -391,25 +390,27 @@ function CallDiagramScript() {
             const errordiv = document.createElement("div");
             errordiv.id = "error";
             errordiv.className = "error";
-            errordiv.appendChild(document.createTextNode("Oops, your diagram wasn't successfully generated!"));
-            errordiv.appendChild(document.createElement("br"));
-            errordiv.appendChild(document.createTextNode("(" + textStatus + ", " + errorThrown + ")"));
-            errordiv.appendChild(document.createElement("br"));
-            errordiv.appendChild(document.createTextNode("Please raise a "));
+            errordiv.append(
+                "Oops, your diagram wasn't successfully generated!",
+                document.createElement("br"),
+                "(" + textStatus + ", " + errorThrown + ")",
+                document.createElement("br"),
+                "Please raise a ",
+            );
             const bugreportlink = document.createElement("a");
             bugreportlink.href = "https://github.com/slashme/parliamentdiagram/issues/new";
-            bugreportlink.appendChild(document.createTextNode("bug report"));
+            bugreportlink.append("bug report");
             errordiv.appendChild(bugreportlink);
-            errordiv.appendChild(document.createTextNode("."));
+            errordiv.append(".");
             newpost.appendChild(errordiv);
             // add a linebreak
             newpost.appendChild(document.createElement("br"));
 
             // Even though we failed, still add the legend template text with the party names, colours and support.
-            newpost.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
+            newpost.appendChild(document.createElement('h4'))
+                .append("Legend template for use in Wikipedia:");
             newpost.appendChild(document.createElement("br"));
             newpost.appendChild(document.createTextNode(legendstring));
-            newpost.appendChild(document.createElement("br"));
         });
         console.log(requestJSON);
         console.log(legendstring);

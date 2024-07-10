@@ -112,38 +112,36 @@ function CallDiagramScript() {
         }).done(function (data, status) {
             data = data.trim();
 
+            // Show the default-hidden div
+            $("#togglablepost").show();
+
             // This will get the first node with id "postcontainer"
             const postcontainer = document.getElementById("postcontainer");
-            // This will get the parent div that contains all the graphs
-            const postparent = postcontainer.parentNode;
-            // This is the new postcontainer that will hold our stuff.
-            const newpost = document.createElement("div");
 
-            postparent.insertBefore(newpost, postcontainer);
-            newpost.setAttribute("id", "postcontainer");
+            const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
 
             // Now add the svg image to the page
             const img = document.createElement("img");
             img.src = data;
-            newpost.appendChild(img);
+            newdiag.appendChild(img);
             // and a linebreak
-            newpost.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("br"));
 
             // Add a link with the new diagram
             const a = document.createElement('a');
-            a.appendChild(document.createTextNode("Click to download your SVG diagram."));
+            a.className = "btn btn-success";
+            a.append("Click to download your SVG diagram.");
             a.title = "SVG diagram";
             a.href = data;
             a.download = data;
-            newpost.appendChild(a);
+            newdiag.appendChild(a);
             // and a linebreak
-            newpost.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("br"));
 
             // Now add the legend template text with the party names, colours and support.
-            newpost.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
-            newpost.appendChild(document.createElement("br"));
-            newpost.appendChild(document.createTextNode(legendstring));
-            newpost.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("h4"))
+                .append("Legend template for use in Wikipedia:");
+            newdiag.append(legendstring);
         });
 
         console.log(requeststring);
@@ -164,10 +162,12 @@ function addParty(newcolor = "") {
     });
     i++;
 
-    // Create a new party <div>
-    const newpartydiv = document.createElement('div');
-    newpartydiv.id = "party" + i;
-    partylistcontainer.appendChild(newpartydiv);
+    const partycard = partylistcontainer.appendChild(document.createElement('div'));
+    partycard.id = "party" + i;
+    partycard.className = "card";
+
+    const newpartydiv = partycard.appendChild(document.createElement('div'));
+    newpartydiv.className = "card-body";
 
     // Party name label
     const partytitle = document.createElement('div');

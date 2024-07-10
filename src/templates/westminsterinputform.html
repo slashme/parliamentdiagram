@@ -8,18 +8,26 @@
 {% endblock %}
 
 {% block content %}
-        <div class=block>
-          <div class="notice">This tool is in Beta testing. Please help to test it, but if you use it to generate diagrams for Wikipedia, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.</div><br/>
-          This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.<br/>
+        <div class="block card">
+          <div class="card-body">
+            <h2 class="card-text">Westminster-style parliament diagram generator</h2>
+            <p class="card-text">
+              This is a tool to generate Westminster-style parliament diagrams, with a house composed of a left bench, a right bench, a cross-bench group and a "head" - for example Speaker of Parliament.
+            </p>
+            <p class="card-text">
+              To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
+              Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
+              To use it in Wikipedia, I recommend uploading it to Wikimedia Commons. However, please make sure that you confirm with other editors what the consensus is on which layout and settings to use.
+              If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.
+            </p>
+            <p class="card-text">
+              Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+            </p>
+          </div>
         </div>
-        <div class=block>
-          To use this tool, fill in the name and support of each party in the legislature, clicking "add party" whenever you need to add a new party.
-          Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
-          To use it in Wikipedia, I recommend uploading it to Wikimedia Commons.
-          If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br/>
-        </div>
-        <div class=block>
-          <div id="spotshapeoptioncontainer" class=block>
+
+        <div class="block card">
+          <div id="spotshapeoptioncontainer" class="card-body">
             <h3>Spot shape options</h3>
             Try out different values of corner radius to round out the blocks (negative
             values will be set to 0, and anything over 0.5 is a circle). Many Wikipedia
@@ -30,7 +38,10 @@
             give invisible spots.)<br/>
             <div class="left">Spot spacing </div><input class="right" type="number" name="spacing" value = 0.1 ><br/>
           </div>
-          <div id="layoutoptioncontainer" class=block>
+        </div>
+
+        <div class="block card">
+          <div id="layoutoptioncontainer" class="card-body">
             <h3>Layout options</h3>
             To use the automatic layout, leave "wing rows" and "cross-bench columns" at
             0, otherwise use them to specify the number of rows in the left and right
@@ -49,15 +60,23 @@
             To create a group of spots for "speakers" or similar functions, you can add parties with the "group" set to "Speaker". To automatically create one or more "speaker" spots with the colour of the largest party, without creating them as separate parties, you can just type a number in the checkbox below:<br/>
             <div class="left">Speaker spots</div><input class="right" type="number" name="autospeaker" value = 0 ><br/>
           </div>
-          <div id="partylistcontainer" class=block>
-            <h3>List of parties</h3>
-          </div>
-          <button class="btn btn-primary" onclick="addParty()">Add a party</button>
         </div>
+
+        <div class="block card">
+          <div class="card-body">
+            <h3>List of parties</h3>
+
+            <div id="partylistcontainer"></div>
+
+            <button class="btn btn-success" onclick="addParty()">+ Add a party</button>
+          </div>
+        </div>
+
         <button class="btn btn-primary" onclick="CallDiagramScript()">Make my diagram</button>
-        <div class="block">
-          <div id="postcontainer">
-            <br/>
+
+        <div class="block card" id="togglablepost" style="display: none;">
+          <div class="card-body">
+            <div id="postcontainer"></div>
           </div>
         </div>
 {% endblock %}

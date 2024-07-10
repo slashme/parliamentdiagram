@@ -7,29 +7,85 @@
 {% endblock %}
 
 {% block content %}
-        <div class=block>
-          This is a tool to generate arch-shaped diagrams of legislatures of Glorious Two-Party American System.<br/>
-          <br/>
-          To use this tool, fill in the support of each party in the legislature.
-          Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
-          To use it in Wikipedia, I recommend uploading it to Wikimedia Commons.
-          If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.<br/><br/>
-        </div>
-        <div class=block>
-          <div id="container">
-            <div class="left" style="font-weight:bold; color:blue"   >Democrat seats   </div><input class="right" type="number" name="Dem" value=40><br/>
-            <div class="left" style="font-weight:bold; color:red"    >Republican seats </div><input class="right" type="number" name="Rep" value=40><br/>
-            <div class="left" style="font-weight:bold; color:#C9C9C9">Independent seats</div><input class="right" type="number" name="Ind" value=0><br/>
-            <div class="left" style="font-weight:bold; color:#6B6B6B">Vacant seats     </div><input class="right" type="number" name="Vac" value=0><br/>
-            <br/>
+        <div class="block card">
+          <div class="card-body">
+            <h2 class="card-text">US-style parliament diagram generator</h2>
+            <p class="card-text">
+              This is a tool to generate arch-shaped diagrams of legislatures of Glorious Two-Party American System.<br/>
+            </p>
+            <p class="card-text">
+              To use this tool, fill in the support of each party in the legislature.
+              Then click "Make my diagram", and a link will appear to your SVG diagram. You can then freely download and use the diagram.
+              To use it in Wikipedia, I recommend uploading it to Wikimedia Commons.
+              If you do upload it, I recommend adding it to the <a href="https://commons.wikimedia.org/wiki/Category:Election_apportionment_diagrams">election apportionment diagrams</a> category.
+            </p>
+            <p class="card-text">
+              Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+            </p>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="CallArchScript()">
+
+        <div class="block card">
+          <div class="card-body">
+            <div class="row"><div class="col-12">
+              <button id="enable-advanced" class="btn btn-secondary">
+                Enable advanced parameters
+              </button>
+              <button id="disable-advanced" class="btn btn-outline-secondary" style="display: none;">
+                Disable advanced parameters
+              </button>
+            </div></div>
+
+            <div id="advanced-body" class="row" style="display: none;">
+              <div class="col-12 mt-2">
+                All-rows diagram
+                <label class="switch">
+                  <input type="checkbox" id="row-densifier">
+                  <span class="slider round"></span>
+                </label>
+                Compact-rows diagram
+                <span class="fa fa-question-circle"
+                      title="'All-rows' is the default aesthetic, it may look weird because too sparse.&#10;'Compact-rows' will generate denser diagrams, it may look weird because too thin.">
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block card">
+          <div id="container" class="card-body">
+            <span class="left" style="font-weight:bold; color:blue">
+              Democrat seats
+            </span>
+            <input id="demNumber" class="right" type="number" min="0" value="40"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:red">
+              Republican seats
+            </span>
+            <input id="repNumber" class="right" type="number" min="0" value="40"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:#C9C9C9">
+              Independent seats
+            </span>
+            <input id="indNumber" class="right" type="number" min="0" value="0"/>
+            <br/>
+
+            <span class="left" style="font-weight:bold; color:#6B6B6B">
+              Vacant seats
+            </span>
+            <input id="vacNumber" class="right" type="number" min="0" value="0"/>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="CallDiagramScript()">
           Make my diagram
         </button>
-        <div class="block">
-          <div id="postcontainer">
-            <br/>
+
+        <div class="block card" id="togglablepost" style="display: none;">
+          <div class="card-body">
+            <div id="postcontainer"></div>
           </div>
         </div>
 {% endblock %}
