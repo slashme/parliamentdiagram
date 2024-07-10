@@ -139,10 +139,9 @@ function CallDiagramScript() {
             newdiag.appendChild(document.createElement("br"));
 
             // Now add the legend template text with the party names, colours and support.
-            newdiag.appendChild(document.createTextNode("Legend template for use in Wikipedia:"));
-            newdiag.appendChild(document.createElement("br"));
+            newdiag.appendChild(document.createElement("h4"))
+                .append("Legend template for use in Wikipedia:");
             newdiag.appendChild(document.createTextNode(legendstring));
-            newdiag.appendChild(document.createElement("br"));
         });
 
         console.log(requeststring);
