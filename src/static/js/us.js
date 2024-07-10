@@ -1,7 +1,25 @@
-function CallArchScript() {
+$(document).ready(function () {
+    // Enable/disable advanced parameters
+    const enable_advanced_btn = $('#enable-advanced');
+    const disable_advanced_btn = $('#disable-advanced');
+    const advanced_body = $('#advanced-body');
+    enable_advanced_btn.click(function () {
+        enable_advanced_btn.hide();
+        disable_advanced_btn.show();
+        advanced_body.show();
+    });
+    disable_advanced_btn.click(function () {
+        enable_advanced_btn.show();
+        disable_advanced_btn.hide();
+        advanced_body.hide();
+    });
+})
+
+function CallDiagramScript() {
     // This is what we send to the python script
     const requestJSON = {
-        denser_rows: false, //Because I'm not going to implement this here yet
+        // Retrieve advanced parameters
+        denser_rows: $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked'),
         parties: [
             {
                 name: "Democrats",

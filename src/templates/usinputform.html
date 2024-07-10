@@ -26,6 +26,33 @@
         </div>
 
         <div class="block card">
+          <div class="card-body">
+            <div class="row"><div class="col-12">
+              <button id="enable-advanced" class="btn btn-secondary">
+                Enable advanced parameters
+              </button>
+              <button id="disable-advanced" class="btn btn-outline-secondary" style="display: none;">
+                Disable advanced parameters
+              </button>
+            </div></div>
+
+            <div id="advanced-body" class="row" style="display: none;">
+              <div class="col-12 mt-2">
+                All-rows diagram
+                <label class="switch">
+                  <input type="checkbox" id="row-densifier">
+                  <span class="slider round"></span>
+                </label>
+                Compact-rows diagram
+                <span class="fa fa-question-circle"
+                      title="'All-rows' is the default aesthetic, it may look weird because too sparse.&#10;'Compact-rows' will generate denser diagrams, it may look weird because too thin.">
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block card">
           <div id="container" class="card-body">
             <span class="left" style="font-weight:bold; color:blue">
               Democrat seats
@@ -52,7 +79,7 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="CallArchScript()">
+        <button class="btn btn-primary" onclick="CallDiagramScript()">
           Make my diagram
         </button>
 

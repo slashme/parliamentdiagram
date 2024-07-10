@@ -215,16 +215,16 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 }
 
 function CallDiagramScript() {
-    const requestJSON = {};  // This is what we send to the python script
-
-    // Retrieve advanced parameters
-    requestJSON.denser_rows = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked');
-
+    // This is what we send to the python script
+    const requestJSON = {
+        // Retrieve advanced parameters
+        denser_rows: $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked'),
+        parties: [],
+    };
 
     // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
     let legendstring = "";
     let totalseats = 0; //count total seats to check for empty diagram
-    requestJSON.parties = [];
     $(".partycard").each(function () {
         const jme = $(this);
 
@@ -249,6 +249,7 @@ function CallDiagramScript() {
         }
         legendstring += "}} ";
     });
+
     if (totalseats > 0) {
         //Now post the request to the script which actually makes the diagram.
         $.ajax({
