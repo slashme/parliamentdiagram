@@ -10,18 +10,19 @@
 {% block content %}
         <div class="block card">
           <div class="card-body">
-            <h2 class="card-text">
-              This is a tool to generate parliament diagrams based on fixed-seat templates.
-            </h2>
+            <h2 class="card-text">Template-based parliament diagram generator</h2>
             <p class="card-text">
-              Here go explanations on how to use. (TODO)
+              Here go explanations on how to use. The number of seats is fixed. (TODO)
+            </p>
+            <p class="card-text">
+              Please submit bug reports and feature requests at the project's <a href="https://github.com/slashme/parliamentdiagram/issues/new">issue tracker</a>.
+            </p>
           </div>
         </div>
 
-        <!-- template selector card grid -->
         <div class="block card">
           <!-- fold when selected ? -->
-          <div class="card-body">
+          <div id="template_selector_grid" class="card-body">
             <h3 class="card-text">Select a template</h3>
             <div class="card-deck" id="templatecontainer">
               <a class="card text-center btn w-25" id="template_assnat" onclick="selectTemplate('assnat')">
@@ -37,12 +38,11 @@
 
         <!-- selected template metadata card, hidden by default -->
         <!-- when template chosen, show number of seats (or default to 0) -->
-        <div class="block card" id="togglabletemplateinfo" style="display: none;">
+        <div id="togglabletemplateinfo" class="block card" style="display: none;">
           <div class="card-body">
             <h3 class="card-text">Template information</h3>
 
-            <div id="templateinfocontainer">
-            </div>
+            <div id="templateinfocontainer"></div>
 
             <button class="btn btn-primary" onclick="callDiagramScript(demo=true)">Demo</button>
           </div>
@@ -50,11 +50,10 @@
 
         <div class="block card" id="togglablepartylistcontainer" style="display: none;">
           <div class="card-body">
-            <div id="partylistcontainer">
-            </div>
+            <div id="partylistcontainer"></div>
 
             <p>
-              <button class="btn btn-success" onclick="addParty()">+ Add a party manually</button>
+              <button class="btn btn-success" onclick="addParty()">+ Add a party</button>
             </p>
 
             <div id="party_vacant" class="block card">
@@ -77,17 +76,14 @@
                 </div>
               </div>
             </div>
-
-            <!-- button to create diagram, only active when number of vacant is positive or 0 -->
-            <button class="btn btn-primary" onclick="callDiagramScript()">Make my diagram</button>
           </div>
         </div>
+
+        <!-- button to create diagram, only active when number of vacant is positive or 0 -->
+        <button class="btn btn-primary" onclick="callDiagramScript()">Make my diagram</button>
 
         <!-- generated diagram displayer, hidden and empty by default -->
         <div class="block card" id="togglablepost" style="display: none;">
-          <div class="card-body" id="postcontainer">
-
-          </div>
+          <div class="card-body" id="postcontainer"></div>
         </div>
-
 {% endblock %}
