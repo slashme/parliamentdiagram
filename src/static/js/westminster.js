@@ -130,7 +130,7 @@ function CallDiagramScript() {
             // Add a link with the new diagram
             const a = document.createElement('a');
             a.className = "btn btn-success";
-            a.appendChild(document.createTextNode("Click to download your SVG diagram."));
+            a.append("Click to download your SVG diagram.");
             a.title = "SVG diagram";
             a.href = data;
             a.download = data;
@@ -141,7 +141,7 @@ function CallDiagramScript() {
             // Now add the legend template text with the party names, colours and support.
             newdiag.appendChild(document.createElement("h4"))
                 .append("Legend template for use in Wikipedia:");
-            newdiag.appendChild(document.createTextNode(legendstring));
+            newdiag.append(legendstring);
         });
 
         console.log(requeststring);
