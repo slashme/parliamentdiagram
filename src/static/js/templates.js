@@ -61,18 +61,20 @@ function selectTemplate(template_id) {
 
 function addParty(newname = "", newcolor = "", newnseats = 0) {
     const partylistcontainer = document.getElementById("partylistcontainer");
+
     // New party's number: one more than the bigger party number so far
     let party_number = 0;
     $("div").each(function () {
-        if (this.id.match(/party\d+/)) {
-            party_number = Math.max(party_number, parseInt(this.id.match(/party(\d+)/)[1]));
+        const match = this.id.match(/party(\d+)/);
+        if (match) {
+            party_number = Math.max(party_number, parseInt(match[1]));
         }
     });
     party_number++;
 
     const partycard = partylistcontainer.appendChild(document.createElement("div"));
     partycard.id = "party" + party_number;
-    partycard.className = "card";
+    partycard.className = "card partycard";
 
     const newpartydiv = partycard.appendChild(document.createElement("div"));
     newpartydiv.className = "card-body";
@@ -175,52 +177,38 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 function callDiagramScript(demo = false) {
     const payload = { template_id: selected_template.id };
 
-    let partylist;
     let legendstring = "";
     if (!demo) {
-        partylist = [];
-        $("input").each(function () {
-            const [matchresult] = [...this.id.matchAll(/party(\d+)_(\w+)/g)];
-            if (matchresult) {
-                let [, partynumber, property] = matchresult;
-                if (partylist[partynumber] == undefined) {
-                    partylist[partynumber] = {};
-                }
-                let value;
-                switch (property) {
-                    case "name":
-                        // TODO: implement the name/data/title feature to fix the legend string
-                        // property = "name";
-                        // value = this.value;
-                        // break;
-                        return;
-                    case "number":
-                        property = "nb_seats";
-                        value = parseInt(this.value);
-                        break;
-                    case "color":
-                        value = "#" + this.value;
-                        break;
-                    case "border":
-                        property = "border_size";
-                        value = parseFloat(this.value);
-                        break;
-                    case "bcolor":
-                        property = "border_color";
-                        value = "#" + this.value;
-                        break;
-                    default:
-                        return;
-                }
-                partylist[partynumber][property] = value;
+        const partylist = [];
+
+        $(".partycard").each(function () {
+            const jme = $(this);
+
+            // TODO: implement the name/data/title feature
+            const partyname = jme.find("input[id^='party'][id$='_name']").val();
+            const party = {
+                // name: jme.find("input[id^='party'][id$='_name']").val(),
+                nb_seats: parseInt(jme.find("input[id^='party'][id$='_number']").val()),
+                color: "#" + jme.find("input[id^='party'][id$='_color']").val(),
+                border_size: parseFloat(jme.find("input[id^='party'][id$='_border']").val()),
+                border_color: "#" + jme.find("input[id^='party'][id$='_bcolor']").val(),
+            };
+
+            partylist.push(party);
+
+            legendstring += `{{legend|${party.color}|${partyname}: ${party.nb_seats} seat`;
+            if (party.nb_seats !== 1) {
+                legendstring += 's';
             }
+            legendstring += '}} ';
         });
-        partylist = partylist.filter((party) => party !== undefined);
+
         const vacants = actuateVacants();
         if (vacants < 0) {
             alert("There are too many seats for the template's capacity.");
             return;
         }
+
         partylist.push({
             nb_seats: vacants,
             color: "#" + $("#color_vacant").val(),
@@ -229,15 +217,6 @@ function callDiagramScript(demo = false) {
         });
 
         payload.partylist_per_area = [partylist];
-
-        // building the legend string
-        for (let party of partylist) {
-            legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
-            if (party.nb_seats !== 1) {
-                legendstring += 's';
-            }
-            legendstring += '}} ';
-        }
     } else {
         payload.demo = true;
     }
@@ -265,12 +244,11 @@ function callDiagramScript(demo = false) {
         download.href = download.download = data;
 
         if (!demo) {
-            postcontainer.append(
-                document.createElement("hr"),
-                "Legend template for use in Wikipedia:",
-                document.createElement("br"),
-                legendstring,
-            );
+            postcontainer.appendChild(document.createElement("hr"));
+
+            postcontainer.appendChild(document.createElement("h4"))
+                .append("Legend template for use in Wikipedia:");
+            postcontainer.append(legendstring);
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         alert("Error " + textStatus + ": " + errorThrown);
