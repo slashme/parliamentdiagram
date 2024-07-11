@@ -29,6 +29,7 @@ The metadata parameters must not be added to any other node.
 The "pardiag:reversed" parameter is a boolean metadata parameter.
 It being absent or set to the empty string indicates a falsey value,
 any other value indicates a truthy value.
+The recommended true value is "true" or "1".
 In a reversed template, the meaning of the ordering of the seat numbers is reversed,
 starting from "right" to "left".
 
