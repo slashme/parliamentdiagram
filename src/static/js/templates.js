@@ -198,7 +198,7 @@ function addVacant() {
     // except that "Party x seats" needs to be just replaced by "Vacant seats"
     jpartycard.find("div.left").each(function () {
         const jme = $(this);
-        jme.text(jme.text().replace(/^Party \d+ seats$/, "Vacant seats").replace(/^Party \d+/, "Vacant"));
+        jme.text(jme.text().replace(/^Party \d+(?: seats$)?/, "Vacant seats"));
     });
 
     // the input of class right of id ending with "number",
