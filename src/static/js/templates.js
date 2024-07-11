@@ -28,10 +28,8 @@ function actuateVacants() {
 
     // get the sum of the number of seats of all parties
     let sum = 0;
-    $("input").each(function () {
-        if (this.id.match(/party\d+_number/)) {
-            sum += parseInt(this.value);
-        }
+    $("input[id^='party'][id$='_number']").each(function () {
+        sum += parseInt(this.value);
     });
     $("#number_vacant").val(Math.max(0, nseats - sum));
     return nseats - sum;
