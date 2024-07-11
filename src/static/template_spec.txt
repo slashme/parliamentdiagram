@@ -1,0 +1,35 @@
+# ParliamentDiagram Template Specification v1.1
+
+A template describes a diagram, containing seats to be colored or otherwise styled.
+
+There may only be a fixed number of seats per template.
+
+A template file must be of the SVG format, and in addition,
+use the "http://parliamentdiagram.toolforge.org/2024/template" namespace whose use will be described further down.
+The namespace will be nicknamed "Namespace" further down, and be assumed to be prefixed as "pardiag" in code snippets,
+although neither are mandatory in any way.
+
+Each seat must be represented with an SVG element supporting the fill, stroke and stroke-width attributes.
+Each seat's element should also support the <title> and <desc> sub-elements.
+
+Each seat's element must have a "pardiag:seatnumber" parameter that is unique in value across the template.
+The values of the parameter must be strings, as per the SVG standard, and represent positive integral numbers.
+The ordering of the seat numbers should be meaningful, ideally from left to right,
+where "left" and "right" may bhave different meanings depending on the template.
+
+The seat numbers do not need to be continuous and may start at any value.
+For example, a template could only contain a seat n°5 and a seat n°16.
+For style and readability purposes however, seat numbers should start at 0 and be continuous.
+
+## Metadata
+
+Templates may contain metadata, stored as Namespace parameters to the root SVG node.
+The metadata parameters must not be added to any other node.
+
+The "pardiag:reversed" parameter is a boolean metadata parameter.
+It being absent or set to the empty string indicates a falsey value,
+any other value indicates a truthy value.
+In a reversed template, the meaning of the ordering of the seat numbers is reversed,
+starting from "right" to "left".
+
+The "paradiag:name" provides the name of the template. It is entirely optional.

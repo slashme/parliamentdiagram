@@ -21,6 +21,7 @@ _NAMESPACES = {
     "": "http://www.w3.org/2000/svg",
     # "svg": "http://www.w3.org/2000/svg",
     "xlink": "http://www.w3.org/1999/xlink",
+    "pardiag": "http://parliamentdiagram.toolforge.org/2024/template",
 }
 for p, n in _NAMESPACES.items():
     ET.register_namespace(p, n)
@@ -99,6 +100,22 @@ def _generate_rainbow(n, boun=300):
         # write ints, if possible without losing precision
         it = (f"hsl({boun*i//(n-1)}deg 100% 50%)" for i in range(n))
     yield from it
+
+
+def _get_template_metadata(template: ET.Element) -> dict[str, str]:
+    """
+    Extracts the metadata from the template.
+    """
+    metadata = {}
+
+    # on the root svg node, find all parameters prefixed by "pardiag:"
+    for key, value in template.attrib.items():
+        if key.startswith(_NAMESPACES["pardiag"]):
+            metadata[key.removeprefix(_NAMESPACES["pardiag"])] = value
+
+    # metadata["reversed"] = bool(metadata.get("reversed"))
+    return metadata
+
 
 def _scan_ET_template(template: ET.Element) -> list[int]:
     # part 1:
