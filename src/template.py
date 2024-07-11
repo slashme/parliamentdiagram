@@ -21,14 +21,38 @@ class SeatData:
     def __hash__(self):
         return hash(frozenset(self.items()))
 
-def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = False) -> int|str|None:
+_NAMESPACES = {
+    "": "http://www.w3.org/2000/svg",
+    # "svg": "http://www.w3.org/2000/svg",
+    "xlink": "http://www.w3.org/1999/xlink",
+}
+for p, n in _NAMESPACES.items():
+    ET.register_namespace(p, n)
+del p, n
+
+def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = True, use_classes: bool|None = None) -> int|str|None:
     """
     Considers the template file and the output file to be a file descriptor or a file path.
+
     If filling is None, prints the number of seats by area.
     If filling is a list of SeatData: nseats dicts,
-    where there is one dict per area and the sum of nseats is the number of seats in that area,
+    where there is one dict per area
+    and the sum of nseats is the number of seats in that area,
     then the template gets filled using that filling.
     If filling is True, it is replaced by a rainbow filling.
+
+    use_ET decides whether a string filling is used (if False)
+    or an ElementTree filling (if True).
+    The string filling doesn't support the <title> insertion,
+    so it's not used by default,
+    however it may be more resilient against attacks.
+
+    use_classes only matters when use_ET is True.
+    If True, the style of each SeatData is written in a <style> entry
+    with a class that is set to each seat.
+    If False, the style is written separately on each seat.
+    The False case is only better when each seat has different SeatData.
+    The parameter defaults to True if and when filling is not True.
     """
     if isinstance(template_file, str):
         with open(template_file, "r") as file:
@@ -37,27 +61,34 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_ET: bool = 
         with open(output_file, "w") as file:
             return main(template_file, file, filling=filling, use_ET=use_ET)
 
+    if use_classes is None:
+        use_classes = filling is not True
+
     template_str = template_file.read()
     if use_ET:
-        template_ET = parse_ET_without_namespaces(template_str)
+        # template_ET = _parse_ET_without_namespaces(template_str)
+        template_ET = ET.fromstring(template_str)
 
     if filling is True:
-        nseats_by_area = scan_str_template(template_str)
-        filling = [{SeatData(fill=color): 1 for color in generate_rainbow(nseats, 250)} for nseats in nseats_by_area]
+        nseats_by_area = _scan_str_template(template_str)
+        filling = [{SeatData(fill=color): 1 for color in _generate_rainbow(nseats, 250)} for nseats in nseats_by_area]
 
     if filling is None:
         if use_ET:
-            print(scan_ET_template(template_ET), file=output_file)
+            print(_scan_ET_template(template_ET), file=output_file)
         else:
-            print(scan_str_template(template_str), file=output_file)
+            print(_scan_str_template(template_str), file=output_file)
     else:
         if use_ET:
-            fill_ET_template_by_class(template_ET, filling)
+            if use_classes:
+                _fill_ET_template_by_class(template_ET, filling)
+            else:
+                _fill_ET_template(template_ET, filling)
             print(ET.tostring(template_ET, encoding="unicode"), file=output_file)
         else:
-            print(fill_str_template(template_str, filling), file=output_file)
+            print(_fill_str_template(template_str, filling), file=output_file)
 
-def parse_ET_without_namespaces(string) -> ET.Element:
+def _parse_ET_without_namespaces(string) -> ET.Element:
     """
     Prevents Python's xml parser from substituting the namespaces in the elements' tags.
     Warning : works only if the namespaces are on the outer node.
@@ -70,7 +101,7 @@ def parse_ET_without_namespaces(string) -> ET.Element:
     element.attrib = found_namespaces | element.attrib
     return element
 
-def generate_rainbow(n, boun=300):
+def _generate_rainbow(n, boun=300):
     """
     Generates a rainbow of that many CSS colors going from full red (inclusive) to boun (inclusive, defaulting to purple).
     If boun is an integer, it is interpreted as a number of degrees. If it is a float, it is interpreted as a fraction of a turn.
@@ -85,23 +116,23 @@ def generate_rainbow(n, boun=300):
         it = (f"hsl({boun*i//(n-1)}deg 100% 50%)" for i in range(n))
     yield from it
 
-def scan_ET_template(template: ET.Element) -> list[int]:
+def _scan_ET_template(template: ET.Element) -> list[int]:
     # part 1:
     # identify the seats
     # return the number of seats per area to the form generator
     # (probably an ordered list of seat counts)
-    _sorted_areas, l1_elements_by_area = extract_ET_template(template, check_unicity=True)
+    _sorted_areas, l1_elements_by_area = _extract_ET_template(template, check_unicity=True)
     return list(map(len, l1_elements_by_area))
 
-def scan_str_template(template: str) -> list[int]:
+def _scan_str_template(template: str) -> list[int]:
     # part 1:
     # identify the seats
     # return the number of seats per area to the form generator
     # (probably an ordered list of seat counts)
-    _sorted_areas, l1_elements_by_area = extract_str_template(template, check_unicity=True)
+    _sorted_areas, l1_elements_by_area = _extract_str_template(template, check_unicity=True)
     return list(map(len, l1_elements_by_area))
 
-def extract_ET_template(template: ET.Element, *, check_unicity=False):
+def _extract_ET_template(template: ET.Element, *, check_unicity=False):
     elements_by_area = defaultdict(dict[int, ET.Element])
     for node in template.findall(".//"): # check that it takes the subelements
         if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:@(\d+))?@(\d+)', id)) is not None:
@@ -115,7 +146,7 @@ def extract_ET_template(template: ET.Element, *, check_unicity=False):
 
     return sorted_areas, l1_elements_by_area
 
-def extract_str_template(template: str, *, check_unicity=False):
+def _extract_str_template(template: str, *, check_unicity=False):
     elements_by_area = defaultdict(set[int])
     for ma in re.finditer(r'id="(?:@(\d+))?@(\d+)"', template):
         area = elements_by_area[int(ma.group(1) or "0")]
@@ -129,7 +160,7 @@ def extract_str_template(template: str, *, check_unicity=False):
     return sorted_areas, l1_elements_by_area
 
 
-def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+def _fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     """
     The operation is done in-place and mutates the ElementTree.
     This method is the only one to properly support the title and desc seat data.
@@ -137,7 +168,7 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
 
     # extract the seat svg elements again
     # group them by area
-    sorted_areas, l1_elements_by_area = extract_ET_template(template)
+    sorted_areas, l1_elements_by_area = _extract_ET_template(template)
 
     # sort each area's set of seats (by number, not by alphabet)
     # converting from list of unsorted dicts to list of sorted dicts
@@ -165,7 +196,7 @@ def fill_ET_template(template: ET.Element, filling: list[dict[SeatData, int]]) -
                     else:
                         node.set(k, str(v))
 
-def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+def _fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     """
     This does it more cleanly, taking advantage of the ET.
     Each party's class definition is put in a <style> node.
@@ -173,7 +204,7 @@ def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData,
     title and desc are not properly managed (treated as attributes).
     """
 
-    sorted_areas, l1_elements_by_area = extract_ET_template(template)
+    sorted_areas, l1_elements_by_area = _extract_ET_template(template)
 
     l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
 
@@ -205,7 +236,7 @@ def fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData,
             node.set("class", node_class)
             node.attrib.pop("id")
 
-def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
+def _fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     """
     The operation is not done in-place since str is immutable.
     title and desc are not properly managed (treated as attributes).
@@ -213,7 +244,7 @@ def fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
 
     # extract the seat svg elements again
     # group them by area
-    sorted_areas, l1_elements_by_area = extract_str_template(template)
+    sorted_areas, l1_elements_by_area = _extract_str_template(template)
 
     # sort each area's set of seats (by number, not by alphabet)
     # converting from list of sets to list of sorted lists
