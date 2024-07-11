@@ -55,6 +55,8 @@ function selectTemplate(template_id) {
 
     // add an empty party with random color
     addParty();
+    // add the vacants party
+    addVacant();
     // actuate the number of vacant seats
     actuateVacants();
 
@@ -62,18 +64,20 @@ function selectTemplate(template_id) {
     $("#diagrammaker").show();
 }
 
-function addParty(newname = "", newcolor = "", newnseats = 0) {
+function addParty(newname = "", newcolor = "", newnseats = 0, party_number = null) {
     const partylistcontainer = document.getElementById("partylistcontainer");
 
-    // New party's number: one more than the bigger party number so far
-    let party_number = 0;
-    $("div").each(function () {
-        const match = this.id.match(/party(\d+)/);
-        if (match) {
-            party_number = Math.max(party_number, parseInt(match[1]));
-        }
-    });
-    party_number++;
+    if (party_number === null) {
+        // New party's number: one more than the bigger party number so far
+        party_number = 0;
+        $("div").each(function () {
+            const match = this.id.match(/party(\d+)/);
+            if (match) {
+                party_number = Math.max(party_number, parseInt(match[1]));
+            }
+        });
+        party_number++;
+    }
 
     const partycard = partylistcontainer.appendChild(document.createElement("div"));
     partycard.id = "party" + party_number;
@@ -172,9 +176,42 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     const delbutton = newpartydiv.appendChild(document.createElement("button"));
     delbutton.className = "btn btn-danger";
     delbutton.append(`Delete party ${party_number}`);
-    delbutton.onclick = function () { deleteParty(party_number); };
+    delbutton.onclick = function () {
+        deleteParty(party_number);
+        actuateVacants();
+    };
 
     jscolor.installByClassName("jscolor");
+
+    return partycard;
+}
+
+function addVacant() {
+    const partycard = addParty("Vacant", "#DDDDDD", null, 0);
+    const jpartycard = $(partycard);
+
+    jpartycard.attr("id", "party_vacant");
+    // jpartycard.removeClass("partycard");
+
+    // a div of class left whose text starts with "Party " then a number then the rest,
+    // the text needs to be replaced to "Vacant seats " then the rest,
+    // except that "Party x seats" needs to be just replaced by "Vacant seats"
+    jpartycard.find("div.left").each(function () {
+        const jme = $(this);
+        jme.text(jme.text().replace(/^Party \d+ seats$/, "Vacant seats").replace(/^Party \d+/, "Vacant"));
+    });
+
+    // the input of class right of id ending with "number",
+    // its value needs to be set to 0 and be disabled, its min and max erased,
+    // and the id needs to be replaced by "number_vacant"
+    jpartycard.find("input.right[id$='_number']")
+        .val(0).prop("disabled", "disabled").removeAttr("min max")
+        .attr("id", "number_vacant");
+
+    // the button of class btn-danger needs to be deleted
+    jpartycard.find("button.btn-danger").remove();
+
+    return partycard;
 }
 
 function callDiagramScript(demo = false) {
@@ -182,41 +219,38 @@ function callDiagramScript(demo = false) {
 
     let legendstring = "";
     if (!demo) {
-        const partylist = [];
-
-        $(".partycard").each(function () {
-            const jme = $(this);
-
-            const party = {
-                name: jme.find("input[id^='party'][id$='_name']").val(),
-                // data:
-                nb_seats: parseInt(jme.find("input[id^='party'][id$='_number']").val()),
-                color: "#" + jme.find("input[id^='party'][id$='_color']").val(),
-                border_size: parseFloat(jme.find("input[id^='party'][id$='_border']").val()),
-                border_color: "#" + jme.find("input[id^='party'][id$='_bcolor']").val(),
-            };
-
-            partylist.push(party);
-
-            legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
-            if (party.nb_seats !== 1) {
-                legendstring += 's';
-            }
-            legendstring += '}} ';
-        });
-
         const vacants = actuateVacants();
         if (vacants < 0) {
             alert("There are too many seats for the template's capacity.");
             return;
         }
 
-        partylist.push({
-            nb_seats: vacants,
-            color: "#" + $("#color_vacant").val(),
-            border_size: parseFloat($("#border_vacant").val()),
-            border_color: "#" + $("#bcolor_vacant").val(),
-        });
+        const partylist = $(".partycard").map(function () {
+            const jme = $(this);
+
+            const party = {
+                name: jme.find("input[id^='party'][id$='_name']").val(),
+                // data:
+                // nb_seats: treated specifically
+                color: "#" + jme.find("input[id^='party'][id$='_color']").val(),
+                border_size: parseFloat(jme.find("input[id^='party'][id$='_border']").val()),
+                border_color: "#" + jme.find("input[id^='party'][id$='_bcolor']").val(),
+            };
+
+            if (jme.attr("id") === "party_vacant") {
+                party.nb_seats = vacants;
+            } else {
+                party.nb_seats = parseInt(jme.find("input[id^='party'][id$='_number']").val());
+
+                legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
+                if (party.nb_seats !== 1) {
+                    legendstring += 's';
+                }
+                legendstring += '}} ';
+            }
+
+            return party;
+        }).get();
 
         payload.partylist_per_area = [partylist];
     } else {
