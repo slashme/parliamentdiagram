@@ -182,10 +182,9 @@ function callDiagramScript(demo = false) {
         $(".partycard").each(function () {
             const jme = $(this);
 
-            // TODO: implement the name/data/title feature
-            const partyname = jme.find("input[id^='party'][id$='_name']").val();
             const party = {
-                // name: jme.find("input[id^='party'][id$='_name']").val(),
+                name: jme.find("input[id^='party'][id$='_name']").val(),
+                // data:
                 nb_seats: parseInt(jme.find("input[id^='party'][id$='_number']").val()),
                 color: "#" + jme.find("input[id^='party'][id$='_color']").val(),
                 border_size: parseFloat(jme.find("input[id^='party'][id$='_border']").val()),
@@ -194,7 +193,7 @@ function callDiagramScript(demo = false) {
 
             partylist.push(party);
 
-            legendstring += `{{legend|${party.color}|${partyname}: ${party.nb_seats} seat`;
+            legendstring += `{{legend|${party.color}|${party.name}: ${party.nb_seats} seat`;
             if (party.nb_seats !== 1) {
                 legendstring += 's';
             }

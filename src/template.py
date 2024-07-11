@@ -17,6 +17,7 @@ class SeatData:
     def __init__(self, **kwargs):
         self._dict = kwargs
         self.items = self._dict.items
+        self.get = self._dict.get
 
     def __hash__(self):
         return hash(frozenset(self.items()))
@@ -217,15 +218,15 @@ def _fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData
     style_node_text = [""]
     for areaid, aread in zip(sorted_areas, filling, strict=True):
         for i, seat_data in enumerate(aread, start=1):
-            style_node_text.append(f"    .area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items()) + "}")
+            style_node_text.append(f"    .area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items() if k not in ("title", "desc")) + "}")
     style_node_text.append("")
     style_node.text = sep.join(style_node_text)
 
     for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
-        fillings_iter = chain(*(repeat(i, r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
+        fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
         for element_id in elements:
             try:
-                nparty = next(fillings_iter)
+                nparty, seat_data = next(fillings_iter)
             except StopIteration:
                 raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
 
@@ -235,6 +236,13 @@ def _fill_ET_template_by_class(template: ET.Element, filling: list[dict[SeatData
                 node_class = node.attrib["class"] + " " + node_class
             node.set("class", node_class)
             node.attrib.pop("id")
+
+            for d in ("title", "desc"):
+                v = seat_data.get(d)
+                if v:
+                    el = ET.Element(d)
+                    el.text = v
+                    node.append(el)
 
 def _fill_str_template(template: str, filling: list[dict[SeatData, int]]) -> str:
     """
