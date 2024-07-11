@@ -57,6 +57,9 @@ function selectTemplate(template_id) {
     addParty();
     // actuate the number of vacant seats
     actuateVacants();
+
+    // show the diagram maker button
+    $("#diagrammaker").show();
 }
 
 function addParty(newname = "", newcolor = "", newnseats = 0) {
