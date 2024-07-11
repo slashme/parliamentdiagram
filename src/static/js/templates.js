@@ -39,12 +39,14 @@ function selectTemplate(template_id) {
     // get the metadata for the selected template
     selected_template = templates_metadata.find((template) => template.id === template_id);
 
+    // TODO improve
     // show the selected template metadata container
     $("#togglabletemplateinfo").show();
-    // TODO
-    // put in the title and description and number of seats of the template,
-    // taken from the element with id "template_" + template_id
-    // in templateinfocontainer
+    // display the title and description of the chosen template
+    const template = $(`#template_${template_id}`);
+    const tic = $("#templateinfocontainer");
+    tic.empty();
+    tic.append(template.find(".card-title").clone(), template.find(".card-text").clone());
 
     // show the parties container
     $("#togglablepartylistcontainer").show();
