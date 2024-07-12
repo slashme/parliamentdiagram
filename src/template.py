@@ -1,6 +1,4 @@
-from collections import defaultdict
 from itertools import chain, repeat
-import re
 import sys
 from typing import Literal
 import xml.etree.ElementTree as ET
@@ -109,16 +107,15 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
 
 
 def _scan_template(template: ET.Element) -> int:
-    # part 1:
-    # identify the seats
     # return the number of seats
+    # may return a list of togglable elements too
     elements = _extract_template(template, check_unicity=True)
     return len(elements)
 
 def _extract_template(template: ET.Element, *, check_unicity=False):
     elements: dict[int, ET.Element] = {}
 
-    for node in template.findall(".//"): # check that it takes the subelements
+    for node in template.findall(".//"):
         if (id := node.get(_pardiag_prefix+"id", None)) and id.isdecimal():
             seat = int(id)
             if check_unicity and (seat in elements):
