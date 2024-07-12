@@ -54,10 +54,10 @@ def main(template_file, output_file=sys.stdout, *,
 
     if isinstance(template_file, str):
         with open(template_file, "r") as file:
-            return main(file, output_file, filling=filling)
+            return main(file, output_file, filling=filling, toggles=toggles, use_classes=use_classes)
     if isinstance(output_file, str):
         with open(output_file, "w") as file:
-            return main(template_file, file, filling=filling)
+            return main(template_file, file, filling=filling, toggles=toggles, use_classes=use_classes)
 
     if use_classes is None:
         # TODO: actually if filling is not True,
@@ -206,8 +206,11 @@ def _fill_template(template: ET.Element,
     # FIXME doesn't work
     for toggle, state in toggles.items():
         if not state:
-            for node in togglable_elements[toggle]:
-                node.find("..").remove(node) # type: ignore
+            # get parent of the toggled elements
+            for node in template.findall(f".//*[@{_pardiag_prefix}togglable='{toggle}'].."):
+                # remove the toggled elements
+                for child in node.findall(f".*[@{_pardiag_prefix}togglable='{toggle}']"):
+                    node.remove(child)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
