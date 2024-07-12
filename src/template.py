@@ -225,4 +225,5 @@ def _fill_template_by_class(template: ET.Element, fillings: dict[SeatData, int])
         raise ValueError("filling contains too many seats")
 
 if __name__ == "__main__":
-    sys.exit(main(*sys.argv[1:]))
+    if len(sys.argv) > 1:
+        sys.exit(main(*sys.argv[1:]))
