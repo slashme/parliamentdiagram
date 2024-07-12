@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import os
 import tomllib
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import unquote_plus
 
 from flask import Flask, abort, render_template, request, session
@@ -157,7 +157,7 @@ def template_generation():
             # convert it to svg properties
             # title, fill, stroke-width, stroke
             # also manage the seat numbers, from nb_seats to dict value
-            filling = {}
+            filling: dict[TemplateSeatData, int]|Literal[True] = {}
             for party in inputdata.pop("partylist"):
                 nb_seats = party.pop("nb_seats", 1)
                 party["title"] = party.pop("name", None)

@@ -2,6 +2,7 @@ from collections import defaultdict
 from itertools import chain, repeat
 import re
 import sys
+from typing import Literal
 import xml.etree.ElementTree as ET
 
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
@@ -31,14 +32,16 @@ def _wrapped_namespace(ns: str) -> str:
     return "{" + _NAMESPACES.get(ns, ns) + "}"
 _pardiag_prefix = _wrapped_namespace("pardiag")
 
-def main(template_file, output_file=sys.stdout, *, filling=None, use_classes: bool|None = None) -> int|str|None:
+def main(template_file, output_file=sys.stdout, *,
+        filling: Literal[True]|None|dict[SeatData, int] = None,
+        use_classes: bool|None = None,
+        ) -> int|str|None:
     """
     Considers the template file and the output file to be a file descriptor or a file path.
 
-    If filling is None, prints the number of seats by area.
-    If filling is a list of SeatData: nseats dicts,
-    where there is one dict per area
-    and the sum of nseats is the number of seats in that area,
+    If filling is None, prints the number of seats.
+    If filling is a SeatData: nseats dict,
+    and the sum of nseats is the number of seats,
     then the template gets filled using that filling.
     If filling is True, it is replaced by a rainbow filling, in "demo mode".
 
@@ -61,7 +64,6 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_classes: bo
         use_classes = filling is not True
 
     template_str = template_file.read()
-    # template = _parse_without_namespaces(template_str)
     template = ET.fromstring(template_str)
 
     if filling is True:
@@ -76,19 +78,6 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_classes: bo
         else:
             _fill_template_individually(template, filling)
         print(ET.tostring(template, encoding="unicode"), file=output_file)
-
-def _parse_without_namespaces(string) -> ET.Element:
-    """
-    Prevents Python's xml parser from substituting the namespaces in the elements' tags.
-    Warning : works only if the namespaces are on the outer node.
-    """
-    found_namespaces = {}
-    for namespace_match in re.finditer(r'(xmlns(?::\w+)?)="([^"]+)"\s*', string):
-        found_namespaces[namespace_match.group(1)] = namespace_match.group(2)
-        string = string.replace(namespace_match.group(0), "")
-    element = ET.fromstring(string)
-    element.attrib = found_namespaces | element.attrib
-    return element
 
 def _generate_rainbow(n, boun=300):
     """
@@ -123,8 +112,7 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
 def _scan_template(template: ET.Element) -> int:
     # part 1:
     # identify the seats
-    # return the number of seats per area to the form generator
-    # (probably an ordered list of seat counts)
+    # return the number of seats
     elements = _extract_template(template, check_unicity=True)
     return len(elements)
 
