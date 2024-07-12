@@ -61,6 +61,8 @@ def main(template_file, output_file=sys.stdout, *,
             return main(template_file, file, filling=filling)
 
     if use_classes is None:
+        # TODO: actually if filling is not True,
+        # compute a ratio between the number of seats and the number of parties
         use_classes = filling is not True
 
     template_str = template_file.read()
@@ -73,10 +75,7 @@ def main(template_file, output_file=sys.stdout, *,
     if filling is None:
         print(_scan_template(template), file=output_file)
     else:
-        if use_classes:
-            _fill_template_by_class(template, filling)
-        else:
-            _fill_template_individually(template, filling)
+        _fill_template(template, filling, use_classes)
         print(ET.tostring(template, encoding="unicode"), file=output_file)
 
 def _generate_rainbow(n, boun=300):
@@ -129,85 +128,60 @@ def _extract_template(template: ET.Element, *, check_unicity=False):
     return elements
 
 
-def _fill_template_individually(template: ET.Element, fillings: dict[SeatData, int]) -> None:
-    """
-    The operation is done in-place and mutates the ElementTree.
-    This method is the only one to properly support the title and desc seat data.
-    """
+def _fill_template(template: ET.Element, fillings: dict[SeatData, int], use_classes: bool) -> None:
 
     metadata = _get_template_metadata(template)
 
     # the SVG elements by seat id, not sorted
     elements = _extract_template(template)
 
-    fillings_iter = chain(*(repeat(sd, r) for sd, r in fillings.items()))
-    # for each seat element:
-    for element_id in sorted(elements, reverse=bool(metadata["reversed"])):
-        try:
-            seat_data = next(fillings_iter)
-        except StopIteration:
-            raise ValueError("filling does not contain enough seats")
+    if use_classes:
+        # add the style node
+        style_node = ET.Element("style", type="text/css")
+        sep = (template.text or "")
+        style_node.tail = sep
+        template.insert(0, style_node)
 
-        # fill the seats progressively, by applying them the style properties and removing their id
-        node = elements[element_id]
-        del node.attrib[_pardiag_prefix+"id"]
-        for k, v in seat_data.items():
-            if v:
-                if k in ("title", "desc"):
-                    el = ET.Element(k)
-                    el.text = v
-                    node.append(el)
-                else:
-                    node.set(k, str(v))
-
-    if tuple(fillings_iter):
-        raise ValueError("filling contains too many seats")
-
-def _fill_template_by_class(template: ET.Element, fillings: dict[SeatData, int]) -> None:
-    """
-    This does it more cleanly, taking advantage of the ET.
-    Each party's class definition is put in a <style> node.
-    Then the class is added to the seats.
-    title and desc are not properly managed (treated as attributes).
-    """
-
-    metadata = _get_template_metadata(template)
-
-    # the SVG elements by seat id, not sorted
-    elements = _extract_template(template)
-
-    # add the style node
-    style_node = ET.Element("style", type="text/css")
-    sep = (template.text or "")
-    style_node.tail = sep
-    template.insert(0, style_node)
-    # fill the style node
-    style_node_text = [""]
-    for i, seat_data in enumerate(fillings, start=1):
-        style_node_text.append(f"    .party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items() if k not in ("title", "desc")) + "}")
-    style_node_text.append("")
-    style_node.text = sep.join(style_node_text)
+        # fill the style node
+        style_node_text = [""]
+        for i, seat_data in enumerate(fillings, start=1):
+            style_node_text.append(f"    .party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items() if k not in ("title", "desc")) + "}")
+        style_node_text.append("")
+        style_node.text = sep.join(style_node_text)
 
     fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
+    # for each seat element:
     for element_id in sorted(elements, reverse=bool(metadata["reversed"])):
         try:
             nparty, seat_data = next(fillings_iter)
         except StopIteration:
-            raise ValueError(f"filling does not contain enough seats")
+            raise ValueError("filling does not contain enough seats")
 
         node = elements[element_id]
-        node_class = f"party{nparty}"
-        if "class" in node.attrib:
-            node_class = node.attrib["class"] + " " + node_class
-        node.set("class", node_class)
         del node.attrib[_pardiag_prefix+"id"]
 
-        for d in ("title", "desc"):
-            v = seat_data.get(d)
-            if v:
-                el = ET.Element(d)
-                el.text = v
-                node.append(el)
+        if use_classes:
+            node_class = f"party{nparty}"
+            if "class" in node.attrib:
+                node_class = node.attrib["class"] + " " + node_class
+            node.set("class", node_class)
+
+            for d in ("title", "desc"):
+                v = seat_data.get(d)
+                if v:
+                    el = ET.Element(d)
+                    el.text = v
+                    node.append(el)
+
+        else:
+            for k, v in seat_data.items():
+                if v:
+                    if k in ("title", "desc"):
+                        el = ET.Element(k)
+                        el.text = v
+                        node.append(el)
+                    else:
+                        node.set(k, str(v))
 
     if tuple(fillings_iter):
         raise ValueError("filling contains too many seats")
