@@ -32,6 +32,7 @@ _pardiag_prefix = _wrapped_namespace("pardiag")
 
 def main(template_file, output_file=sys.stdout, *,
         filling: Literal[True]|None|dict[SeatData, int] = None,
+        toggles: dict[str, bool]|None = None,
         use_classes: bool|None = None,
         ) -> int|str|None:
     """
@@ -73,7 +74,7 @@ def main(template_file, output_file=sys.stdout, *,
     if filling is None:
         print(_scan_template(template), file=output_file)
     else:
-        _fill_template(template, filling, use_classes)
+        _fill_template(template, filling, toggles or {}, use_classes)
         print(ET.tostring(template, encoding="unicode"), file=output_file)
 
 def _generate_rainbow(n, boun=300):
@@ -123,22 +124,33 @@ def _extract_template(template: ET.Element, *,
 
     for node in template.findall(".//"):
         if (id := node.get(_pardiag_prefix+"id", None)):
-            if id.isdecimal():
-                seat = int(id)
-                if check_unicity and (seat in seat_elements):
-                    raise Exception(f"Duplicate seat : {id}")
-                seat_elements[seat] = node
-            elif id:
-                togglable_elements.setdefault(id, []).append(node)
+            if not id.isdecimal():
+                raise ValueError(f"Invalid id : {id!r}")
+            seat = int(id)
+            if check_unicity and (seat in seat_elements):
+                raise Exception(f"Duplicate seat : {id}")
+            seat_elements[seat] = node
+
+        if (togglable := node.get(_pardiag_prefix+"togglable", None)):
+            if id:
+                raise ValueError(f"Node {node} has both an id and a togglable attribute")
+            togglable_elements.setdefault(togglable, []).append(node)
 
     return seat_elements, togglable_elements
 
 
-def _fill_template(template: ET.Element, fillings: dict[SeatData, int], use_classes: bool) -> None:
+def _fill_template(template: ET.Element,
+        fillings: dict[SeatData, int],
+        toggles: dict[str, bool],
+        use_classes: bool,
+        ) -> None:
 
     metadata = _get_template_metadata(template)
 
     seat_elements, togglable_elements = _extract_template(template)
+
+    if frozenset(toggles).difference(togglable_elements):
+        raise ValueError("Unknown toggles : " + ", ".join(frozenset(toggles).difference(togglable_elements)))
 
     if use_classes:
         # add the style node
@@ -190,6 +202,11 @@ def _fill_template(template: ET.Element, fillings: dict[SeatData, int], use_clas
 
     if tuple(fillings_iter):
         raise ValueError("filling contains too many seats")
+
+    for toggle, state in toggles.items():
+        if not state:
+            for node in togglable_elements[toggle]:
+                node.find("..").remove(node) # type: ignore
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
