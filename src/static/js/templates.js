@@ -26,6 +26,13 @@ const templates_metadata = [
             "bancs_commissions",
         ],
     },
+    {
+        id: "dáil_éireann",
+        nseats: 165, // + speaker
+        togglables: [
+            "ceann_comhairle", // the speaker
+        ],
+    },
 ];
 
 let selected_template = null;
