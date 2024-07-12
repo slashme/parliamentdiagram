@@ -38,4 +38,16 @@ The recommended true value is "true" or "1".
 In a reversed template, the meaning of the ordering of the seat numbers is reversed,
 starting from "right" to "left".
 
-The "paradiag:name" provides the name of the template. It is entirely optional.
+The "pardiag:name" provides the name of the template. It is entirely optional.
+
+## Togglables
+
+The "pardiag:togglable" parameter sets an element to be togglable,
+which means that it can be removed from the diagram.
+The parameter can be applied to any element
+which does not directly or indirectly contain a seat element.
+However, a togglable element may be contained in a seat element,
+or in other togglable elements.
+Its value is an identifier which must not start with a digit, must not be empty,
+and must not start or end with whitespace.
+Several elements may share the same togglable identifier.

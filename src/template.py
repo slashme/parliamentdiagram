@@ -1,6 +1,6 @@
 from itertools import chain, repeat
 import sys
-from typing import Literal
+from typing import Literal, NamedTuple
 import xml.etree.ElementTree as ET
 
 # SeatData = TypedDict("SeatData", {"fill": str, "stroke": str, "stroke-width": str, "title": str}, total=False)
@@ -67,7 +67,7 @@ def main(template_file, output_file=sys.stdout, *,
     template = ET.fromstring(template_str)
 
     if filling is True:
-        nseats = _scan_template(template)
+        nseats = _scan_template(template).nseats
         filling = {SeatData(fill=color): 1 for color in _generate_rainbow(nseats, 250)}
 
     if filling is None:
@@ -106,31 +106,39 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
     return metadata
 
 
-def _scan_template(template: ET.Element) -> int:
-    # return the number of seats
-    # may return a list of togglable elements too
-    elements = _extract_template(template, check_unicity=True)
-    return len(elements)
+class _TemplateData(NamedTuple):
+    nseats: int
+    togglable_elements: tuple[str, ...]
 
-def _extract_template(template: ET.Element, *, check_unicity=False):
-    elements: dict[int, ET.Element] = {}
+def _scan_template(template: ET.Element) -> _TemplateData:
+    seat_elements, togglable_elements = _extract_template(template, check_unicity=True)
+    return _TemplateData(len(seat_elements), tuple(togglable_elements))
+
+def _extract_template(template: ET.Element, *,
+        check_unicity=True,
+        ) -> tuple[dict[int, ET.Element], dict[str, list[ET.Element]]]:
+
+    seat_elements = {}
+    togglable_elements = {}
 
     for node in template.findall(".//"):
-        if (id := node.get(_pardiag_prefix+"id", None)) and id.isdecimal():
-            seat = int(id)
-            if check_unicity and (seat in elements):
-                raise Exception(f"Duplicate seat : {id}")
-            elements[seat] = node
+        if (id := node.get(_pardiag_prefix+"id", None)):
+            if id.isdecimal():
+                seat = int(id)
+                if check_unicity and (seat in seat_elements):
+                    raise Exception(f"Duplicate seat : {id}")
+                seat_elements[seat] = node
+            elif id:
+                togglable_elements.setdefault(id, []).append(node)
 
-    return elements
+    return seat_elements, togglable_elements
 
 
 def _fill_template(template: ET.Element, fillings: dict[SeatData, int], use_classes: bool) -> None:
 
     metadata = _get_template_metadata(template)
 
-    # the SVG elements by seat id, not sorted
-    elements = _extract_template(template)
+    seat_elements, togglable_elements = _extract_template(template)
 
     if use_classes:
         # add the style node
@@ -148,13 +156,13 @@ def _fill_template(template: ET.Element, fillings: dict[SeatData, int], use_clas
 
     fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
     # for each seat element:
-    for element_id in sorted(elements, reverse=bool(metadata["reversed"])):
+    for element_id in sorted(seat_elements, reverse=bool(metadata["reversed"])):
         try:
             nparty, seat_data = next(fillings_iter)
         except StopIteration:
             raise ValueError("filling does not contain enough seats")
 
-        node = elements[element_id]
+        node = seat_elements[element_id]
         del node.attrib[_pardiag_prefix+"id"]
 
         if use_classes:
