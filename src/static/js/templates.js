@@ -18,6 +18,13 @@ const templates_metadata = [
     {
         id: "assnat",
         nseats: 582,
+        togglables: [
+            "enceinte",
+            "pupitres",
+            "perchoir",
+            "bancs_ministres",
+            "bancs_commissions",
+        ]
     },
 ];
 
@@ -44,9 +51,36 @@ function selectTemplate(template_id) {
     $("#togglabletemplateinfo").show();
     // display the title and description of the chosen template
     const template = $(`#template_${template_id}`);
-    const tic = $("#templateinfocontainer");
-    tic.empty();
-    tic.append(template.find(".card-title").clone(), template.find(".card-text").clone());
+    const jtic = $("#templateinfocontainer");
+    jtic.empty();
+    jtic.append(template.find(".card-title").clone(), template.find(".card-text").clone());
+
+    // show the toggles
+    const tic = jtic[0];
+    tic.append(
+        document.createElement("hr"),
+        document.createElement("h4"),
+    );
+    tic.lastChild.append("Togglable elements:");
+    const rowdiv = tic.appendChild(document.createElement("div"));
+    rowdiv.className = "row";
+    const coldiv = rowdiv.appendChild(document.createElement("div"));
+    coldiv.className = "col-12 mt-2";
+    for (const togglable of selected_template.togglables) {
+        const sdiv = coldiv.appendChild(document.createElement("div"));
+        sdiv.className = "form-check form-switch";
+        const input = sdiv.appendChild(document.createElement("input"));
+        input.className = "form-check-input togglable";
+        input.type = "checkbox";
+        input.role = "switch";
+        input.id = `toggle_${togglable}`;
+        input.checked = true;
+        const label = sdiv.appendChild(document.createElement("label"));
+        label.className = "form-check-label";
+        label.htmlFor = input.id;
+        label.append(togglable.slice(0, 1).toUpperCase() + togglable.slice(1).replace("_", " "));
+    }
+    tic.append(document.createElement("hr"));
 
     // show the parties container
     $("#togglablepartylistcontainer").show();
