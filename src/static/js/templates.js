@@ -24,7 +24,7 @@ const templates_metadata = [
             "perchoir",
             "bancs_ministres",
             "bancs_commissions",
-        ]
+        ],
     },
 ];
 
