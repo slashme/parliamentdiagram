@@ -151,13 +151,15 @@ def _fill_template_individually(template: ET.Element, filling: list[dict[SeatDat
     This method is the only one to properly support the title and desc seat data.
     """
 
+    metadata = _get_template_metadata(template)
+
     # extract the seat svg elements again
     # group them by area
     sorted_areas, l1_elements_by_area = _extract_template(template)
 
     # sort each area's set of seats (by number, not by alphabet)
     # converting from list of unsorted dicts to list of sorted dicts
-    l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
+    l2_elements_by_area = [{k: elements[k] for k in sorted(elements, reverse=bool(metadata["reversed"]))} for elements in l1_elements_by_area]
 
     # for each area:
     for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
@@ -189,9 +191,11 @@ def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, i
     title and desc are not properly managed (treated as attributes).
     """
 
+    metadata = _get_template_metadata(template)
+
     sorted_areas, l1_elements_by_area = _extract_template(template)
 
-    l2_elements_by_area = [{k: elements[k] for k in sorted(elements)} for elements in l1_elements_by_area]
+    l2_elements_by_area = [{k: elements[k] for k in sorted(elements, reverse=bool(metadata["reversed"]))} for elements in l1_elements_by_area]
 
     # add the style node
     style_node = ET.Element("style", type="text/css")
