@@ -17,14 +17,14 @@ $(document).ready(function () {
 const templates_metadata = [
     {
         id: "assnat",
-        nseats_per_area: [582],
+        nseats: 582,
     },
 ];
 
 let selected_template = null;
 
 function actuateVacants() {
-    const [nseats] = selected_template.nseats_per_area;
+    const nseats = selected_template.nseats;
 
     // get the sum of the number of seats of all parties
     let sum = 0;
@@ -126,7 +126,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0, party_number = nul
     partyseatsinput.type = "number";
     partyseatsinput.id = `party${party_number}_number`;
     partyseatsinput.min = 0;
-    [partyseatsinput.max] = selected_template.nseats_per_area;
+    partyseatsinput.max = selected_template.nseats;
     partyseatsinput.value = newnseats;
     partyseatsinput.onchange = actuateVacants;
 
@@ -225,7 +225,7 @@ function callDiagramScript(demo = false) {
             return;
         }
 
-        const partylist = $(".partycard").map(function () {
+        payload.partylist = $(".partycard").map(function () {
             const jme = $(this);
 
             const party = {
@@ -251,8 +251,6 @@ function callDiagramScript(demo = false) {
 
             return party;
         }).get();
-
-        payload.partylist_per_area = [partylist];
     } else {
         payload.demo = true;
     }

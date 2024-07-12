@@ -157,18 +157,15 @@ def template_generation():
             # convert it to svg properties
             # title, fill, stroke-width, stroke
             # also manage the seat numbers, from nb_seats to dict value
-            filling = []
-            for partylist in inputdata.pop("partylist_per_area", ()):
-                area_filling = {}
-                for party in partylist:
-                    nb_seats = party.pop("nb_seats", 1)
-                    party["title"] = party.pop("name", None)
-                    party["desc"] = party.pop("data", None)
-                    party["fill"] = party.pop("color")
-                    party["stroke-width"] = party.pop("border_size", 0)
-                    party["stroke"] = party.pop("border_color", "black")
-                    area_filling[TemplateSeatData(**party)] = nb_seats
-                filling.append(area_filling)
+            filling = {}
+            for party in inputdata.pop("partylist"):
+                nb_seats = party.pop("nb_seats", 1)
+                party["title"] = party.pop("name", None)
+                party["desc"] = party.pop("data", None)
+                party["fill"] = party.pop("color")
+                party["stroke-width"] = party.pop("border_size", 0)
+                party["stroke"] = party.pop("border_color", "black")
+                filling[TemplateSeatData(**party)] = nb_seats
 
         template_main("static/svg_templates/"+inputdata.pop("template_id")+"_template.svg", "static/"+filename,
             filling=filling,
