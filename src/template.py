@@ -27,6 +27,10 @@ for p, n in _NAMESPACES.items():
     ET.register_namespace(p, n)
 del p, n
 
+def _wrapped_namespace(ns: str) -> str:
+    return "{" + _NAMESPACES.get(ns, ns) + "}"
+_pardiag_prefix = _wrapped_namespace("pardiag")
+
 def main(template_file, output_file=sys.stdout, *, filling=None, use_classes: bool|None = None) -> int|str|None:
     """
     Considers the template file and the output file to be a file descriptor or a file path.
@@ -108,10 +112,9 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
     """
     metadata = {}
 
-    # on the root svg node, find all parameters prefixed by "pardiag:"
     for key, value in template.attrib.items():
-        if key.startswith(_NAMESPACES["pardiag"]):
-            metadata[key.removeprefix(_NAMESPACES["pardiag"])] = value
+        if key.startswith(_pardiag_prefix):
+            metadata[key.removeprefix(_pardiag_prefix)] = value
 
     # metadata["reversed"] = bool(metadata.get("reversed"))
     return metadata
@@ -127,13 +130,15 @@ def _scan_template(template: ET.Element) -> list[int]:
 
 def _extract_template(template: ET.Element, *, check_unicity=False):
     elements_by_area = defaultdict(dict[int, ET.Element])
+
     for node in template.findall(".//"): # check that it takes the subelements
-        if (id := node.get("id", None)) and (ma := re.fullmatch(r'(?:@(\d+))?@(\d+)', id)) is not None:
-            area = elements_by_area[int(ma.group(1) or "0")]
-            seat = int(ma.group(2))
+        if (id := node.get(_pardiag_prefix+"id", None)) and id.isdecimal():
+            area = elements_by_area[0]
+            seat = int(id)
             if check_unicity and (seat in area):
-                raise Exception(f"Duplicate seat : {ma.group(0)!r}")
+                raise Exception(f"Duplicate seat : {id}")
             area[seat] = node
+
     sorted_areas = sorted(elements_by_area)
     l1_elements_by_area = [elements_by_area[area] for area in sorted_areas]
 
@@ -166,7 +171,7 @@ def _fill_template_individually(template: ET.Element, filling: list[dict[SeatDat
 
             # fill the seats progressively, by applying them the style properties and removing their id
             node = elements[element_id]
-            del node.attrib["id"]
+            del node.attrib[_pardiag_prefix+"id"]
             for k, v in seat_data.items():
                 if v:
                     if k in ("title", "desc"):
@@ -214,7 +219,7 @@ def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, i
             if "class" in node.attrib:
                 node_class = node.attrib["class"] + " " + node_class
             node.set("class", node_class)
-            node.attrib.pop("id")
+            del node.attrib[_pardiag_prefix+"id"]
 
             for d in ("title", "desc"):
                 v = seat_data.get(d)
