@@ -65,8 +65,8 @@ def main(template_file, output_file=sys.stdout, *, filling=None, use_classes: bo
     template = ET.fromstring(template_str)
 
     if filling is True:
-        nseats_by_area = _scan_template(template)
-        filling = [{SeatData(fill=color): 1 for color in _generate_rainbow(nseats, 250)} for nseats in nseats_by_area]
+        nseats = _scan_template(template)
+        filling = {SeatData(fill=color): 1 for color in _generate_rainbow(nseats, 250)}
 
     if filling is None:
         print(_scan_template(template), file=output_file)
@@ -120,32 +120,28 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
     return metadata
 
 
-def _scan_template(template: ET.Element) -> list[int]:
+def _scan_template(template: ET.Element) -> int:
     # part 1:
     # identify the seats
     # return the number of seats per area to the form generator
     # (probably an ordered list of seat counts)
-    _sorted_areas, l1_elements_by_area = _extract_template(template, check_unicity=True)
-    return list(map(len, l1_elements_by_area))
+    elements = _extract_template(template, check_unicity=True)
+    return len(elements)
 
 def _extract_template(template: ET.Element, *, check_unicity=False):
-    elements_by_area = defaultdict(dict[int, ET.Element])
+    elements: dict[int, ET.Element] = {}
 
     for node in template.findall(".//"): # check that it takes the subelements
         if (id := node.get(_pardiag_prefix+"id", None)) and id.isdecimal():
-            area = elements_by_area[0]
             seat = int(id)
-            if check_unicity and (seat in area):
+            if check_unicity and (seat in elements):
                 raise Exception(f"Duplicate seat : {id}")
-            area[seat] = node
+            elements[seat] = node
 
-    sorted_areas = sorted(elements_by_area)
-    l1_elements_by_area = [elements_by_area[area] for area in sorted_areas]
-
-    return sorted_areas, l1_elements_by_area
+    return elements
 
 
-def _fill_template_individually(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+def _fill_template_individually(template: ET.Element, fillings: dict[SeatData, int]) -> None:
     """
     The operation is done in-place and mutates the ElementTree.
     This method is the only one to properly support the title and desc seat data.
@@ -153,35 +149,31 @@ def _fill_template_individually(template: ET.Element, filling: list[dict[SeatDat
 
     metadata = _get_template_metadata(template)
 
-    # extract the seat svg elements again
-    # group them by area
-    sorted_areas, l1_elements_by_area = _extract_template(template)
+    # the SVG elements by seat id, not sorted
+    elements = _extract_template(template)
 
-    # sort each area's set of seats (by number, not by alphabet)
-    # converting from list of unsorted dicts to list of sorted dicts
-    l2_elements_by_area = [{k: elements[k] for k in sorted(elements, reverse=bool(metadata["reversed"]))} for elements in l1_elements_by_area]
+    fillings_iter = chain(*(repeat(sd, r) for sd, r in fillings.items()))
+    # for each seat element:
+    for element_id in sorted(elements, reverse=bool(metadata["reversed"])):
+        try:
+            seat_data = next(fillings_iter)
+        except StopIteration:
+            raise ValueError("filling does not contain enough seats")
 
-    # for each area:
-    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
-        fillings_iter = chain(*(repeat(sd, r) for sd, r in fillings.items()))
-        # for each seat element:
-        for element_id in elements:
-            try:
-                seat_data = next(fillings_iter)
-            except StopIteration:
-                raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
+        # fill the seats progressively, by applying them the style properties and removing their id
+        node = elements[element_id]
+        del node.attrib[_pardiag_prefix+"id"]
+        for k, v in seat_data.items():
+            if v:
+                if k in ("title", "desc"):
+                    el = ET.Element(k)
+                    el.text = v
+                    node.append(el)
+                else:
+                    node.set(k, str(v))
 
-            # fill the seats progressively, by applying them the style properties and removing their id
-            node = elements[element_id]
-            del node.attrib[_pardiag_prefix+"id"]
-            for k, v in seat_data.items():
-                if v:
-                    if k in ("title", "desc"):
-                        el = ET.Element(k)
-                        el.text = v
-                        node.append(el)
-                    else:
-                        node.set(k, str(v))
+    if tuple(fillings_iter):
+        raise ValueError("filling contains too many seats")
 
 def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
     """
@@ -193,7 +185,7 @@ def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, i
 
     metadata = _get_template_metadata(template)
 
-    sorted_areas, l1_elements_by_area = _extract_template(template)
+    raw_elements = _extract_template(template)
 
     l2_elements_by_area = [{k: elements[k] for k in sorted(elements, reverse=bool(metadata["reversed"]))} for elements in l1_elements_by_area]
 
