@@ -56,31 +56,33 @@ function selectTemplate(template_id) {
     jtic.append(template.find(".card-title").clone(), template.find(".card-text").clone());
 
     // show the toggles
-    const tic = jtic[0];
-    tic.append(
-        document.createElement("hr"),
-        document.createElement("h4"),
-    );
-    tic.lastChild.append("Togglable elements:");
-    const rowdiv = tic.appendChild(document.createElement("div"));
-    rowdiv.className = "row";
-    const coldiv = rowdiv.appendChild(document.createElement("div"));
-    coldiv.className = "col-12 mt-2";
-    for (const togglable of selected_template.togglables) {
-        const sdiv = coldiv.appendChild(document.createElement("div"));
-        sdiv.className = "form-check form-switch";
-        const input = sdiv.appendChild(document.createElement("input"));
-        input.className = "form-check-input togglable";
-        input.type = "checkbox";
-        input.role = "switch";
-        input.id = `toggle_${togglable}`;
-        input.checked = true;
-        const label = sdiv.appendChild(document.createElement("label"));
-        label.className = "form-check-label";
-        label.htmlFor = input.id;
-        label.append(togglable.slice(0, 1).toUpperCase() + togglable.slice(1).replace("_", " "));
+    if (selected_template.togglables.length) {
+        const tic = jtic[0];
+        tic.append(
+            document.createElement("hr"),
+            document.createElement("h4"),
+        );
+        tic.lastChild.append("Togglable elements:");
+        const rowdiv = tic.appendChild(document.createElement("div"));
+        rowdiv.className = "row";
+        const coldiv = rowdiv.appendChild(document.createElement("div"));
+        coldiv.className = "col-12 mt-2";
+        for (const togglable of selected_template.togglables) {
+            const sdiv = coldiv.appendChild(document.createElement("div"));
+            sdiv.className = "form-check form-switch";
+            const input = sdiv.appendChild(document.createElement("input"));
+            input.className = "form-check-input togglable";
+            input.type = "checkbox";
+            input.role = "switch";
+            input.id = `toggle_${togglable}`;
+            input.checked = true;
+            const label = sdiv.appendChild(document.createElement("label"));
+            label.className = "form-check-label";
+            label.htmlFor = input.id;
+            label.append(togglable.slice(0, 1).toUpperCase() + togglable.slice(1).replace("_", " "));
+        }
+        tic.append(document.createElement("hr"));
     }
-    tic.append(document.createElement("hr"));
 
     // show the parties container
     $("#togglablepartylistcontainer").show();
@@ -308,9 +310,14 @@ function callDiagramScript(demo = false) {
         const postcontainer = document.getElementById("postcontainer");
         postcontainer.innerHTML = "";
 
-        const img = postcontainer.appendChild(document.createElement("img"));
+        const imgdiv = postcontainer.appendChild(document.createElement("div"));
+        imgdiv.className = "text-center";
+        const img = imgdiv.appendChild(document.createElement("img"));
         img.src = data;
         img.id = "SVGDiagram";
+        img.style = "max-width: 100%; max-height: 40vw; object-fit: scale-down;";
+
+        postcontainer.appendChild(document.createElement("br"));
 
         const download = postcontainer.appendChild(document.createElement("a"));
         download.append("Click to download your SVG diagram.");

@@ -24,14 +24,16 @@
           <!-- fold when selected ? -->
           <div id="template_selector_grid" class="card-body">
             <h3 class="card-text">Select a template</h3>
-            <div class="card-deck" id="templatecontainer">
-              <a class="card text-center btn w-25" id="template_assnat" onclick="selectTemplate('assnat')">
-                <img src="{{url_for('static', filename='images/assnat_template_demo.svg')}}" class="card-img">
-                <div class="card-overlay">
-                  <h5 class="card-title">Assemblée nationale</h5>
-                  <p class="card-text">This is the french assembly.</p>
-                </div>
-              </a>
+            <div id="templatecontainer" class="row row-cols-1 row-cols-md-4 g-4">
+              <div class="col">
+                <a class="card text-center btn" id="template_assnat" onclick="selectTemplate('assnat')">
+                  <img src="{{url_for('static', filename='images/assnat_template_demo.svg')}}" class="card-img">
+                  <div class="card-overlay">
+                    <h5 class="card-title">Assemblée nationale</h5>
+                    <p class="card-text">This is the french assembly.</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>

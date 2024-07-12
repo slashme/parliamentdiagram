@@ -168,7 +168,7 @@ def _fill_template(template: ET.Element,
 
     fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
     # for each seat element:
-    for element_id in sorted(seat_elements, reverse=bool(metadata["reversed"])):
+    for element_id in sorted(seat_elements, reverse=bool(metadata.get("reversed", False))):
         try:
             nparty, seat_data = next(fillings_iter)
         except StopIteration:
