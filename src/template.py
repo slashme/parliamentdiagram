@@ -109,7 +109,7 @@ def _get_template_metadata(template: ET.Element) -> dict[str, str]:
 
 class _TemplateData(NamedTuple):
     nseats: int
-    togglable_elements: tuple[str, ...]
+    togglables: tuple[str, ...]
 
 def _scan_template(template: ET.Element) -> _TemplateData:
     seat_elements, togglable_elements = _extract_template(template, check_unicity=True)
@@ -203,6 +203,7 @@ def _fill_template(template: ET.Element,
     if tuple(fillings_iter):
         raise ValueError("filling contains too many seats")
 
+    # FIXME doesn't work
     for toggle, state in toggles.items():
         if not state:
             for node in togglable_elements[toggle]:

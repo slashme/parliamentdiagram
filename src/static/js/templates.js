@@ -249,7 +249,14 @@ function addVacant() {
 }
 
 function callDiagramScript(demo = false) {
-    const payload = { template_id: selected_template.id };
+    const payload = {
+        template_id: selected_template.id,
+
+        // list of elements toggled off
+        togglables: $(".togglable").not(":checked").map(function () {
+            return this.id.replace("toggle_", "");
+        }).get(),
+    };
 
     let legendstring = "";
     if (!demo) {

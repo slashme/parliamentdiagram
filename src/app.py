@@ -168,7 +168,7 @@ def template_generation():
                 filling[TemplateSeatData(**party)] = nb_seats
 
         template_main("static/svg_templates/"+inputdata.pop("template_id")+"_template.svg", "static/"+filename,
-            filling=filling,
+            filling=filling, toggles=dict.fromkeys(inputdata.pop("togglables", ()), False),
         )
 
     return app.url_for("static", filename=filename)
