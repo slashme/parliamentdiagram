@@ -175,7 +175,7 @@ def _fill_template_individually(template: ET.Element, fillings: dict[SeatData, i
     if tuple(fillings_iter):
         raise ValueError("filling contains too many seats")
 
-def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, int]]) -> None:
+def _fill_template_by_class(template: ET.Element, fillings: dict[SeatData, int]) -> None:
     """
     This does it more cleanly, taking advantage of the ET.
     Each party's class definition is put in a <style> node.
@@ -185,44 +185,44 @@ def _fill_template_by_class(template: ET.Element, filling: list[dict[SeatData, i
 
     metadata = _get_template_metadata(template)
 
-    raw_elements = _extract_template(template)
-
-    l2_elements_by_area = [{k: elements[k] for k in sorted(elements, reverse=bool(metadata["reversed"]))} for elements in l1_elements_by_area]
+    # the SVG elements by seat id, not sorted
+    elements = _extract_template(template)
 
     # add the style node
     style_node = ET.Element("style", type="text/css")
     sep = (template.text or "")
     style_node.tail = sep
     template.insert(0, style_node)
-    # fill the style nodes
+    # fill the style node
     style_node_text = [""]
-    for areaid, aread in zip(sorted_areas, filling, strict=True):
-        for i, seat_data in enumerate(aread, start=1):
-            style_node_text.append(f"    .area{areaid}party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items() if k not in ("title", "desc")) + "}")
+    for i, seat_data in enumerate(fillings, start=1):
+        style_node_text.append(f"    .party{i}" "{" + "".join(f"{k}:{v};" for k, v in seat_data.items() if k not in ("title", "desc")) + "}")
     style_node_text.append("")
     style_node.text = sep.join(style_node_text)
 
-    for area_id, elements, fillings in zip(sorted_areas, l2_elements_by_area, filling, strict=True):
-        fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
-        for element_id in elements:
-            try:
-                nparty, seat_data = next(fillings_iter)
-            except StopIteration:
-                raise ValueError(f"Area {area_id} has the wrong number of filling seat data")
+    fillings_iter = chain(*(repeat((i, sd), r) for i, (sd, r) in enumerate(fillings.items(), start=1)))
+    for element_id in sorted(elements, reverse=bool(metadata["reversed"])):
+        try:
+            nparty, seat_data = next(fillings_iter)
+        except StopIteration:
+            raise ValueError(f"filling does not contain enough seats")
 
-            node = elements[element_id]
-            node_class = f"area{area_id}party{nparty}"
-            if "class" in node.attrib:
-                node_class = node.attrib["class"] + " " + node_class
-            node.set("class", node_class)
-            del node.attrib[_pardiag_prefix+"id"]
+        node = elements[element_id]
+        node_class = f"party{nparty}"
+        if "class" in node.attrib:
+            node_class = node.attrib["class"] + " " + node_class
+        node.set("class", node_class)
+        del node.attrib[_pardiag_prefix+"id"]
 
-            for d in ("title", "desc"):
-                v = seat_data.get(d)
-                if v:
-                    el = ET.Element(d)
-                    el.text = v
-                    node.append(el)
+        for d in ("title", "desc"):
+            v = seat_data.get(d)
+            if v:
+                el = ET.Element(d)
+                el.text = v
+                node.append(el)
+
+    if tuple(fillings_iter):
+        raise ValueError("filling contains too many seats")
 
 if __name__ == "__main__":
     sys.exit(main(*sys.argv[1:]))
