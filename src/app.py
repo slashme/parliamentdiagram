@@ -204,6 +204,10 @@ def already_existing_file(request_hash: str) -> str|None:
             return f"svgfiles/{file}"
     return None
 
+@app.route("/2024/template")
+def template_spec():
+    return app.redirect(app.url_for("static", filename="template_spec.txt"))
+
 
 # oauth
 @app.route("/login")
