@@ -47,6 +47,12 @@
             <img class="mt-5 card-img-top" src="{{url_for('static', filename='images/NewZealand_House_Nov_2020.svg')}}" alt="Westminster-style diagram tool" title="Westminster-style diagram tool" width="90%">
             <p class="card-text pt-3">Westminster-style diagram</p>
           </a>
+
+          <a class="card text-center btn" href="{{url_for('templateform')}}">
+            <!-- no mt-5 because this image is not as wide as the others -->
+            <img class="card-img-top" src="{{url_for('static', filename='images/assnat_XVI_june_2024.svg')}}" alt="Template-based diagram tool" title="Template-based diagram tool" width="90%">
+            <p class="card-text pt-3">Template-based diagram</p>
+          </a>
         </div>
 
         {% block content %}{% endblock %}

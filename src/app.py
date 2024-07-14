@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import os
 import tomllib
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import unquote_plus
 
 from flask import Flask, abort, render_template, request, session
@@ -13,6 +13,7 @@ from requests import get as requests_get, post as requests_post
 from requests_oauthlib import OAuth1
 
 from westminster import treat_inputlist as westminster_treat_inputlist
+from template import main as template_main, SeatData as TemplateSeatData
 
 app = Flask(__name__)
 
@@ -65,6 +66,10 @@ def usinputform():
 @app.route("/westminsterinputform")
 def westminsterinputform():
     return render_template("westminsterinputform.html")
+
+@app.route("/templateform")
+def templateform():
+    return render_template("templateform.html")
 
 
 # direct requests
@@ -132,6 +137,42 @@ def westminster_generation():
 
     return app.url_for("static", filename=filename)
 
+@app.post("/template")
+@app.post("/template.py")
+def template_generation():
+    nowstrftime, request_hash, inputdata = common_handling("tlog")
+
+    filename = already_existing_file(request_hash)
+    if filename is not None:
+        app.logger.info("File already exists")
+        os.utime("static/"+filename)
+    else:
+        filename = f"svgfiles/{nowstrftime}-{request_hash}.svg"
+
+        if inputdata.pop("demo", False):
+            filling = True
+        else:
+            # expect the same SeatData format as parliamentarch
+            # data, color, border_size, border_color
+            # convert it to svg properties
+            # title, fill, stroke-width, stroke
+            # also manage the seat numbers, from nb_seats to dict value
+            filling: dict[TemplateSeatData, int]|Literal[True] = {}
+            for party in inputdata.pop("partylist"):
+                nb_seats = party.pop("nb_seats", 1)
+                party["title"] = party.pop("name", None)
+                party["desc"] = party.pop("data", None)
+                party["fill"] = party.pop("color")
+                party["stroke-width"] = party.pop("border_size", 0)
+                party["stroke"] = party.pop("border_color", "black")
+                filling[TemplateSeatData(**party)] = nb_seats
+
+        template_main("static/svg_templates/"+inputdata.pop("template_id")+"_template.svg", "static/"+filename,
+            filling=filling, toggles=dict.fromkeys(inputdata.pop("togglables", ()), False),
+        )
+
+    return app.url_for("static", filename=filename)
+
 def common_handling(logfn: str):
     # data
     data = request.form["data"]
@@ -162,6 +203,10 @@ def already_existing_file(request_hash: str) -> str|None:
         if request_hash in file:
             return f"svgfiles/{file}"
     return None
+
+@app.route("/2024/template")
+def template_spec():
+    return app.redirect(app.url_for("static", filename="template_spec.txt"))
 
 
 # oauth
