@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    $('#diagrammaker').click(function () {
+        CallDiagramScript();
+    });
+
     // Enable/disable advanced parameters
     const enable_advanced_btn = $('#enable-advanced');
     const disable_advanced_btn = $('#disable-advanced');

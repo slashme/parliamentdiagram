@@ -2,6 +2,14 @@ $(document).ready(function () {
     jscolor.installByClassName("jscolor");
     addParty(newcolor = "#AD1FFF");
 
+    $('#addparty').click(function () {
+        addParty();
+    });
+
+    $('#diagrammaker').click(function () {
+        CallDiagramScript();
+    });
+
     $(".sortableContainer").each(function (index, liz) {
         const jliz = $(liz);
         jliz.sortable({

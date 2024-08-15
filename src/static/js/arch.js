@@ -37,6 +37,10 @@ $(document).ready(function () {
         addParty();
     });
 
+    $('#diagrammaker').click(function () {
+        CallDiagramScript();
+    });
+
     // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
     const wikitextregexp = /{{\s*legend\s*(?:\||｜)\s*([^|｜]*)(?:\||｜)\s*([^:：]*)(?::|：)\s*(\d+)[^}]*}}/g;
     $('#getfile').click(function () {
