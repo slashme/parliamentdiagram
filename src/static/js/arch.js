@@ -209,7 +209,9 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     const delbutton = document.createElement('button');
     delbutton.className = 'btn btn-danger';
     delbutton.innerHTML = "Delete party " + i;
-    delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
+    $(delbutton).click(function () {
+        deleteParty(i);
+    });
     newpartydiv.appendChild(delbutton);
     // Add a newline
     newpartydiv.appendChild(document.createElement("br"));
@@ -370,7 +372,9 @@ function CallDiagramScript() {
             if (oauth_enabled) {
                 const uploadlinkbutton = document.createElement('a');
                 uploadlinkbutton.className = 'btn btn-primary';
-                uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
+                $(uploadlinkbutton).click(function () {
+                    makeUploadLink(data, legendstring);
+                });
                 uploadlinkbutton.append("Generate upload link");
                 postcontainer.appendChild(uploadlinkbutton);
                 // and a linebreak
@@ -477,7 +481,9 @@ function makeUploadLink(linkdata, legendtext) {
         const uploadbutton = document.createElement('button');
         uploadbutton.id = "uploadbutton";
         uploadbutton.className = 'btn btn-primary';
-        uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '", ignore=false)');
+        $(uploadbutton).click(function () {
+            postToUpload(fname, linkdata, legendtext);
+        });
         uploadbutton.append("Click to upload " + fname + " to Wikimedia Commons");
 
         buttonlocation.innerHTML = "";
@@ -490,7 +496,9 @@ function makeUploadLink(linkdata, legendtext) {
         loginbutton.setAttribute("target", "_blank");
         loginbutton.append("Login to Wikimedia Commons");
         // TODO: if possible the callback should redirect to a page that closes the tab
-        loginbutton.setAttribute("onClick", 'document.getElementById("uploadloginbutton").remove();');
+        $(loginbutton).click(function () {
+            document.getElementById("uploadloginbutton").remove();
+        });
 
         buttonlocation.innerHTML = "";
         buttonlocation.append(loginbutton);
@@ -640,8 +648,9 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
 
         if (retry_ignore && !force_removebutton) {
             uploadbutton.disabled = false;
-            const onClick = uploadbutton.getAttribute("onClick");
-            uploadbutton.setAttribute("onClick", onClick.replace("ignore=false", "ignore=true"));
+            $(uploadbutton).click(function () {
+                postToUpload(fname, linkdata, legendtext, true);
+            });
         } else {
             uploadbutton.remove();
         }

@@ -111,7 +111,9 @@ function addParty(newcolor = "") {
     const delbutton = document.createElement('button');
     delbutton.className = 'btn btn-danger';
     delbutton.innerHTML = `Delete party ${i}`;
-    delbutton.setAttribute("onClick", `deleteParty(${i})`);
+    $(delbutton).click(function () {
+        deleteParty(i);
+    });
     newpartydiv.appendChild(delbutton);
     // Add a newline
     newpartydiv.appendChild(document.createElement("br"));
