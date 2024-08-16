@@ -1,3 +1,8 @@
+"use strict";
+
+import * as parliamentarch from "parliamentarch";
+import { fillingStrategy } from "parliamentarch/geometry.js";
+
 $(document).ready(function () {
     $('#diagrammaker').click(function () {
         CallDiagramScript();
@@ -20,74 +25,39 @@ $(document).ready(function () {
 })
 
 function CallDiagramScript() {
-    // This is what we send to the python script
-    const requestJSON = {
-        // Retrieve advanced parameters
-        denser_rows: $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked'),
-        parties: [
-            {
-                name: "Democrats",
-                nb_seats: Math.max(0, parseInt($("#demNumber").val())),
-                color: "#0000FF",
-                border_size: 0,
-                border_color: "#000000",
-            },
-            {
-                name: "Republicans",
-                nb_seats: Math.max(0, parseInt($("#repNumber").val())),
-                color: "#FF0000",
-                border_size: 0,
-                border_color: "#000000",
-            },
-            {
-                name: "Independents",
-                nb_seats: Math.max(0, parseInt($("#indNumber").val())),
-                color: "#C9C9C9",
-                border_size: 0,
-                border_color: "#000000",
-            },
-            {
-                name: "Vacant",
-                nb_seats: Math.max(0, parseInt($("#vacNumber").val())),
-                color: "#6B6B6B",
-                border_size: 0,
-                border_color: "#000000",
-            },
-        ],
-    };
+    const attrib = new Map([
+        [new parliamentarch.SeatData("Democrats", "#0000FF", 0, "#000000"), Math.max(0, parseInt($("#demNumber").val()))],
+        [new parliamentarch.SeatData("Republicans", "#FF0000", 0, "#000000"), Math.max(0, parseInt($("#repNumber").val()))],
+        [new parliamentarch.SeatData("Independents", "#C9C9C9", 0, "#000000"), Math.max(0, parseInt($("#indNumber").val()))],
+        [new parliamentarch.SeatData("Vacant", "#6B6B6B", 0, "#000000"), Math.max(0, parseInt($("#vacNumber").val()))],
+    ]);
+    const strategy = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked') ?
+        fillingStrategy.EMPTY_INNER :
+        fillingStrategy.DEFAULT;
 
-    console.log(requestJSON);
+    const svg = parliamentarch.get_svg_from_attribution(attrib, .8, {"filling_strategy": strategy});
 
-    //Now post the request to the script which actually makes the diagram.
-    $.ajax({
-        type: "POST",
-        url: "newarch.py",
-        data: { data: JSON.stringify(requestJSON) },
-    }).done(function (data, status) {
-        data = data.trim();
+    // Show the default-hidden div
+    $("#togglablepost").show();
 
-        // Show the default-hidden div
-        $("#togglablepost").show();
+    // This will get the first node with id "postcontainer"
+    const postcontainer = document.getElementById("postcontainer");
 
-        // This will get the first node with id "postcontainer"
-        const postcontainer = document.getElementById("postcontainer");
+    const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
 
-        const newdiag = postcontainer.insertBefore(document.createElement('p'), postcontainer.firstChild);
+    newdiag.appendChild(svg);
+    // and a linebreak
+    newdiag.appendChild(document.createElement("br"));
 
-        // Now add the svg image to the page
-        const img = document.createElement("img");
-        img.src = data;
-        newdiag.appendChild(img);
-        // and a linebreak
-        newdiag.appendChild(document.createElement("br"));
+    const blob = new Blob([svg.outerHTML], {type: "image/svg+xml"});
+    const url = URL.createObjectURL(blob);
 
-        // Add a link with the new diagram
-        const a = document.createElement('a');
-        a.className = "btn btn-success";
-        a.appendChild(document.createTextNode("Click to download your SVG diagram."));
-        a.title = "SVG diagram";
-        a.href = data;
-        a.download = data;
-        newdiag.appendChild(a);
-    });
+    // Add a link with the new diagram
+    const a = document.createElement('a');
+    a.className = "btn btn-success";
+    a.append("Click to download your SVG diagram.");
+    a.title = "SVG diagram";
+    a.href = url;
+    a.download = "diagram.svg";
+    newdiag.appendChild(a);
 }

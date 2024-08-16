@@ -3,7 +3,15 @@
 {% block title %}US-style parliament diagram generator{% endblock %}
 
 {% block otherimports %}
-<script type="text/javascript" src="{{url_for('static', filename='js/us.js')}}"></script>
+<script type="importmap">
+  {
+      "imports": {
+          "parliamentarch": "{{url_for('static', filename='js/parliamentarch.js')}}",
+          "parliamentarch/": "{{url_for('static', filename='js/parliamentarch/')}}"
+      }
+  }
+</script>
+<script type="module" src="{{url_for('static', filename='js/us.js')}}"></script>
 {% endblock %}
 
 {% block content %}

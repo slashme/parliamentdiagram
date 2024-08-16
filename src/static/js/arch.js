@@ -1,3 +1,8 @@
+"use strict";
+
+import * as parliamentarch from "parliamentarch";
+import { fillingStrategy } from "parliamentarch/geometry.js";
+
 $(document).ready(function () {
     $.ajax({
         dataType: "json",
@@ -220,7 +225,90 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     jscolor.installByClassName("jscolor");
 }
 
+let url = null;
+
+// This one is local and doesn't support Wikimedia upload
 function CallDiagramScript() {
+    // Create legend string: this is a Wikipedia markup legend that can be pasted into an article.
+    let legendstring = "";
+    let totalseats = 0; //count total seats to check for empty diagram
+    const attrib = new Map();
+    $(".partycard").each(function () {
+        const jme = $(this);
+        let bwidth = parseFloat(jme.find("input[name^='Border']").val());
+        if (isNaN(bwidth)) { bwidth = 0 };
+        bwidth = Math.min(Math.max(bwidth, 0), 1);
+        const name = jme.find("input[name^='Name']").val();
+        const nb_seats = parseInt(jme.find("input[name^='Number']").val());
+        const color = '#' + jme.find("input[name^='Color']").val()
+        attrib.set(
+            new parliamentarch.SeatData(name.replace(',', ''), color, bwidth, '#' + jme.find("input[name^='BColor']").val()),
+            nb_seats,
+        );
+
+        totalseats += nb_seats;
+
+        legendstring += `{{legend|${color}|${name}: ${nb_seats} seat`;
+        if (nb_seats != 1) {
+            legendstring += "s";
+        }
+        legendstring += "}} ";
+    });
+    const strategy = $('#advanced-body').is(':visible') && $('#row-densifier').is(':checked') ?
+        fillingStrategy.EMPTY_INNER :
+        fillingStrategy.DEFAULT;
+
+    if (totalseats > 0) {
+        const svg = parliamentarch.get_svg_from_attribution(attrib, .8, {"filling_strategy": strategy});
+
+        // Show the default-hidden div
+        $("#togglablepost").show();
+
+        // This will get the first node with id "postcontainer"
+        const postcontainer = document.getElementById("postcontainer");
+        // Remove old images
+        while (postcontainer.hasChildNodes()) {
+            postcontainer.removeChild(postcontainer.lastChild);
+        }
+
+        // This will get the first node with id "postcontainerbutton"
+        const postcontainerbutton = document.getElementById("postcontainerbutton");
+        // Remove stale upload button, if any
+        while (postcontainerbutton.hasChildNodes()) {
+            postcontainerbutton.removeChild(postcontainerbutton.lastChild);
+        }
+
+        // Now add the svg image to the page
+        postcontainer.appendChild(svg);
+        svg.setAttribute("id", "SVGdiagram");
+        // and a linebreak
+        postcontainer.appendChild(document.createElement("br"));
+
+        const blob = new Blob([svg.outerHTML], {type: "image/svg+xml"});
+        if (url)
+            URL.revokeObjectURL(url);
+        url = URL.createObjectURL(blob);
+
+        // Add a link with the new diagram
+        const abtn = document.createElement('a');
+        abtn.className = "btn btn-success";
+        abtn.append("Click to download your SVG diagram.");
+        abtn.title = "SVG diagram";
+        abtn.href = url;
+        abtn.download = "diagram.svg";
+        postcontainer.appendChild(abtn);
+        // and a horizontal line
+        postcontainer.appendChild(document.createElement("hr"));
+
+        // Now add the legend template text with the party names, colours and support.
+        postcontainer.appendChild(document.createElement('h4'))
+            .append("Legend template for use in Wikipedia:");
+        postcontainer.append(legendstring);
+    }
+}
+
+// This one makes a POST call and enables uploading to Wikimedia
+function oldCallDiagramScript() {
     // This is what we send to the python script
     const requestJSON = {
         // Retrieve advanced parameters

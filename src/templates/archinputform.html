@@ -11,8 +11,16 @@
   {% endif %}
   let username = "{{ session.get('username', '') }}";
 </script>
+<script type="importmap">
+  {
+      "imports": {
+          "parliamentarch": "{{url_for('static', filename='js/parliamentarch.js')}}",
+          "parliamentarch/": "{{url_for('static', filename='js/parliamentarch/')}}"
+      }
+  }
+</script>
 <script type="text/javascript" src="{{url_for('static', filename='js/main.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/arch.js')}}"></script>
+<script type="module" src="{{url_for('static', filename='js/arch.js')}}"></script>
 {% endblock %}
 
 {% block content %}
