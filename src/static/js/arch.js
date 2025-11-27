@@ -517,7 +517,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
         data: {
             uri: linkdata,
             filename: fname,
-            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
+            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-wpdc}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
             ignorewarnings: ignore,
         },
     }).done(function (data) {
