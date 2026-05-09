@@ -42,6 +42,65 @@ function addParty(newcolor = "") {
     const newpartydiv = partycard.appendChild(document.createElement('div'));
     newpartydiv.className = "card-body";
 
+    let input;
+    // Party name input control
+    input = document.createElement('div');
+    input.innerHTML = `<input type="text" name="Name${i}" value="Party ${i}">`;
+    
+    // Party name label
+    const partytitle = document.createElement('div');
+    partytitle.innerHTML = "Party " + i + " name";
+    input.insertAdjacentElement("afterbegin", partytitle);
+    newpartydiv.appendChild(input);
+
+    // Party support input control
+    input = document.createElement('div');
+    input.innerHTML = `<input type="number" name="Number${i}" value="${i}">`;
+    
+    // Party support name tag
+    const partysupport = document.createElement('div');
+    partysupport.innerHTML = `Party ${i} delegates`;
+    input.insertAdjacentElement("afterbegin", partysupport);
+    newpartydiv.appendChild(input);
+
+    // Party group input control
+    input = document.createElement('div');
+    input.innerHTML = `<select name="Group${i}">
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="center">Cross-bench</option>
+        <option value="head">Speaker</option>
+    </select>`;
+
+    // Party group name tag
+    const partygroup = document.createElement('div');
+    partygroup.innerHTML = `Party ${i} group`;
+    input.insertAdjacentElement("afterbegin", partygroup);
+    newpartydiv.appendChild(input);
+
+    // Party color input control
+    input = document.createElement('div');
+    if (newcolor == "") { newcolor = getRandomColor() }
+    input.innerHTML = `<input class="jscolor" type="text" name="Color${i}" value="${newcolor}">`;
+
+    // Party color name tag
+    const partycolor = document.createElement('div');
+    partycolor.innerHTML = `Party ${i} color`;
+    input.insertAdjacentElement("afterbegin", partycolor);
+    newpartydiv.appendChild(input);
+
+    // Delete button
+    const delbutton = document.createElement('button');
+    delbutton.className = 'btn btn-danger';
+    Object.assign(delbutton.style, {
+      "max-width": "150px",
+    });
+    delbutton.innerHTML = `Delete party ${i}`;
+    $(delbutton).click(function () {
+        deleteParty(i);
+    });
+    newpartydiv.appendChild(delbutton);
+
     // Ordering handle
     const mover = newpartydiv.appendChild(document.createElement('span'));
     mover.className = 'handle btn btn-secondary';
@@ -49,74 +108,8 @@ function addParty(newcolor = "") {
     Object.assign(mover.style, {
         cursor: "move",
         "font-size": "30px",
-        position: 'absolute',
-        right: '20px',
-        top: '50%',
-        transform: 'translateY(-50%)', // yalign .5
-        padding: '0 10px',
     });
 
-    // Party name label
-    const partytitle = document.createElement('div');
-    partytitle.className = 'left';
-    partytitle.innerHTML = "Party " + i + " name";
-    newpartydiv.appendChild(partytitle);
-
-    let input;
-    // Party name input control
-    input = document.createElement('div');
-    input.innerHTML = `<input class="right" type="text" name="Name${i}" value="Party ${i}">`;
-    newpartydiv.appendChild(input);
-
-    // Party support name tag
-    const partysupport = document.createElement('div');
-    partysupport.className = 'left';
-    partysupport.innerHTML = `Party ${i} delegates`;
-    newpartydiv.appendChild(partysupport);
-
-    // Party support input control
-    input = document.createElement('div');
-    input.innerHTML = `<input class="right" type="number" name="Number${i}" value="${i}">`;
-    newpartydiv.appendChild(input);
-
-    // Party group name tag
-    const partygroup = document.createElement('div');
-    partygroup.className = 'left';
-    partygroup.innerHTML = `Party ${i} group`;
-    newpartydiv.appendChild(partygroup);
-
-    // Party group input control
-    input = document.createElement('div');
-    input.innerHTML = `<select class="right" name="Group${i}">
-        <option value="left">Left</option>
-        <option value="right">Right</option>
-        <option value="center">Cross-bench</option>
-        <option value="head">Speaker</option>
-    </select>`;
-    newpartydiv.appendChild(input);
-
-    // Party color name tag
-    const partycolor = document.createElement('div');
-    partycolor.className = 'left';
-    partycolor.innerHTML = `Party ${i} color`;
-    newpartydiv.appendChild(partycolor);
-
-    // Party color input control
-    input = document.createElement('div');
-    if (newcolor == "") { newcolor = getRandomColor() }
-    input.innerHTML = `<input class="right jscolor" type="text" name="Color${i}" value="${newcolor}">`;
-    newpartydiv.appendChild(input);
-
-    // Delete button
-    const delbutton = document.createElement('button');
-    delbutton.className = 'btn btn-danger';
-    delbutton.innerHTML = `Delete party ${i}`;
-    $(delbutton).click(function () {
-        deleteParty(i);
-    });
-    newpartydiv.appendChild(delbutton);
-    // Add a newline
-    newpartydiv.appendChild(document.createElement("br"));
     jscolor.installByClassName("jscolor");
 }
 
