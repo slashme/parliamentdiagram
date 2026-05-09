@@ -115,6 +115,24 @@ color: #D8000C;
   box-shadow: rgba(12, 12, 13, 0.1) 0px 1px 4px 0px;
 }
 
+.partycard .card-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 1200px) {
+    .partycard .card-body {
+        display: grid;
+        gap: 10px;
+        margin: 0 auto;
+    }
+    .partycard .card-body > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 75px;
+    }
+}
+
 .footer {
   padding-top: 40px;
   padding-bottom: 40px;
