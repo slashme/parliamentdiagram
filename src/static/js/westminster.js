@@ -46,20 +46,20 @@ function addParty(newcolor = "") {
     // Party name input control
     input = document.createElement('div');
     input.innerHTML = `<input type="text" name="Name${i}" value="Party ${i}">`;
-    
+
     // Party name label
     const partytitle = document.createElement('div');
-    partytitle.innerHTML = "Party " + i + " name";
+    partytitle.innerHTML = "Party name";
     input.insertAdjacentElement("afterbegin", partytitle);
     newpartydiv.appendChild(input);
 
     // Party support input control
     input = document.createElement('div');
     input.innerHTML = `<input type="number" name="Number${i}" value="${i}">`;
-    
+
     // Party support name tag
     const partysupport = document.createElement('div');
-    partysupport.innerHTML = `Party ${i} delegates`;
+    partysupport.innerHTML = "Delegates";
     input.insertAdjacentElement("afterbegin", partysupport);
     newpartydiv.appendChild(input);
 
@@ -74,7 +74,7 @@ function addParty(newcolor = "") {
 
     // Party group name tag
     const partygroup = document.createElement('div');
-    partygroup.innerHTML = `Party ${i} group`;
+    partygroup.innerHTML = "Group";
     input.insertAdjacentElement("afterbegin", partygroup);
     newpartydiv.appendChild(input);
 
@@ -85,7 +85,7 @@ function addParty(newcolor = "") {
 
     // Party color name tag
     const partycolor = document.createElement('div');
-    partycolor.innerHTML = `Party ${i} color`;
+    partycolor.innerHTML = "Color";
     input.insertAdjacentElement("afterbegin", partycolor);
     newpartydiv.appendChild(input);
 
@@ -95,7 +95,7 @@ function addParty(newcolor = "") {
     Object.assign(delbutton.style, {
       "max-width": "150px",
     });
-    delbutton.innerHTML = `Delete party ${i}`;
+    delbutton.innerHTML = "Delete party";
     $(delbutton).click(function () {
         deleteParty(i);
     });

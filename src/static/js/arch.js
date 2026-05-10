@@ -142,7 +142,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     // Party name label
     const partytitle = document.createElement('div');
     if (newname == "") { newname = "Party " + i }
-    partytitle.innerHTML = "Party " + i + " Name";
+    partytitle.innerHTML = "Party name";
     input.insertAdjacentElement("afterbegin", partytitle);
     newpartydiv.appendChild(input);
 
@@ -152,7 +152,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // Party support name tag
     const partysupport = document.createElement('div');
-    partysupport.innerHTML = "Party " + i + " delegates";
+    partysupport.innerHTML = "Delegates";
     input.insertAdjacentElement("afterbegin", partysupport);
     newpartydiv.appendChild(input);
 
@@ -163,7 +163,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // Party color name tag
     const partycolor = document.createElement('div');
-    partycolor.innerHTML = "Party " + i + " color";
+    partycolor.innerHTML = "Color";
     input.insertAdjacentElement("afterbegin", partycolor);
     newpartydiv.appendChild(input);
 
@@ -173,7 +173,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // Party border width name tag
     const partybwidth = document.createElement('div');
-    partybwidth.innerHTML = "Party " + i + " border width";
+    partybwidth.innerHTML = "Border width";
     input.insertAdjacentElement("afterbegin", partybwidth);
     newpartydiv.appendChild(input);
 
@@ -183,7 +183,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
 
     // Party border color name tag
     const partybcolor = document.createElement('div');
-    partybcolor.innerHTML = "Party " + i + " border color";
+    partybcolor.innerHTML = "Border color";
     input.insertAdjacentElement("afterbegin", partybcolor);
     newpartydiv.appendChild(input);
 
@@ -192,12 +192,12 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     Object.assign(delbutton.style, {
       "max-width": "150px",
     });
-    delbutton.innerHTML = "Delete party " + i;
+    delbutton.innerHTML = "Delete party";
     $(delbutton).click(function () {
         deleteParty(i);
     });
     newpartydiv.appendChild(delbutton);
-    
+
     // Ordering handle
     const mover = newpartydiv.appendChild(document.createElement('span'));
     mover.className = 'handle btn btn-secondary';
