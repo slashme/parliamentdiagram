@@ -119,8 +119,14 @@ color: #D8000C;
     display: flex;
     justify-content: space-between;
 }
+.partycard .card-body input[name^="Name"] {
+    width: 30ch;
+}
+.partycard .card-body input {
+    width: 10ch;
+}
 
-@media (max-width: 1400px) {
+@media (max-width: 1200px) {
     .partycard .card-body {
         display: grid;
         gap: 10px;
