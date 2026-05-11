@@ -120,7 +120,7 @@ color: #D8000C;
     justify-content: space-between;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .partycard .card-body {
         display: grid;
         gap: 10px;
@@ -130,6 +130,19 @@ color: #D8000C;
         display: flex;
         justify-content: space-between;
         gap: 75px;
+    }
+    .partycard .card-body .handle {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+@media (max-width: 770px) {
+    .partycard .card-body > div {
+        gap: 10px;
+        margin-right: 60px;
     }
 }
 
