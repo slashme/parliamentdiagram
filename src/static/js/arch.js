@@ -37,6 +37,10 @@ $(document).ready(function () {
         addParty();
     });
 
+    $('#diagrammaker').click(function () {
+        CallDiagramScript();
+    });
+
     // searching for /seats?/ at the end does not work for other languages, for example french uses "sièges"
     const wikitextregexp = /{{\s*legend\s*(?:\||｜)\s*([^|｜]*)(?:\||｜)\s*([^:：]*)(?::|：)\s*(\d+)[^}]*}}/g;
     $('#getfile').click(function () {
@@ -131,6 +135,69 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     newpartydiv.className = 'card-body';
     partycard.appendChild(newpartydiv);
 
+    // Party name input control
+    let input = document.createElement('div');
+    input.innerHTML = '<input type="text" name="Name' + i + '" value="' + newname + '">'
+
+    // Party name label
+    const partytitle = document.createElement('div');
+    if (newname == "") { newname = "Party " + i }
+    partytitle.innerHTML = "Party name";
+    input.insertAdjacentElement("afterbegin", partytitle);
+    newpartydiv.appendChild(input);
+
+    // Party support input control
+    input = document.createElement('div');
+    input.innerHTML = '<input type="number" name="Number' + i + '" value= "' + newnseats + '" >';
+
+    // Party support name tag
+    const partysupport = document.createElement('div');
+    partysupport.innerHTML = "Delegates";
+    input.insertAdjacentElement("afterbegin", partysupport);
+    newpartydiv.appendChild(input);
+
+    // Party color input control
+    input = document.createElement('div');
+    if (newcolor == "") { newcolor = getRandomColor() }
+    input.innerHTML = '<input class="jscolor" type="text" name="Color' + i + '" value= "' + newcolor + '" >'
+
+    // Party color name tag
+    const partycolor = document.createElement('div');
+    partycolor.innerHTML = "Color";
+    input.insertAdjacentElement("afterbegin", partycolor);
+    newpartydiv.appendChild(input);
+
+    // Party border width control
+    input = document.createElement('div');
+    input.innerHTML = '<input type="number" name="Border' + i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
+
+    // Party border width name tag
+    const partybwidth = document.createElement('div');
+    partybwidth.innerHTML = "Border width";
+    input.insertAdjacentElement("afterbegin", partybwidth);
+    newpartydiv.appendChild(input);
+
+    // Party border color input control
+    input = document.createElement('div');
+    input.innerHTML = '<input class="jscolor" type="text" name="BColor' + i + '" value= "000000" >'
+
+    // Party border color name tag
+    const partybcolor = document.createElement('div');
+    partybcolor.innerHTML = "Border color";
+    input.insertAdjacentElement("afterbegin", partybcolor);
+    newpartydiv.appendChild(input);
+
+    const delbutton = document.createElement('button');
+    delbutton.className = 'btn btn-danger';
+    Object.assign(delbutton.style, {
+      "max-width": "150px",
+    });
+    delbutton.innerHTML = "Delete party";
+    $(delbutton).click(function () {
+        deleteParty(i);
+    });
+    newpartydiv.appendChild(delbutton);
+
     // Ordering handle
     const mover = newpartydiv.appendChild(document.createElement('span'));
     mover.className = 'handle btn btn-secondary';
@@ -138,77 +205,7 @@ function addParty(newname = "", newcolor = "", newnseats = 0) {
     Object.assign(mover.style, {
         cursor: 'move',
         "font-size": '30px',
-        position: 'absolute',
-        right: '20px',
-        top: '50%',
-        transform: 'translateY(-50%)', // yalign .5
-        padding: '0 10px',
     });
-
-    // Party name label
-    const partytitle = document.createElement('div');
-    partytitle.className = 'left';
-    if (newname == "") { newname = "Party " + i }
-    partytitle.innerHTML = "Party " + i + " Name";
-    newpartydiv.appendChild(partytitle);
-
-    // Party name input control
-    let input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="text" name="Name' + i + '" value="' + newname + '">'
-    newpartydiv.appendChild(input);
-
-    // Party support name tag
-    const partysupport = document.createElement('div');
-    partysupport.className = 'left';
-    partysupport.innerHTML = "Party " + i + " delegates";
-    newpartydiv.appendChild(partysupport);
-
-    // Party support input control
-    input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="number" name="Number' + i + '" value= "' + newnseats + '" >';
-    newpartydiv.appendChild(input);
-
-    // Party color name tag
-    const partycolor = document.createElement('div');
-    partycolor.className = 'left';
-    partycolor.innerHTML = "Party " + i + " color";
-    newpartydiv.appendChild(partycolor);
-
-    // Party color input control
-    input = document.createElement('div');
-    if (newcolor == "") { newcolor = getRandomColor() }
-    input.innerHTML = '<input class="right jscolor" type="text" name="Color' + i + '" value= "' + newcolor + '" >'
-    newpartydiv.appendChild(input);
-
-    // Party border width name tag
-    const partybwidth = document.createElement('div');
-    partybwidth.className = 'left';
-    partybwidth.innerHTML = "Party " + i + " border width";
-    newpartydiv.appendChild(partybwidth);
-
-    // Party border width control
-    input = document.createElement('div');
-    input.innerHTML = '<input class="right" type="number" name="Border' + i + '" type="number" step="0.01" min="0.0" max="1.0" value="0.00">'
-    newpartydiv.appendChild(input);
-
-    // Party border color name tag
-    const partybcolor = document.createElement('div');
-    partybcolor.className = 'left';
-    partybcolor.innerHTML = "Party " + i + " border color";
-    newpartydiv.appendChild(partybcolor);
-
-    // Party border color input control
-    input = document.createElement('div');
-    input.innerHTML = '<input class="right jscolor" type="text" name="BColor' + i + '" value= "000000" >'
-    newpartydiv.appendChild(input);
-
-    const delbutton = document.createElement('button');
-    delbutton.className = 'btn btn-danger';
-    delbutton.innerHTML = "Delete party " + i;
-    delbutton.setAttribute("onClick", "deleteParty(" + i + ")");
-    newpartydiv.appendChild(delbutton);
-    // Add a newline
-    newpartydiv.appendChild(document.createElement("br"));
 
     //$( "input[name=Color" + i + "]").addClass('color'); /* no longer needed because I'm writing the innerHTML
     jscolor.installByClassName("jscolor");
@@ -366,7 +363,9 @@ function CallDiagramScript() {
             if (oauth_enabled) {
                 const uploadlinkbutton = document.createElement('a');
                 uploadlinkbutton.className = 'btn btn-primary';
-                uploadlinkbutton.setAttribute("onClick", 'makeUploadLink("' + data + '", "' + legendstring + '")');
+                $(uploadlinkbutton).click(function () {
+                    makeUploadLink(data, legendstring);
+                });
                 uploadlinkbutton.append("Generate upload link");
                 postcontainer.appendChild(uploadlinkbutton);
                 // and a linebreak
@@ -473,7 +472,9 @@ function makeUploadLink(linkdata, legendtext) {
         const uploadbutton = document.createElement('button');
         uploadbutton.id = "uploadbutton";
         uploadbutton.className = 'btn btn-primary';
-        uploadbutton.setAttribute("onClick", 'postToUpload("' + fname + '", "' + linkdata + '", "' + legendtext + '", ignore=false)');
+        $(uploadbutton).click(function () {
+            postToUpload(fname, linkdata, legendtext);
+        });
         uploadbutton.append("Click to upload " + fname + " to Wikimedia Commons");
 
         buttonlocation.innerHTML = "";
@@ -486,7 +487,9 @@ function makeUploadLink(linkdata, legendtext) {
         loginbutton.setAttribute("target", "_blank");
         loginbutton.append("Login to Wikimedia Commons");
         // TODO: if possible the callback should redirect to a page that closes the tab
-        loginbutton.setAttribute("onClick", 'document.getElementById("uploadloginbutton").remove();');
+        $(loginbutton).click(function () {
+            document.getElementById("uploadloginbutton").remove();
+        });
 
         buttonlocation.innerHTML = "";
         buttonlocation.append(loginbutton);
@@ -505,7 +508,7 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
         data: {
             uri: linkdata,
             filename: fname,
-            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-shape}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
+            pagecontent: encodeURIComponent("== {{int:filedesc}} ==\n{{Information\n|description = " + legendtext + "\n|date = " + today + "\n|source = [https://parliamentdiagram.toolforge.org/archinputform Parliament diagram tool]\n|author = [[User:{{subst:REVISIONUSER}}]]\n|permission = {{PD-wpdc}}\n|other versions =\n}}\n\n[[Category:Election apportionment diagrams]]\n"),
             ignorewarnings: ignore,
         },
     }).done(function (data) {
@@ -636,8 +639,9 @@ function postToUpload(fname, linkdata, legendtext, ignore = false) {
 
         if (retry_ignore && !force_removebutton) {
             uploadbutton.disabled = false;
-            const onClick = uploadbutton.getAttribute("onClick");
-            uploadbutton.setAttribute("onClick", onClick.replace("ignore=false", "ignore=true"));
+            $(uploadbutton).click(function () {
+                postToUpload(fname, linkdata, legendtext, true);
+            });
         } else {
             uploadbutton.remove();
         }
