@@ -35,4 +35,4 @@ CONSUMER_SECRET = "abcd" # the 'secret token' value from the OAuth consumer regi
 
 ## License
 
-This tool is licensed GPL v2, see [LICENSE.md](LICENSE.md).
+This tool is licensed under BSD 3-Clause, see [LICENSE](LICENSE).
