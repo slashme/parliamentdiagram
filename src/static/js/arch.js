@@ -315,14 +315,6 @@ function CallDiagramScript() {
             uploadtocommons.className = "card-body";
             uploadtocommonscontainer.appendChild(uploadtocommons);
 
-            if (!oauth_enabled) {
-                const loginmsg = document.createElement("div");
-                loginmsg.className = "alert alert-warning";
-                loginmsg.role = "alert";
-                loginmsg.innerText = "To use this feature, first connect your account using the link in the header"
-                uploadtocommons.appendChild(loginmsg);
-            }
-
             const uploadform = document.createElement("div");
             uploadform.className = "upload";
             uploadtocommons.appendChild(uploadform);
