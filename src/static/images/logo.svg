@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="360" height="185" version="1.1" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with parliamentarch (https://github.com/Gouvernathor/parliamentarch/) -->
+ <g fill="#ccc">
+  <title>10</title>
+  <circle cx="23.48" cy="162.5" r="14"/>
+  <circle cx="58.76" cy="162.5" r="14"/>
+  <circle cx="94.27" cy="162.5" r="14"/>
+  <circle cx="33.54" cy="122.06" r="14"/>
+  <circle cx="72.51" cy="121.25" r="14"/>
+  <circle cx="53.86" cy="85.68" r="14"/>
+  <circle cx="115.93" cy="120.41" r="14"/>
+  <circle cx="99.8" cy="87.4" r="14"/>
+  <circle cx="83.01" cy="55.9" r="14"/>
+ </g>
+ <g id="1-1-" fill="#999">
+  <title>1-</title>
+  <circle cx="118.95" cy="34.81" r="14"/>
+  <circle cx="137.21" cy="65.22" r="14"/>
+  <circle cx="156.33" cy="95.76" r="14"/>
+  <circle cx="159.16" cy="23.88" r="14"/>
+  <circle cx="180" cy="57.5" r="14"/>
+  <circle cx="200.84" cy="23.88" r="14"/>
+  <circle cx="203.67" cy="95.76" r="14"/>
+  <circle cx="222.79" cy="65.22" r="14"/>
+  <circle cx="241.05" cy="34.81" r="14"/>
+ </g>
+ <g id="2-" fill="#444">
+  <circle cx="276.99" cy="55.9" r="14"/>
+  <circle cx="260.2" cy="87.4" r="14"/>
+  <circle cx="244.07" cy="120.41" r="14"/>
+  <circle cx="306.14" cy="85.68" r="14"/>
+  <circle cx="287.49" cy="121.25" r="14"/>
+  <circle cx="326.46" cy="122.06" r="14"/>
+  <circle cx="265.73" cy="162.5" r="14"/>
+  <circle cx="301.24" cy="162.5" r="14"/>
+  <circle cx="336.52" cy="162.5" r="14"/>
+ </g>
+</svg>

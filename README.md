@@ -24,7 +24,7 @@ To enable the feature of uploading the created diagrams to Wikimedia Commons, yo
 with the right of "editing existing pages", "create, edit and move pages", "upload new files",
 and "upload, replace and rename files". The callback URL should be "http://(domain)/oauth_callback".
 
- The credentials of that consumer then go in "src/oauth_config.toml", using the following pattern.
+The credentials of that consumer then go in "src/oauth_config.toml", using the following pattern.
 
 ```toml
 SECRET_KEY = "abcd" # import secrets; print(secrets.token_urlsafe(48))
@@ -35,4 +35,4 @@ CONSUMER_SECRET = "abcd" # the 'secret token' value from the OAuth consumer regi
 
 ## License
 
-This tool is licensed GPL v2, see [LICENSE.md](LICENSE.md).
+This tool is licensed under BSD 3-Clause, see [LICENSE](LICENSE).

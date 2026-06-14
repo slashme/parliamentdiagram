@@ -157,6 +157,14 @@ color: #D8000C;
     max-width: 700px;
 }
 
+#header, #header a {
+    color: white;
+}
+
+#header h1 {
+    font-size: 1.6rem;
+}
+
 .footer {
   padding-top: 40px;
   padding-bottom: 40px;
