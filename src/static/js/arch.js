@@ -298,78 +298,96 @@ function CallDiagramScript() {
             postcontainer.append(legendstring);
             postcontainer.appendChild(document.createElement("hr"));
 
-            // File upload name label
-            const filenametitle = document.createElement('div');
-            filenametitle.className = 'left greendiv';
-            filenametitle.innerHTML = "Filename to upload:";
-            postcontainer.appendChild(filenametitle);
+            const uploadtocommonscontainer = document.createElement("details");
+            uploadtocommonscontainer.className = "card";
+            if (username) { uploadtocommonscontainer.open = true };
+            postcontainer.appendChild(uploadtocommonscontainer);
 
-            // File upload name input control
-            let input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
-            postcontainer.appendChild(input);
+            const summary = document.createElement("summary");
+            summary.className = "card-header";
+            const uploadheader = document.createElement("b")
+            uploadheader.innerText = "Direct upload to Wikimedia Commons";
+            uploadheader.className = "d-inline-block my-0";
+            summary.appendChild(uploadheader);
+            uploadtocommonscontainer.appendChild(summary);
+
+            const uploadtocommons = document.createElement("div");
+            uploadtocommons.className = "card-body";
+            uploadtocommonscontainer.appendChild(uploadtocommons);
+
+            const uploadform = document.createElement("div");
+            uploadform.className = "upload";
+            uploadtocommons.appendChild(uploadform);
 
             // Year label
             let yeartitle = document.createElement('div');
-            yeartitle.className = 'left greendiv';
             yeartitle.innerHTML = "Election year:";
-            postcontainer.appendChild(yeartitle);
+            uploadform.appendChild(yeartitle);
 
             // Year input control
-            input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="number" name="year" id="year" min="0" max="' + (new Date()).getFullYear() + '" value=' + (new Date()).getFullYear() + ' oninput="updateFilename()" >';
-            postcontainer.appendChild(input);
+            let input = document.createElement('div');
+            input.innerHTML = '<input type="number" name="year" id="year" min="0" max="' + (new Date()).getFullYear() + '" value=' + (new Date()).getFullYear() + ' oninput="updateFilename()" >';
+            uploadform.appendChild(input);
 
             // Country label
             const countrytitle = document.createElement('div');
-            countrytitle.className = 'left greendiv';
             countrytitle.innerHTML = "Country:";
-            postcontainer.appendChild(countrytitle);
+            uploadform.appendChild(countrytitle);
 
             // Country input control
             input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="text" name="country" id="country" value=""  oninput="updateFilename()">';
-            postcontainer.appendChild(input);
+            input.innerHTML = '<input type="text" name="country" id="country" value=""  oninput="updateFilename()">';
+            uploadform.appendChild(input);
 
             // Locality label
             const localitytitle = document.createElement('div');
-            localitytitle.className = 'left greendiv';
             localitytitle.innerHTML = "Locality:";
-            postcontainer.appendChild(localitytitle);
+            uploadform.appendChild(localitytitle);
 
             // Locality input control
             input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
-            postcontainer.appendChild(input);
+            input.innerHTML = '<input type="text" name="locality" id="locality" value=""  oninput="updateFilename()">';
+            uploadform.appendChild(input);
 
             // Body label
             const bodytitle = document.createElement('div');
-            bodytitle.className = 'left greendiv';
             bodytitle.innerHTML = "Body (e.g. Town Council, Bundestag or Senate):";
-            postcontainer.appendChild(bodytitle);
+            uploadform.appendChild(bodytitle);
 
             // Body input control
             input = document.createElement('div');
-            input.innerHTML = '<input class="right" type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
-            postcontainer.appendChild(input);
-            postcontainer.appendChild(document.createElement("br"));
+            input.innerHTML = '<input type="text" name="body" id="body" value="Parliament" oninput="updateFilename()">';
+            uploadform.appendChild(input);
 
-            // Button to add a link to upload the new diagram
-            const uploadwarn = document.createElement('div');
-            uploadwarn.className = 'notice';
-            uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
-            postcontainer.appendChild(uploadwarn);
+            // File upload name label
+            const filenametitle = document.createElement('div');
+            filenametitle.innerHTML = "Filename to upload:";
+            uploadform.appendChild(filenametitle);
+
+            // File upload name input control
+            input = document.createElement('div');
+            input.innerHTML = '<input type="text" name="' + data.replace(/.*\//, '').replace(/.svg\s*$/, '') + '" id="inputFilename" value= "My_Parliament.svg" >';
+            uploadform.appendChild(input);
 
             if (oauth_enabled) {
+                uploadtocommons.appendChild(document.createElement("br"));
+                // Confirmation message
+                const uploadwarn = document.createElement('div');
+                uploadwarn.className = "alert alert-primary";
+                uploadwarn.role = "alert";
+                uploadwarn.innerHTML = "This image is for a real-world body or a notable work of fiction and I want to upload it to Commons.<br />I understand that images uploaded for private use can be deleted without notice and can lead to my username being blocked.";
+                uploadtocommons.appendChild(uploadwarn);
+
+                // Button to add a link to upload the new diagram
                 const uploadlinkbutton = document.createElement('a');
                 uploadlinkbutton.className = 'btn btn-primary';
                 $(uploadlinkbutton).click(function () {
                     makeUploadLink(data, legendstring);
                 });
-                uploadlinkbutton.append("Generate upload link");
-                postcontainer.appendChild(uploadlinkbutton);
+                uploadlinkbutton.append("Generate upload link...");
+                uploadtocommons.appendChild(uploadlinkbutton);
                 // and a linebreak
-                postcontainer.appendChild(document.createElement("br"));
+                uploadtocommons.appendChild(document.createElement("br"));
             }
         }).fail(function (xhr, textStatus, errorThrown) {
             // data doesn't contain "svg", so post an error message instead
