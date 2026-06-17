@@ -300,7 +300,7 @@ function CallDiagramScript() {
 
             const uploadtocommonscontainer = document.createElement("details");
             uploadtocommonscontainer.className = "card";
-            if (oauth_enabled) { uploadtocommonscontainer.open = true };
+            if (username) { uploadtocommonscontainer.open = true };
             postcontainer.appendChild(uploadtocommonscontainer);
 
             const summary = document.createElement("summary");
